@@ -1,0 +1,36 @@
+{
+  "name": "xpressengine-plugin/dynamic_factory",
+  "description": "This Package is Xpressengine Plugin - DynamicFactory plugin.",
+  "keywords": [
+    "xpressengine",
+    "plugin"
+  ],
+  "license": "LGPL-3.0-or-later",
+  "version": "1.0.0",
+  "type": "xpressengine-plugin",
+  "support": {
+    "email": "overcode@amuz.co.kr"
+  },
+  "authors": [
+    {
+      "name": "OVERCODE",
+      "email": "overcode@amuz.co.kr",
+      "homepage": "http://amuz.co.kr",
+      "role": "Developer"
+    }
+  ],
+  "extra": {
+    "xpressengine": {
+      "title": "다이나믹 팩토리",
+      "component": {}
+    }
+  },
+  "require": {
+    "xpressengine/xpressengine": "~3.0.12"
+  },
+  "autoload": {
+    "psr-4": {
+      "Overcode\\XePlugin\\DynamicFactory\\": "src/"
+    }
+  }
+}
