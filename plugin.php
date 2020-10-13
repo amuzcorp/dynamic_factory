@@ -3,6 +3,7 @@ namespace Overcode\XePlugin\DynamicFactory;
 
 use Route;
 use Xpressengine\Plugin\AbstractPlugin;
+use XeRegister;
 
 class Plugin extends AbstractPlugin
 {
@@ -16,6 +17,40 @@ class Plugin extends AbstractPlugin
         // implement code
 
         $this->route();
+        $this->registerSettingsMenus();
+        $this->registerSettingsRoute();
+    }
+
+    protected function registerSitesPermissions()
+    {
+
+    }
+
+    protected function registerSettingsMenus()
+    {
+        \XeRegister::push('settings/menu', 'dynamic', [
+            'title' => 'Dynamic Factory',
+            'description' => 'CPT를 생성하고 관리합니다.',
+            'display' => true,
+            'ordering' => 5000
+        ]);
+        \XeRegister::push('settings/menu', 'dynamic.index', [
+            'title' => 'DF 관리',
+            'description' => '생성된 CPT를 열람합니다.',
+            'display' => true,
+            'ordering' => 1000
+        ]);
+    }
+
+    protected function registerSettingsRoute()
+    {
+        Route::settings(static::getId(), function() {
+            Route::get('/', [
+                'as' => 'settings.dynamic_factory.index',
+                'uses' => 'DynamicFactoryController@index',
+                'settings_menu' => 'dynamic.index'
+            ]);
+        },['namespace' => 'Overcode\XePlugin\DynamicFactory\Controllers']);
     }
 
     protected function route()
@@ -26,7 +61,7 @@ class Plugin extends AbstractPlugin
             $this->getId(),
             function () {
                 Route::get('/', [
-                    'as' => 'dynamic_factory::index','uses' => 'Overcode\XePlugin\DynamicFactory\Controller@index'
+                    'as' => 'dynamic_factory::index','uses' => 'Overcode\XePlugin\DynamicFactory\Controllers\Controller@index'
                 ]);
             }
         );
@@ -52,7 +87,10 @@ class Plugin extends AbstractPlugin
      */
     public function install()
     {
-        // implement code
+        $migration = new Migrations();
+        if ($migration->checkInstalled() === false) {
+            $migration->install();
+        }
     }
 
     /**
@@ -63,9 +101,12 @@ class Plugin extends AbstractPlugin
      */
     public function checkInstalled()
     {
-        // implement code
+        $migration = new Migrations();
+        if ($migration->checkInstalled() === false) {
+            return false;
+        }
 
-        return parent::checkInstalled();
+        return true;
     }
 
     /**
@@ -75,7 +116,10 @@ class Plugin extends AbstractPlugin
      */
     public function update()
     {
-        // implement code
+        $migration = new Migrations();
+        if ($migration->checkInstalled() === false) {
+            $migration->install();
+        }
     }
 
     /**
@@ -86,8 +130,11 @@ class Plugin extends AbstractPlugin
      */
     public function checkUpdated()
     {
-        // implement code
+        $migration = new Migrations();
+        if ($migration->checkInstalled() === false) {
+            return false;
+        }
 
-        return parent::checkUpdated();
+        return true;
     }
 }
