@@ -28,13 +28,13 @@ class Plugin extends AbstractPlugin
 
     protected function registerSettingsMenus()
     {
-        \XeRegister::push('settings/menu', 'dynamic', [
+        \XeRegister::push('settings/menu', 'dynamic_factory', [
             'title' => 'Dynamic Factory',
             'description' => 'CPT를 생성하고 관리합니다.',
             'display' => true,
             'ordering' => 5000
         ]);
-        \XeRegister::push('settings/menu', 'dynamic.index', [
+        \XeRegister::push('settings/menu', 'dynamic_factory.index', [
             'title' => 'DF 관리',
             'description' => '생성된 CPT를 열람합니다.',
             'display' => true,
@@ -45,12 +45,19 @@ class Plugin extends AbstractPlugin
     protected function registerSettingsRoute()
     {
         Route::settings(static::getId(), function() {
-            Route::get('/', [
-                'as' => 'settings.dynamic_factory.index',
-                'uses' => 'DynamicFactoryController@index',
-                'settings_menu' => 'dynamic.index'
-            ]);
-        },['namespace' => 'Overcode\XePlugin\DynamicFactory\Controllers']);
+            Route::group([
+                'namespace' => 'Overcode\XePlugin\DynamicFactory\Controllers',
+                'as' => 'd_fac.setting.'
+            ], function(){
+                Route::get('/', [
+                    'as' => 'index',
+                    'uses' => 'DynamicFactoryController@index',
+                    'settings_menu' => 'dynamic_factory.index'
+                ]);
+                Route::get('/create', [ 'as' => 'create', 'uses' => 'DynamicFactoryController@create' ]);
+                Route::post('/store_cpt', ['as' => 'store_cpt', 'uses' => 'DynamicFactoryController@storeCpt']);
+            });
+        });
     }
 
     protected function route()

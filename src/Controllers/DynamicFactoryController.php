@@ -5,6 +5,7 @@ use XeFrontend;
 use XePresenter;
 use XeLang;
 use Plugin;
+use Xpressengine\Http\Request;
 //use Overcode\XePlugin\DynamicFactory\Models\??;
 use App\Http\Controllers\Controller as BaseController;
 
@@ -27,5 +28,15 @@ class DynamicFactoryController extends BaseController
         return XePresenter::make('dynamic_factory::views.settings.index', [
             'title' => $title
         ]);
+    }
+
+    public function create()
+    {
+        return XePresenter::make('dynamic_factory::views.settings.create');
+    }
+
+    public function storeCpt(Request $request)
+    {
+        return redirect()->back();
     }
 }
