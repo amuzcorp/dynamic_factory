@@ -7,6 +7,8 @@ use XeRegister;
 
 class Plugin extends AbstractPlugin
 {
+
+    protected $test_arr;
     /**
      * 이 메소드는 활성화(activate) 된 플러그인이 부트될 때 항상 실행됩니다.
      *
@@ -14,7 +16,7 @@ class Plugin extends AbstractPlugin
      */
     public function boot()
     {
-        // implement code
+        $this->inputTestData();
 
         $this->route();
         $this->registerSettingsMenus();
@@ -26,6 +28,29 @@ class Plugin extends AbstractPlugin
 
     }
 
+    protected function inputTestData()
+    {
+        $df1 = new \stdClass();
+        $df1->menu_id = 'df1';
+        $df1->menu_order = 100;
+        $df1->label = '내 유형 1';
+        $df1->description = 'aaaa';
+
+        $df2 = new \stdClass();
+        $df2->menu_id = 'df2';
+        $df2->menu_order = 100;
+        $df2->label = '내 유형 2';
+        $df2->description = 'aaaa';
+
+        $df3 = new \stdClass();
+        $df3->menu_id = 'df3';
+        $df3->menu_order = 100;
+        $df3->label = '내 유형 3';
+        $df3->description = 'aaaa';
+
+        $this->test_arr = [$df1, $df2, $df3];
+    }
+
     protected function registerSettingsMenus()
     {
         \XeRegister::push('settings/menu', 'dynamic_factory', [
@@ -35,11 +60,20 @@ class Plugin extends AbstractPlugin
             'ordering' => 5000
         ]);
         \XeRegister::push('settings/menu', 'dynamic_factory.index', [
-            'title' => 'DF 관리',
+            'title' => '유형 관리',
             'description' => '생성된 CPT를 열람합니다.',
             'display' => true,
             'ordering' => 1000
         ]);
+
+        foreach($this->test_arr as $val){
+            \XeRegister::push('settings/menu', $val->menu_id, [
+                'title' => $val->label,
+                'description' => $val->description,
+                'display' => true,
+                'ordering' => $val->menu_order
+            ]);
+        }
     }
 
     protected function registerSettingsRoute()
@@ -56,8 +90,20 @@ class Plugin extends AbstractPlugin
                 ]);
                 Route::get('/create', [ 'as' => 'create', 'uses' => 'DynamicFactoryController@create' ]);
                 Route::post('/store_cpt', ['as' => 'store_cpt', 'uses' => 'DynamicFactoryController@storeCpt']);
+                Route::get('/test', [ 'as' => 'test', 'uses' => 'DynamicFactoryController@test']);
+                Route::post('/test', [ 'as' => 'test', 'uses' => 'DynamicFactoryController@test']);
             });
         });
+
+        Route::settings(static::getId(), function () {
+            foreach($this->test_arr as $val) {
+                Route::get('/'.$val->menu_id. '/{type?}', [
+                    'as' => 'd_fac.setting.'.$val->menu_id,
+                    'uses' => 'DynamicFactoryController@dynamic',
+                    'settings_menu' => $val->menu_id
+                ]);
+            }
+        },['namespace' => 'Overcode\XePlugin\DynamicFactory\Controllers']);
     }
 
     protected function route()
@@ -72,6 +118,11 @@ class Plugin extends AbstractPlugin
                 ]);
             }
         );
+
+    }
+
+    protected function reserveSlugUrl()
+    {
 
     }
 
