@@ -12,21 +12,21 @@
                 </div>
                 <div class="panel-body">
                     <div class="form-group row">
-                        <label class="col-sm-2 col-form-label">이름 복수형 (필수)</label>
+                        <label class="col-sm-2 col-form-label">CPT 이름 (필수)</label>
                         <div class="col-sm-10">
-                            <input type="text" class="form-control" name="singular_label">
-                        </div>
-                    </div>
-                    <div class="form-group row">
-                        <label class="col-sm-2 col-form-label">이름 단수형 (필수)</label>
-                        <div class="col-sm-10">
-                            <input type="text" class="form-control" name="plural_label">
+                            <input type="text" class="form-control" name="label">
                         </div>
                     </div>
                     <div class="form-group row">
                         <label class="col-sm-2 col-form-label">슬러그 (필수)</label>
                         <div class="col-sm-10">
                             <input type="text" class="form-control" name="slug">
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-sm-2 col-form-label">메뉴 순서 (필수)</label>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" name="menu_order" value="{{ $menu_order }}">
                         </div>
                     </div>
                     <div class="form-group row">
@@ -55,16 +55,16 @@
                 </div>
                 <div class="panel-body">
                     <div class="form-check">
-                        <input class="form-check-input" type="checkbox" value="" id="defaultCheck1" name="show_title">
-                        <label class="form-check-label" for="defaultCheck1">제목</label>
+                        <input class="form-check-input" type="checkbox" value="Y" id="use_title" name="use_title">
+                        <label class="form-check-label" for="use_title">제목</label>
                     </div>
                     <div class="form-check">
-                        <input class="form-check-input" type="checkbox" value="" id="defaultCheck1">
-                        <label class="form-check-label" for="defaultCheck1">에디터</label>
+                        <input class="form-check-input" type="checkbox" value="Y" id="use_editor" name="use_editor">
+                        <label class="form-check-label" for="use_editor">에디터</label>
                     </div>
                     <div class="form-check">
-                        <input class="form-check-input" type="checkbox" value="" id="defaultCheck1">
-                        <label class="form-check-label" for="defaultCheck1">댓글</label>
+                        <input class="form-check-input" type="checkbox" value="Y" id="use_comment" name="use_comment">
+                        <label class="form-check-label" for="use_comment">댓글</label>
                     </div>
                 </div>
             </div>
@@ -74,8 +74,8 @@
                 </div>
                 <div class="panel-body">
                     <div class="form-check">
-                        <input class="form-check-input" type="checkbox" value="" id="defaultCheck1" name="has_archive">
-                        <label class="form-check-label" for="defaultCheck1">아카이브 슬러그 사용</label>
+                        <input class="form-check-input" type="checkbox" value="Y" id="has_archive" name="has_archive">
+                        <label class="form-check-label" for="has_archive">아카이브 슬러그 사용</label>
                     </div>
                     <input type="text" class="form-control" name="archive_slug">
                 </div>
