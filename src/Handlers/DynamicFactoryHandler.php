@@ -74,15 +74,11 @@ class DynamicFactoryHandler
 
     public function store_cpt($inputs)
     {
-//        $inputs['instance_id'] = Plugin::getId();
-
-//        dd($inputs);
-
         $newCpt = new Cpt();
         $newCpt->fill([
-            'menu_id' => 'dfz',
+            'obj_name' => $inputs['obj_name'],
+            'menu_name' => $inputs['menu_name'],
             'menu_order' => $inputs['menu_order'] ?? '900',
-            'label' => $inputs['label'],
             'description' => $inputs['description'] ?? '',
             'slug' => $inputs['slug'],
             'editor' => $inputs['editor'] ?? '',

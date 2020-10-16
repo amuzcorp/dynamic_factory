@@ -7,7 +7,7 @@ class Cpt extends DynamicModel
 {
     protected $table = 'df_cpt';
 
-    protected $fillable = ['menu_id','menu_order','label','description','slug','editor'];
+    protected $fillable = ['menu_id','obj_name','menu_name','menu_order','description','slug','editor','edit_section'];
 
     public $incrementing = false;
 }

@@ -12,9 +12,21 @@
                 </div>
                 <div class="panel-body">
                     <div class="form-group row">
-                        <label class="col-sm-2 col-form-label">CPT 이름 (필수)</label>
+                        <label class="col-sm-2 col-form-label">메뉴 이름 (필수)</label>
                         <div class="col-sm-10">
-                            <input type="text" class="form-control" name="label">
+                            <input type="text" class="form-control" name="menu_name">
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-sm-2 col-form-label">메뉴 순서 (필수)</label>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" name="menu_order" value="{{ $menu_order }}">
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-sm-2 col-form-label">유형 이름 (필수)</label>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" name="obj_name">
                         </div>
                     </div>
                     <div class="form-group row">
@@ -24,9 +36,9 @@
                         </div>
                     </div>
                     <div class="form-group row">
-                        <label class="col-sm-2 col-form-label">메뉴 순서 (필수)</label>
+                        <label class="col-sm-2 col-form-label">설명</label>
                         <div class="col-sm-10">
-                            <input type="text" class="form-control" name="menu_order" value="{{ $menu_order }}">
+                            <input type="text" class="form-control" name="description">
                         </div>
                     </div>
                     <div class="form-group row">
@@ -68,6 +80,77 @@
                     </div>
                 </div>
             </div>
+
+            <div class="panel accordion" id="accordion_ex">
+                <div class="panel-heading clearfix" id="headingOne" data-toggle="collapse" data-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
+                    <h4>레이블 <i class="xi-angle-down pull-right"></i></h4>
+                </div>
+                <div id="collapseOne" class="collapse" style="overflow: hidden;">
+                    <div class="panel-body">
+                        <div class="form-group row">
+                            <label class="col-sm-2 col-form-label">새로 추가</label>
+                            <div class="col-sm-10">
+                                <input type="text" class="form-control" name="new_add">
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="col-sm-2 col-form-label">새 항목 추가</label>
+                            <div class="col-sm-10">
+                                <input type="text" class="form-control" name="new_add_obj">
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="col-sm-2 col-form-label">항목 편집</label>
+                            <div class="col-sm-10">
+                                <input type="text" class="form-control" name="obj_edit">
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="col-sm-2 col-form-label">새 항목</label>
+                            <div class="col-sm-10">
+                                <input type="text" class="form-control" name="new_obj">
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="col-sm-2 col-form-label">항목 검색</label>
+                            <div class="col-sm-10">
+                                <input type="text" class="form-control" name="obj_search">
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="col-sm-2 col-form-label">찾을 수 없음</label>
+                            <div class="col-sm-10">
+                                <input type="text" class="form-control" name="no_search">
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="col-sm-2 col-form-label">휴지통에서 찾을 수 없음</label>
+                            <div class="col-sm-10">
+                                <input type="text" class="form-control" name="no_trash">
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="col-sm-2 col-form-label">상위 항목 설명</label>
+                            <div class="col-sm-10">
+                                <input type="text" class="form-control" name="parent_txt">
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="col-sm-2 col-form-label">모든 항목</label>
+                            <div class="col-sm-10">
+                                <input type="text" class="form-control" name="all_obj">
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="col-sm-2 col-form-label">여기에 제목 입력</label>
+                            <div class="col-sm-10">
+                                <input type="text" class="form-control" name="here_title_input">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <div class="panel">
                 <div class="panel-heading">
                     <h4>옵션</h4>

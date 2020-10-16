@@ -13,15 +13,17 @@
                     <thead>
                     <tr>
                         <th>글 유형</th>
-                        <th>다이나믹 필드</th>
+                        <th>확장 필드</th>
                         <th>분류</th>
                     </tr>
                     </thead>
                     <tbody>
                     @foreach($cpts as $cpt)
                     <tr>
-                        <td>{{ $cpt->label }}</td>
-                        <td></td>
+                        <td>{{ $cpt->obj_name }}</td>
+                        <td>
+                            <a href="{{ route('d_fac.setting.create_extra') }}" class="btn btn-sm btn-warning">확장 필드 추가</a>
+                        </td>
                         <td></td>
                     </tr>
                     @endforeach

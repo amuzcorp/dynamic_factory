@@ -36,6 +36,7 @@ class Plugin extends AbstractPlugin
     public function boot()
     {
         $this->loadCpts();
+//        $this->cpts = [];
 
         $this->route();
         $this->registerSettingsMenus();
@@ -70,7 +71,7 @@ class Plugin extends AbstractPlugin
 
         foreach($this->cpts as $val){
             \XeRegister::push('settings/menu', 'df'.$val->menu_id, [
-                'title' => $val->label,
+                'title' => $val->menu_name,
                 'description' => $val->description,
                 'display' => true,
                 'ordering' => $val->menu_order
@@ -92,6 +93,7 @@ class Plugin extends AbstractPlugin
                 ]);
                 Route::get('/create', [ 'as' => 'create', 'uses' => 'DynamicFactoryController@create' ]);
                 Route::post('/store_cpt', ['as' => 'store_cpt', 'uses' => 'DynamicFactoryController@storeCpt']);
+                Route::get('/create_extra', [ 'as' => 'create_extra', 'uses' => 'DynamicFactoryController@createExtra' ]);
             });
         });
 

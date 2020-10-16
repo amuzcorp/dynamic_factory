@@ -44,6 +44,11 @@ class DynamicFactoryController extends BaseController
         ]);
     }
 
+    public function createExtra()
+    {
+        return XePresenter::make('dynamic_factory::views.settings.create_extra');
+    }
+
     public function storeCpt(Request $request)
     {
         // TODO 권한체크
