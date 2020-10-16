@@ -7,5 +7,27 @@
 
 <div class="row">
     <div class="col-sm-12">
+        <div class="panel">
+            <div class="panel-body">
+                <table class="table table-bordered">
+                    <thead>
+                    <tr>
+                        <th>글 유형</th>
+                        <th>다이나믹 필드</th>
+                        <th>분류</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    @foreach($cpts as $cpt)
+                    <tr>
+                        <td>{{ $cpt->label }}</td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                    @endforeach
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
 </div>

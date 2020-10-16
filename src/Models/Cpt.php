@@ -9,5 +9,5 @@ class Cpt extends DynamicModel
 
     protected $fillable = ['menu_id','menu_order','label','description','slug','editor'];
 
-    protected $primaryKey = 'id';
+    public $incrementing = false;
 }

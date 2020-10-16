@@ -1,14 +1,33 @@
 <?php
 namespace Overcode\XePlugin\DynamicFactory;
 
+use Overcode\XePlugin\DynamicFactory\Handlers\DynamicFactoryHandler;
+use Overcode\XePlugin\DynamicFactory\Services\DynamicFactoryService;
 use Route;
 use Xpressengine\Plugin\AbstractPlugin;
 use XeRegister;
 
 class Plugin extends AbstractPlugin
 {
+    protected $cpts;
 
-    protected $test_arr;
+    public function register()
+    {
+        app()->singleton(DynamicFactoryService::class, function () {
+            $dynamicFactoryHandler = app('ovcd.df.handler');
+
+            return new DynamicFactoryService(
+                $dynamicFactoryHandler
+            );
+        });
+        app()->alias(DynamicFactoryService::class, 'ovcd.df.service');
+
+        app()->singleton(DynamicFactoryHandler::class, function () {
+            return new DynamicFactoryHandler();
+        });
+        app()->alias(DynamicFactoryHandler::class, 'ovcd.df.handler');
+    }
+
     /**
      * 이 메소드는 활성화(activate) 된 플러그인이 부트될 때 항상 실행됩니다.
      *
@@ -16,7 +35,7 @@ class Plugin extends AbstractPlugin
      */
     public function boot()
     {
-        $this->inputTestData();
+        $this->loadCpts();
 
         $this->route();
         $this->registerSettingsMenus();
@@ -28,27 +47,10 @@ class Plugin extends AbstractPlugin
 
     }
 
-    protected function inputTestData()
+    protected function loadCpts()
     {
-        $df1 = new \stdClass();
-        $df1->menu_id = 'df1';
-        $df1->menu_order = 100;
-        $df1->label = '내 유형 1';
-        $df1->description = 'aaaa';
-
-        $df2 = new \stdClass();
-        $df2->menu_id = 'df2';
-        $df2->menu_order = 100;
-        $df2->label = '내 유형 2';
-        $df2->description = 'aaaa';
-
-        $df3 = new \stdClass();
-        $df3->menu_id = 'df3';
-        $df3->menu_order = 100;
-        $df3->label = '내 유형 3';
-        $df3->description = 'aaaa';
-
-        $this->test_arr = [$df1, $df2, $df3];
+        $dfService = app('ovcd.df.service');
+        $this->cpts = $dfService->getItems();
     }
 
     protected function registerSettingsMenus()
@@ -66,8 +68,8 @@ class Plugin extends AbstractPlugin
             'ordering' => 1000
         ]);
 
-        foreach($this->test_arr as $val){
-            \XeRegister::push('settings/menu', $val->menu_id, [
+        foreach($this->cpts as $val){
+            \XeRegister::push('settings/menu', 'df'.$val->menu_id, [
                 'title' => $val->label,
                 'description' => $val->description,
                 'display' => true,
@@ -90,17 +92,15 @@ class Plugin extends AbstractPlugin
                 ]);
                 Route::get('/create', [ 'as' => 'create', 'uses' => 'DynamicFactoryController@create' ]);
                 Route::post('/store_cpt', ['as' => 'store_cpt', 'uses' => 'DynamicFactoryController@storeCpt']);
-                Route::get('/test', [ 'as' => 'test', 'uses' => 'DynamicFactoryController@test']);
-                Route::post('/test', [ 'as' => 'test', 'uses' => 'DynamicFactoryController@test']);
             });
         });
 
         Route::settings(static::getId(), function () {
-            foreach($this->test_arr as $val) {
-                Route::get('/'.$val->menu_id. '/{type?}', [
-                    'as' => 'd_fac.setting.'.$val->menu_id,
+            foreach($this->cpts as $val) {
+                Route::get('/df'.$val->menu_id. '/{type?}', [
+                    'as' => 'd_fac.setting.df'.$val->menu_id,
                     'uses' => 'DynamicFactoryController@dynamic',
-                    'settings_menu' => $val->menu_id
+                    'settings_menu' => 'df'.$val->menu_id
                 ]);
             }
         },['namespace' => 'Overcode\XePlugin\DynamicFactory\Controllers']);

@@ -74,6 +74,8 @@ class DynamicFactoryHandler
 
     public function store_cpt($inputs)
     {
+//        $inputs['instance_id'] = Plugin::getId();
+
 //        dd($inputs);
 
         $newCpt = new Cpt();
@@ -90,5 +92,10 @@ class DynamicFactoryHandler
         $newCpt->save();
 
         return $newCpt;
+    }
+
+    public function getItems()
+    {
+        return Cpt::all();
     }
 }

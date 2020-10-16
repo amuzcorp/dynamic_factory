@@ -27,9 +27,11 @@ class DynamicFactoryController extends BaseController
         // set browser title
         XeFrontend::title($title);
 
+        $cpts = $this->dfService->getItems();
+
         // output
         return XePresenter::make('dynamic_factory::views.settings.index', [
-            'title' => $title
+            'title' => $title, 'cpts' => $cpts
         ]);
     }
 
@@ -49,13 +51,6 @@ class DynamicFactoryController extends BaseController
         $cpt = $this->dfService->storeCpt($request);
 
         return redirect()->route('d_fac.setting.index');
-    }
-
-    public function test(Request $request)
-    {
-        //$items = $this->dService->getItemsJson($request->all());
-
-        return XePresenter::makeApi($request->all());
     }
 
     public function dynamic()

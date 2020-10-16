@@ -37,4 +37,11 @@ class DynamicFactoryService
 
         return $cpt;
     }
+
+    public function getItems()
+    {
+        $cpt = $this->dfHandler->getItems();
+
+        return $cpt;
+    }
 }

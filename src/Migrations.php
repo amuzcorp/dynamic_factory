@@ -49,9 +49,9 @@ class Migrations
     protected function createCptTable()
     {
         Schema::create(self::CPT_TABLE_NAME, function (Blueprint $table) {
-            $table->increments('id');
+            $table->string('id', 36);
 
-            $table->string('menu_id');
+            $table->increments('menu_id');
             $table->string('menu_order');
             $table->string('label');
             $table->string('description');
@@ -62,7 +62,6 @@ class Migrations
 
             $table->timestamps();
 
-            $table->unique('menu_id');
             $table->unique('slug');
         });
     }
