@@ -2,12 +2,23 @@
 namespace Overcode\XePlugin\DynamicFactory\Models;
 
 use Xpressengine\Database\Eloquent\DynamicModel;
-
+use XeDB;
 class Cpt extends DynamicModel
 {
-    protected $table = 'df_cpt';
+    protected $table = 'df_cpts';
 
-    protected $fillable = ['menu_id','obj_name','menu_name','menu_order','description','slug','editor','edit_section'];
+    protected $fillable = ['site_key', 'cpt_id', 'cpt_name', 'menu_name', 'menu_order', 'slug', 'description', 'sections', 'options', 'labels'];
 
-    public $incrementing = false;
+    protected $casts = ['sections' => 'array', 'options' => 'array', 'labels' => 'array'];
+
+    protected $primaryKey = 'cpt_id';
+    //protected $incrementing = false;
+    protected $keyType = 'string';
+
+    public $timestamps = false;
+
+    public function getNextId() {
+        $statement = XeDB::select("show table status like 'xe_".$this->table."'");
+        return $statement[0]->Auto_increment ?? 1;
+    }
 }

@@ -38,9 +38,24 @@ class DynamicFactoryService
         return $cpt;
     }
 
+    public function updateCpt(Request $request)
+    {
+        $inputs = $request->originExcept('_token');
+        $cpt = $this->dfHandler->update_cpt($inputs);
+
+        return $cpt;
+    }
+
     public function getItems()
     {
         $cpt = $this->dfHandler->getItems();
+
+        return $cpt;
+    }
+
+    public function getItem($cpt_id)
+    {
+        $cpt = $this->dfHandler->getItem($cpt_id);
 
         return $cpt;
     }

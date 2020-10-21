@@ -3,10 +3,31 @@
 namespace Overcode\XePlugin\DynamicFactory\Handlers;
 
 use Overcode\XePlugin\DynamicFactory\Models\Cpt;
+use XeSite;
 
 class DynamicFactoryHandler
 {
     protected $reserved = [];
+
+    protected $defaultLabels = [
+        'new_add' => '새로 추가',
+        'new_add_cpt' => '새 %s 추가',
+        'cpt_edit' => 'Edit %s',
+        'new_cpt' => '새 %s',
+        'cpt_view' => '%s 보기',
+        'cpt_search' => '%s 검색',
+        'no_search' => '%s을(를) 찾을 수 없음',
+        'no_trash' => '휴지통에서 %s을(를) 찾을 수 없음',
+        'parent_txt' => '상위 텍스트',
+        'all_cpt' => '모든 항목',
+        'here_title' => '여기에 제목 입력'
+    ];
+
+    public function getDefaultLabels()
+    {
+        return $this->defaultLabels;
+    }
+
 
     public function setReserved($slug)
     {
@@ -76,22 +97,52 @@ class DynamicFactoryHandler
     {
         $newCpt = new Cpt();
         $newCpt->fill([
-            'obj_name' => $inputs['obj_name'],
+            'site_key' => XeSite::getCurrentSiteKey(),
+            'cpt_id' => 'df_' . $newCpt->getNextId(),
+            'cpt_name' => $inputs['cpt_name'],
             'menu_name' => $inputs['menu_name'],
-            'menu_order' => $inputs['menu_order'] ?? '900',
-            'description' => $inputs['description'] ?? '',
+            'menu_order' => $inputs['menu_order'] ?? '500',
             'slug' => $inputs['slug'],
+            'description' => $inputs['description'] ?? '',
             'editor' => $inputs['editor'] ?? '',
-            'edit_section' => $inputs['edit_section'] ?? '',
-            'archive_slug' => $inputs['archive_slug'] ?? ''
+            'sections' => $inputs['sections'] ?? '',
+            'options' => $inputs['options'] ?? '',
+            'labels' => $inputs['labels'] ?? ''
         ]);
+
         $newCpt->save();
 
         return $newCpt;
     }
 
+    public function update_cpt($inputs)
+    {
+        $cpt = Cpt::find($inputs['cpt_id']);
+
+        $cpt->fill([
+            'cpt_name' => $inputs['cpt_name'],
+            'menu_name' => $inputs['menu_name'],
+            'menu_order' => $inputs['menu_order'] ?? '500',
+            'slug' => $inputs['slug'],
+            'description' => $inputs['description'] ?? '',
+            'editor' => $inputs['editor'] ?? '',
+            'sections' => $inputs['sections'] ?? '',
+            'options' => $inputs['options'] ?? '',
+            'labels' => $inputs['labels'] ?? ''
+        ]);
+
+        $cpt->save();
+
+        return $cpt;
+    }
+
     public function getItems()
     {
         return Cpt::all();
+    }
+
+    public function getItem($cpt_id)
+    {
+        return Cpt::find($cpt_id);
     }
 }

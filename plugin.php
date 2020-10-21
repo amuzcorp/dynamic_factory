@@ -5,7 +5,6 @@ use Overcode\XePlugin\DynamicFactory\Handlers\DynamicFactoryHandler;
 use Overcode\XePlugin\DynamicFactory\Services\DynamicFactoryService;
 use Route;
 use Xpressengine\Plugin\AbstractPlugin;
-use XeRegister;
 
 class Plugin extends AbstractPlugin
 {
@@ -41,11 +40,21 @@ class Plugin extends AbstractPlugin
         $this->route();
         $this->registerSettingsMenus();
         $this->registerSettingsRoute();
+
+        $this->testRegister();
     }
 
     protected function registerSitesPermissions()
     {
 
+    }
+
+    protected function testRegister()
+    {
+        //$arr = \XeRegister::all();
+        $arr = \XeRegister::get('settings/menu');
+
+//        dd($arr);
     }
 
     protected function loadCpts()
@@ -70,7 +79,7 @@ class Plugin extends AbstractPlugin
         ]);
 
         foreach($this->cpts as $val){
-            \XeRegister::push('settings/menu', 'df'.$val->menu_id, [
+            \XeRegister::push('settings/menu', $val->cpt_id, [
                 'title' => $val->menu_name,
                 'description' => $val->description,
                 'display' => true,
@@ -93,16 +102,18 @@ class Plugin extends AbstractPlugin
                 ]);
                 Route::get('/create', [ 'as' => 'create', 'uses' => 'DynamicFactoryController@create' ]);
                 Route::post('/store_cpt', ['as' => 'store_cpt', 'uses' => 'DynamicFactoryController@storeCpt']);
-                Route::get('/create_extra', [ 'as' => 'create_extra', 'uses' => 'DynamicFactoryController@createExtra' ]);
+                Route::get('/create_extra/{cpt_id}', [ 'as' => 'create_extra', 'uses' => 'DynamicFactoryController@createExtra' ]);
+                Route::get('/edit/{cpt_id}', [ 'as' => 'edit', 'uses' => 'DynamicFactoryController@edit' ]);
+                Route::post('/update/{cpt_id?}', [ 'as' => 'update', 'uses' => 'DynamicFactoryController@update' ]);
             });
         });
 
         Route::settings(static::getId(), function () {
             foreach($this->cpts as $val) {
-                Route::get('/df'.$val->menu_id. '/{type?}', [
-                    'as' => 'd_fac.setting.df'.$val->menu_id,
+                Route::get('/'.$val->cpt_id. '/{type?}', [
+                    'as' => 'd_fac.setting.'.$val->cpt_id,
                     'uses' => 'DynamicFactoryController@dynamic',
-                    'settings_menu' => 'df'.$val->menu_id
+                    'settings_menu' => $val->cpt_id
                 ]);
             }
         },['namespace' => 'Overcode\XePlugin\DynamicFactory\Controllers']);

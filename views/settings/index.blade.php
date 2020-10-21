@@ -4,7 +4,6 @@
         <a href="{{ route('d_fac.setting.create') }}" class="xu-button xu-button--primary pull-right">새 유형 추가</a>
     </div>
 @endsection
-
 <div class="row">
     <div class="col-sm-12">
         <div class="panel">
@@ -20,9 +19,11 @@
                     <tbody>
                     @foreach($cpts as $cpt)
                     <tr>
-                        <td>{{ $cpt->obj_name }}</td>
                         <td>
-                            <a href="{{ route('d_fac.setting.create_extra') }}" class="btn btn-sm btn-warning">확장 필드 추가</a>
+                            <a href="{{ route('d_fac.setting.edit', ['cpt_id' => $cpt->cpt_id]) }}">{{ $cpt->cpt_name }}</a>
+                        </td>
+                        <td>
+                            <a href="{{ route('d_fac.setting.create_extra', ['cpt_id' => $cpt->cpt_id]) }}" class="btn btn-sm btn-warning">확장 필드 추가</a>
                         </td>
                         <td></td>
                     </tr>

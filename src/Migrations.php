@@ -7,19 +7,19 @@ use Illuminate\Support\Facades\Schema;
 
 class Migrations
 {
-    const CPT_TABLE_NAME = 'df_cpt';
-    const LABEL_TABLE_NAME = 'df_label';
+    const CPT_TABLE_NAME = 'df_cpts';
+    const LABEL_TABLE_NAME = 'df_labels';
 
     public function checkInstalled()
     {
         if ($this->checkExistCptTable() === false) return false;
-        if ($this->checkExistLabelTable() === false) return false;
+//        if ($this->checkExistLabelTable() === false) return false;
     }
 
     public function install()
     {
         if ($this->checkExistCptTable() === false) $this->createCptTable();
-        if ($this->checkExistLabelTable() === false) $this->createLabelTable();
+//        if ($this->checkExistLabelTable() === false) $this->createLabelTable();
     }
 
     protected function checkExistCptTable()
@@ -35,19 +35,17 @@ class Migrations
     protected function createCptTable()
     {
         Schema::create(self::CPT_TABLE_NAME, function (Blueprint $table) {
-            $table->string('id', 36);
-
-            $table->increments('menu_id');
-            $table->string('obj_name');
+            $table->increments('id');
+            $table->string('site_key', 50);
+            $table->string('cpt_id');
+            $table->string('cpt_name');
             $table->string('menu_name');
             $table->string('menu_order');
-            $table->string('description');
             $table->string('slug');
-            $table->string('editor');
-            $table->text('edit_section');
-            $table->string('archive_slug');
-
-            $table->timestamps();
+            $table->string('description');
+            $table->text('sections');
+            $table->text('options');
+            $table->text('labels');
 
             $table->unique('slug');
         });
