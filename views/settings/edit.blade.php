@@ -1,10 +1,14 @@
 @section('page_title')
-    <h2>{{ $cpt['cpt_name'] ?? '' }} 유형 수정하기</h2>
+    <h2>[{{ $cpt['cpt_name'] }}] 유형 수정하기</h2>
 @endsection
-
+<ul class="nav nav-tabs">
+    <li class="active" ><a href="#">기본정보</a></li>
+    <li><a href="{{ route('dyFac.setting.create_extra', ['cpt_id' => $cpt['cpt_id']]) }}">확장필드</a></li>
+    <li><a href="{{ route('dyFac.setting.edit_category', ['cpt_id' => $cpt['cpt_id']]) }}">카테고리</a></li>
+</ul>
 <div class="row">
     <div class="col-sm-12">
-        <form method="post" action="{{ route('d_fac.setting.update') }}">
+        <form method="post" action="{{ route('dyFac.setting.update') }}">
             {!! csrf_field() !!}
             <input type="hidden" name="cpt_id" value="{{ $cpt['cpt_id'] }}" />
             <div class="panel">

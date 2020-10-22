@@ -1,10 +1,12 @@
 <?php
 namespace Overcode\XePlugin\DynamicFactory;
 
+use Overcode\XePlugin\DynamicFactory\Handlers\DynamicFactoryConfigHandler;
 use Overcode\XePlugin\DynamicFactory\Handlers\DynamicFactoryHandler;
 use Overcode\XePlugin\DynamicFactory\Services\DynamicFactoryService;
 use Route;
 use Xpressengine\Plugin\AbstractPlugin;
+use Xpressengine\Plugins\XeBlog\Handlers\BlogConfigHandler;
 
 class Plugin extends AbstractPlugin
 {
@@ -13,18 +15,27 @@ class Plugin extends AbstractPlugin
     public function register()
     {
         app()->singleton(DynamicFactoryService::class, function () {
-            $dynamicFactoryHandler = app('ovcd.df.handler');
+            $dynamicFactoryHandler = app('overcode.df.handler');
+            $dynamicFactoryConfigHandler = app('overcode.df.configHandler');
 
             return new DynamicFactoryService(
-                $dynamicFactoryHandler
+                $dynamicFactoryHandler,
+                $dynamicFactoryConfigHandler
             );
         });
-        app()->alias(DynamicFactoryService::class, 'ovcd.df.service');
+        app()->alias(DynamicFactoryService::class, 'overcode.df.service');
 
         app()->singleton(DynamicFactoryHandler::class, function () {
             return new DynamicFactoryHandler();
         });
-        app()->alias(DynamicFactoryHandler::class, 'ovcd.df.handler');
+        app()->alias(DynamicFactoryHandler::class, 'overcode.df.handler');
+
+        app()->singleton(DynamicFactoryConfigHandler::class, function () {
+            $configManager = app('xe.config');
+
+            return new DynamicFactoryConfigHandler($configManager);
+        });
+        app()->alias(DynamicFactoryConfigHandler::class, 'overcode.df.configHandler');
     }
 
     /**
@@ -59,7 +70,7 @@ class Plugin extends AbstractPlugin
 
     protected function loadCpts()
     {
-        $dfService = app('ovcd.df.service');
+        $dfService = app('overcode.df.service');
         $this->cpts = $dfService->getItems();
     }
 
@@ -93,7 +104,7 @@ class Plugin extends AbstractPlugin
         Route::settings(static::getId(), function() {
             Route::group([
                 'namespace' => 'Overcode\XePlugin\DynamicFactory\Controllers',
-                'as' => 'd_fac.setting.'
+                'as' => 'dyFac.setting.'
             ], function(){
                 Route::get('/', [
                     'as' => 'index',
@@ -105,13 +116,15 @@ class Plugin extends AbstractPlugin
                 Route::get('/create_extra/{cpt_id}', [ 'as' => 'create_extra', 'uses' => 'DynamicFactoryController@createExtra' ]);
                 Route::get('/edit/{cpt_id}', [ 'as' => 'edit', 'uses' => 'DynamicFactoryController@edit' ]);
                 Route::post('/update/{cpt_id?}', [ 'as' => 'update', 'uses' => 'DynamicFactoryController@update' ]);
+                Route::get('/edit_category/{cpt_id}', [ 'as' => 'edit_category', 'uses' => 'DynamicFactoryController@editCategory' ]);
+                Route::post('/store_category', ['as' => 'store_category', 'uses' => 'DynamicFactoryController@storeCategory']);
             });
         });
 
         Route::settings(static::getId(), function () {
             foreach($this->cpts as $val) {
                 Route::get('/'.$val->cpt_id. '/{type?}', [
-                    'as' => 'd_fac.setting.'.$val->cpt_id,
+                    'as' => 'dyFac.setting.'.$val->cpt_id,
                     'uses' => 'DynamicFactoryController@dynamic',
                     'settings_menu' => $val->cpt_id
                 ]);
@@ -162,6 +175,10 @@ class Plugin extends AbstractPlugin
         if ($migration->checkInstalled() === false) {
             $migration->install();
         }
+
+        /** @var DynamicFactoryConfigHandler $configHandler */
+        $configHandler = app('overcode.df.configHandler');
+        $configHandler->storeDfConfig();
     }
 
     /**

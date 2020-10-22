@@ -1,6 +1,7 @@
 <?php
 namespace Overcode\XePlugin\DynamicFactory\Services;
 
+use Overcode\XePlugin\DynamicFactory\Handlers\DynamicFactoryConfigHandler;
 use XeDB;
 use Overcode\XePlugin\DynamicFactory\Handlers\DynamicFactoryHandler;
 use Xpressengine\Http\Request;
@@ -9,9 +10,15 @@ class DynamicFactoryService
 {
     protected $dfHandler;
 
-    public function __construct(DynamicFactoryHandler $dfHandler)
+    protected $dfConfigHandler;
+
+    public function __construct(
+        DynamicFactoryHandler $dfHandler,
+        DynamicFactoryConfigHandler $dfConfigHandler
+    )
     {
         $this->dfHandler = $dfHandler;
+        $this->dfConfigHandler = $dfConfigHandler;
     }
 
     public function getItemsJson(array $attr)

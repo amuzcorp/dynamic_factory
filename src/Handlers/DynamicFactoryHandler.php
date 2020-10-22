@@ -3,6 +3,7 @@
 namespace Overcode\XePlugin\DynamicFactory\Handlers;
 
 use Overcode\XePlugin\DynamicFactory\Models\Cpt;
+use Overcode\XePlugin\DynamicFactory\Plugin;
 use XeSite;
 
 class DynamicFactoryHandler
@@ -144,5 +145,27 @@ class DynamicFactoryHandler
     public function getItem($cpt_id)
     {
         return Cpt::find($cpt_id);
+    }
+
+    public static function getDynamicFields($cpt_id)
+    {
+        $group = Plugin::getId() . '_' . $cpt_id;
+
+        $dynamicField = app('xe.dynamicField');
+
+        $list = [];
+
+        $configs = $dynamicField->getConfigHandler()->gets('dynamic_factory_df_1');
+        foreach ($configs as $config) {
+            $info = $config->getPureAll();
+            $fieldType = $dynamicField->get($config->get('group'), $config->get('id'));
+            $info['typeName'] = $fieldType->name();
+            $info['skinName'] = $fieldType->getSkin()->name();
+            $info['label'] = xe_trans($info['label']);
+
+            $list[] = $info;
+        }
+
+        return $list;
     }
 }

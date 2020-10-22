@@ -3,7 +3,7 @@
 @endsection
 <div class="row">
     <div class="col-sm-12">
-        <form method="post" action="{{ route('d_fac.setting.store_cpt') }}">
+        <form method="post" action="{{ route('dyFac.setting.store_cpt') }}">
             {!! csrf_field() !!}
             <div class="panel">
                 <div class="panel-heading">

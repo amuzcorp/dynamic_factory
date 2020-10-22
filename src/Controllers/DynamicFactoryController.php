@@ -3,6 +3,7 @@ namespace Overcode\XePlugin\DynamicFactory\Controllers;
 
 use App\Http\Sections\DynamicFieldSection;
 use Overcode\XePlugin\DynamicFactory\Handlers\DynamicFactoryHandler;
+use Overcode\XePlugin\DynamicFactory\Handlers\DynamicFactoryTaxonomyHandler;
 use Overcode\XePlugin\DynamicFactory\Plugin;
 use Overcode\XePlugin\DynamicFactory\Services\DynamicFactoryService;
 use App\Http\Sections\EditorSection;
@@ -11,7 +12,6 @@ use XePresenter;
 use XeLang;
 use XeDB;
 use Xpressengine\Http\Request;
-//use Overcode\XePlugin\DynamicFactory\Models\??;
 use App\Http\Controllers\Controller as BaseController;
 
 class DynamicFactoryController extends BaseController
@@ -20,13 +20,19 @@ class DynamicFactoryController extends BaseController
 
     protected $dfHandler;
 
+    protected $taxonomyHandler;
+
     const DEFAULT_MENU_ORDER = '500';
 
-    public function __construct(DynamicFactoryService $dynamicFactoryService, DynamicFactoryHandler $dynamicFactoryHandler)
+    public function __construct(
+        DynamicFactoryService $dynamicFactoryService,
+        DynamicFactoryHandler $dynamicFactoryHandler,
+        DynamicFactoryTaxonomyHandler $dynamicFactoryTaxonomyHandler
+    )
     {
-        //XeFrontend::css('plugins/dynamic_factory/assets/style.css')->load();
         $this->dfService = $dynamicFactoryService;
         $this->dfHandler = $dynamicFactoryHandler;
+        $this->taxonomyHandler = $dynamicFactoryTaxonomyHandler;
     }
 
     public function index()
@@ -38,19 +44,15 @@ class DynamicFactoryController extends BaseController
 
         $cpts = $this->dfService->getItems();
 
-        $editorSection = new EditorSection(Plugin::getId());
-
         // output
         return XePresenter::make('dynamic_factory::views.settings.index', [
             'title' => $title,
-            'cpts' => $cpts,
-            'editorSection' => $editorSection
+            'cpts' => $cpts
         ]);
     }
 
     public function create()
     {
-
         return XePresenter::make('dynamic_factory::views.settings.create', [
             'menu_order' => self::DEFAULT_MENU_ORDER,
              'labels' => $this->dfHandler->getDefaultLabels()
@@ -59,16 +61,17 @@ class DynamicFactoryController extends BaseController
 
     public function createExtra($cpt_id)
     {
+        $cpt = $this->dfService->getItem($cpt_id);
+
         $dynamicFieldSection = new DynamicFieldSection(
-            //'cpt_' . $request->get('id'),
-            'documents_' . Plugin::getId(),
+            Plugin::getId() . '_' . $cpt_id,
             \XeDB::connection(),
             true
         );
 
         return XePresenter::make(
             'dynamic_factory::views.settings.create_extra',
-            compact('dynamicFieldSection'));
+            compact('dynamicFieldSection', 'cpt'));
     }
 
     public function storeCpt(Request $request)
@@ -77,7 +80,7 @@ class DynamicFactoryController extends BaseController
 
         $cpt = $this->dfService->storeCpt($request);
 
-        return redirect()->route('d_fac.setting.index');
+        return redirect()->route('dyFac.setting.index');
     }
 
     public function edit($cpt_id)
@@ -94,7 +97,7 @@ class DynamicFactoryController extends BaseController
         // TODO 권한체크
         $cpt = $this->dfService->updateCpt($request);
 
-        return redirect()->route('d_fac.setting.edit', ['cpt_id' => $request->cpt_id]);
+        return redirect()->route('dyFac.setting.edit', ['cpt_id' => $request->cpt_id]);
     }
 
     public function dynamic()
@@ -102,5 +105,23 @@ class DynamicFactoryController extends BaseController
         $type = 'aaa';
 
         return $type;
+    }
+
+    public function editCategory($cpt_id)
+    {
+        $cpt = $this->dfService->getItem($cpt_id);
+
+        return XePresenter::make('dynamic_factory::views.settings.edit_category', [
+            'cpt' => $cpt
+        ]);
+    }
+
+    public function storeCategory(Request $request)
+    {
+        $taxonomyAttribute = $request->except('_token');
+
+        $taxonomyItem = $this->taxonomyHandler->createTaxonomy($taxonomyAttribute);
+
+        return redirect()->back();  //TODO 경로 수정
     }
 }

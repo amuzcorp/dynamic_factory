@@ -1,7 +1,10 @@
+@php
+    use Overcode\XePlugin\DynamicFactory\Handlers\DynamicFactoryHandler;
+@endphp
 @section('page_title')
     <div class="clearfix">
         <h2 class="pull-left">CPT 관리</h2>
-        <a href="{{ route('d_fac.setting.create') }}" class="xu-button xu-button--primary pull-right">새 유형 추가</a>
+        <a href="{{ route('dyFac.setting.create') }}" class="xu-button xu-button--primary pull-right">새 유형 추가</a>
     </div>
 @endsection
 <div class="row">
@@ -20,10 +23,15 @@
                     @foreach($cpts as $cpt)
                     <tr>
                         <td>
-                            <a href="{{ route('d_fac.setting.edit', ['cpt_id' => $cpt->cpt_id]) }}">{{ $cpt->cpt_name }}</a>
+                            <a href="{{ route('dyFac.setting.edit', ['cpt_id' => $cpt->cpt_id]) }}">{{ $cpt->cpt_name }}</a>
                         </td>
                         <td>
-                            <a href="{{ route('d_fac.setting.create_extra', ['cpt_id' => $cpt->cpt_id]) }}" class="btn btn-sm btn-warning">확장 필드 추가</a>
+                            <ul class="list-group">
+                            @foreach(DynamicFactoryHandler::getDynamicFields($cpt->cpt_id) as $dyFi)
+                                <li class="list-group-item">{{ $dyFi['label'] }} ({{ $dyFi['typeName'] }})</li>
+                            @endforeach
+                            </ul>
+                            <a href="{{ route('dyFac.setting.create_extra', ['cpt_id' => $cpt->cpt_id]) }}" class="btn btn-sm btn-warning">확장 필드 관리</a>
                         </td>
                         <td></td>
                     </tr>
