@@ -25,17 +25,10 @@ class DynamicFactoryTaxonomyHandler
         // Todo slug 중복 체크
         // Todo taxonomy 중복 체크
 
-        $taxonomyItem = $this->categoryHandler->createCate($inputs);
+        //$taxonomyItem = $this->categoryHandler->createCate($inputs);
 
-        $taxonomyCptIdConfigName = $this->dfConfigHandler->getConfigName($inputs['cpt_id']);
-
-        // TODO 사용할 카테고리 여러개 넣을수 있게
-        $newInput = [
-            //'useCategories' => [] get 해온 배열에 add
-            'categoryIds' => [ $taxonomyItem->id ]
-        ];
-
-        $this->dfConfigHandler->addConfig($newInput, $taxonomyCptIdConfigName);
+        $taxonomyItem = new \stdClass();
+        $taxonomyItem->id = '4';
 
         return $taxonomyItem;
     }

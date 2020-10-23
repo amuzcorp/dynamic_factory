@@ -4,7 +4,6 @@
 <ul class="nav nav-tabs">
     <li class="active" ><a href="#">기본정보</a></li>
     <li><a href="{{ route('dyFac.setting.create_extra', ['cpt_id' => $cpt['cpt_id']]) }}">확장필드</a></li>
-    <li><a href="{{ route('dyFac.setting.edit_category', ['cpt_id' => $cpt['cpt_id']]) }}">카테고리</a></li>
 </ul>
 <div class="row">
     <div class="col-sm-12">

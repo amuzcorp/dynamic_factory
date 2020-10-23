@@ -107,13 +107,13 @@ class DynamicFactoryController extends BaseController
         return $type;
     }
 
-    public function editCategory($cpt_id)
+    public function createTaxonomy($tax_id = null)
     {
-        $cpt = $this->dfService->getItem($cpt_id);
+        //$cpt = $this->dfService->getItem($cpt_id);
 
-        return XePresenter::make('dynamic_factory::views.settings.edit_category', [
-            'cpt' => $cpt
-        ]);
+        //TODO tax_id 가 있으면 로드 하여 프레젠터에 보낸다.
+
+        return XePresenter::make('dynamic_factory::views.settings.create_taxonomy');
     }
 
     public function storeCategory(Request $request)

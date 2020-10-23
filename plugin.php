@@ -116,8 +116,8 @@ class Plugin extends AbstractPlugin
                 Route::get('/create_extra/{cpt_id}', [ 'as' => 'create_extra', 'uses' => 'DynamicFactoryController@createExtra' ]);
                 Route::get('/edit/{cpt_id}', [ 'as' => 'edit', 'uses' => 'DynamicFactoryController@edit' ]);
                 Route::post('/update/{cpt_id?}', [ 'as' => 'update', 'uses' => 'DynamicFactoryController@update' ]);
-                Route::get('/edit_category/{cpt_id}', [ 'as' => 'edit_category', 'uses' => 'DynamicFactoryController@editCategory' ]);
-                Route::post('/store_category', ['as' => 'store_category', 'uses' => 'DynamicFactoryController@storeCategory']);
+                Route::get('/create_taxonomy/{tax_id?}', [ 'as' => 'create_taxonomy', 'uses' => 'DynamicFactoryController@createTaxonomy' ]);
+                Route::post('/store_cpt_tax', ['as' => 'store_cpt_tax', 'uses' => 'DynamicFactoryController@storeCategory']);
             });
         });
 
