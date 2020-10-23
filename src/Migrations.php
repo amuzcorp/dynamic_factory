@@ -8,18 +8,24 @@ use Illuminate\Support\Facades\Schema;
 class Migrations
 {
     const CPT_TABLE_NAME = 'df_cpts';
-    const LABEL_TABLE_NAME = 'df_labels';
+    const CATEGORY_EXTRA_TABLE_NAME = 'df_category_extra';
+    const CPT_TAXONOMY_TABLE_NAME = 'df_cpt_taxonomy';
+    const TAXONOMY_TABLE_NAME = 'df_taxonomy';
 
     public function checkInstalled()
     {
         if ($this->checkExistCptTable() === false) return false;
-//        if ($this->checkExistLabelTable() === false) return false;
+        if ($this->checkExistCategoryExtraTable() === false) return false;
+        if ($this->checkExistCptTaxTable() === false) return false;
+        if ($this->checkExistTaxonomyTable() === false) return false;
     }
 
     public function install()
     {
         if ($this->checkExistCptTable() === false) $this->createCptTable();
-//        if ($this->checkExistLabelTable() === false) $this->createLabelTable();
+        if ($this->checkExistCategoryExtraTable() === false) $this->createCategoryExtraTable();
+        if ($this->checkExistCptTaxTable() === false) $this->createCptTaxTable();
+        if ($this->checkExistTaxonomyTable() === false) $this->createTaxonomyTable();
     }
 
     protected function checkExistCptTable()
@@ -27,14 +33,26 @@ class Migrations
         return Schema::hasTable(self::CPT_TABLE_NAME);
     }
 
-    protected function checkExistLabelTable()
+    protected function checkExistCategoryExtraTable()
     {
-        return Schema::hasTable(self::LABEL_TABLE_NAME);
+        return Schema::hasTable(self::CATEGORY_EXTRA_TABLE_NAME);
+    }
+
+    protected function checkExistCptTaxTable()
+    {
+        return Schema::hasTable(self::CPT_TAXONOMY_TABLE_NAME);
+    }
+
+    protected function checkExistTaxonomyTable()
+    {
+        return Schema::hasTable(self::TAXONOMY_TABLE_NAME);
     }
 
     protected function createCptTable()
     {
         Schema::create(self::CPT_TABLE_NAME, function (Blueprint $table) {
+            $table->engine = "InnoDB";
+
             $table->increments('id');
             $table->string('site_key', 50);
             $table->string('cpt_id');
@@ -50,24 +68,34 @@ class Migrations
             $table->unique('slug');
         });
     }
-
-    protected function createLabelTable()
+    protected function createCategoryExtraTable()
     {
-        Schema::create(self::LABEL_TABLE_NAME, function (Blueprint $table) {
-            $table->string('target_id', 36);
+        Schema::create(self::CATEGORY_EXTRA_TABLE_NAME, function (Blueprint $table) {
+            $table->engine = "InnoDB";
 
-            $table->string('new_add');          // 새로 추가
-            $table->string('new_add_obj');      // 새 항목 추가
-            $table->string('obj_edit');         // 항목 편집
-            $table->string('new_obj');          // 새 항목
-            $table->string('obj_search');       // 항목 검색
-            $table->string('no_search');        // 찾을 수 없음
-            $table->string('no_trash');         // 휴지통에서 찾을 수 없음
-            $table->string('parent_txt');       // 상위 항목 설명
-            $table->string('all_obj');          // 모든 항목
-            $table->string('here_title_input'); // 여기에 제목 입력
+            $table->integer('category_id');
+            $table->string('slug');
+            $table->boolean('is_hierarchy');
+        });
+    }
 
-            $table->primary('target_id');
+    protected function createCptTaxTable()
+    {
+        Schema::create(self::CPT_TAXONOMY_TABLE_NAME, function (Blueprint $table) {
+            $table->engine = "InnoDB";
+
+            $table->string('cpt_id');
+            $table->integer('category_id');
+        });
+    }
+
+    protected function createTaxonomyTable()
+    {
+        Schema::create(self::TAXONOMY_TABLE_NAME, function (Blueprint $table) {
+            $table->engine = "InnoDB";
+
+            $table->string('target_id');
+            $table->integer('item_id');
         });
     }
 
