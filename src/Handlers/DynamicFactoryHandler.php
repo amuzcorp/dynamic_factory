@@ -155,7 +155,7 @@ class DynamicFactoryHandler
 
         $list = [];
 
-        $configs = $dynamicField->getConfigHandler()->gets('dynamic_factory_df_1');
+        $configs = $dynamicField->getConfigHandler()->gets($group);
         foreach ($configs as $config) {
             $info = $config->getPureAll();
             $fieldType = $dynamicField->get($config->get('group'), $config->get('id'));
