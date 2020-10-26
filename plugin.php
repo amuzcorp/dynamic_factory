@@ -116,16 +116,16 @@ class Plugin extends AbstractPlugin
             ], function(){
                 Route::get('/', [
                     'as' => 'index',
-                    'uses' => 'DynamicFactoryController@index',
+                    'uses' => 'DynamicFactorySettingController@index',
                     'settings_menu' => 'dynamic_factory.index'
                 ]);
-                Route::get('/create', [ 'as' => 'create', 'uses' => 'DynamicFactoryController@create' ]);
-                Route::post('/store_cpt', ['as' => 'store_cpt', 'uses' => 'DynamicFactoryController@storeCpt']);
-                Route::get('/create_extra/{cpt_id}', [ 'as' => 'create_extra', 'uses' => 'DynamicFactoryController@createExtra' ]);
-                Route::get('/edit/{cpt_id}', [ 'as' => 'edit', 'uses' => 'DynamicFactoryController@edit' ]);
-                Route::post('/update/{cpt_id?}', [ 'as' => 'update', 'uses' => 'DynamicFactoryController@update' ]);
-                Route::get('/create_taxonomy/{tax_id?}', [ 'as' => 'create_taxonomy', 'uses' => 'DynamicFactoryController@createTaxonomy' ]);
-                Route::post('/store_cpt_tax', ['as' => 'store_cpt_tax', 'uses' => 'DynamicFactoryController@storeTaxonomy']);
+                Route::get('/create', [ 'as' => 'create', 'uses' => 'DynamicFactorySettingController@create' ]);
+                Route::post('/store_cpt', ['as' => 'store_cpt', 'uses' => 'DynamicFactorySettingController@storeCpt']);
+                Route::get('/create_extra/{cpt_id}', [ 'as' => 'create_extra', 'uses' => 'DynamicFactorySettingController@createExtra' ]);
+                Route::get('/edit/{cpt_id}', [ 'as' => 'edit', 'uses' => 'DynamicFactorySettingController@edit' ]);
+                Route::post('/update/{cpt_id?}', [ 'as' => 'update', 'uses' => 'DynamicFactorySettingController@update' ]);
+                Route::get('/create_taxonomy/{tax_id?}', [ 'as' => 'create_taxonomy', 'uses' => 'DynamicFactorySettingController@createTaxonomy' ]);
+                Route::post('/store_cpt_tax', ['as' => 'store_cpt_tax', 'uses' => 'DynamicFactorySettingController@storeTaxonomy']);
             });
         });
 
@@ -133,7 +133,7 @@ class Plugin extends AbstractPlugin
             foreach($this->cpts as $val) {
                 Route::get('/'.$val->cpt_id. '/{type?}', [
                     'as' => 'dyFac.setting.'.$val->cpt_id,
-                    'uses' => 'DynamicFactoryController@dynamic',
+                    'uses' => 'DynamicFactorySettingController@dynamic',
                     'settings_menu' => $val->cpt_id
                 ]);
             }

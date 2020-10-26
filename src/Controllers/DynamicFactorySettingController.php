@@ -17,7 +17,7 @@ use Xpressengine\Category\Models\Category;
 use Xpressengine\Http\Request;
 use App\Http\Controllers\Controller as BaseController;
 
-class DynamicFactoryController extends BaseController
+class DynamicFactorySettingController extends BaseController
 {
     protected $dfService;
 
