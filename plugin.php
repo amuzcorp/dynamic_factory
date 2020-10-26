@@ -133,7 +133,7 @@ class Plugin extends AbstractPlugin
             foreach($this->cpts as $val) {
                 Route::get('/'.$val->cpt_id. '/{type?}', [
                     'as' => 'dyFac.setting.'.$val->cpt_id,
-                    'uses' => 'DynamicFactorySettingController@dynamic',
+                    'uses' => 'DynamicFactorySettingController@cptDocument',
                     'settings_menu' => $val->cpt_id
                 ]);
             }

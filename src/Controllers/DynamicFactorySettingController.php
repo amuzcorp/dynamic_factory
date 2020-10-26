@@ -108,11 +108,10 @@ class DynamicFactorySettingController extends BaseController
         return redirect()->route('dyFac.setting.edit', ['cpt_id' => $request->cpt_id]);
     }
 
-    public function dynamic()
+    public function cptDocument($type = 'list')
     {
-        $type = 'aaa';
 
-        return $type;
+        return XePresenter::make('dynamic_factory::views.documents.list');
     }
 
     public function createTaxonomy($tax_id = null)
