@@ -7,7 +7,6 @@ use Overcode\XePlugin\DynamicFactory\Handlers\DynamicFactoryTaxonomyHandler;
 use Overcode\XePlugin\DynamicFactory\Services\DynamicFactoryService;
 use Route;
 use Xpressengine\Plugin\AbstractPlugin;
-use Xpressengine\Plugins\XeBlog\Handlers\BlogConfigHandler;
 
 class Plugin extends AbstractPlugin
 {
@@ -54,26 +53,15 @@ class Plugin extends AbstractPlugin
     public function boot()
     {
         $this->loadCpts();
-//        $this->cpts = [];
 
         $this->route();
         $this->registerSettingsMenus();
         $this->registerSettingsRoute();
-
-        $this->testRegister();
     }
 
     protected function registerSitesPermissions()
     {
 
-    }
-
-    protected function testRegister()
-    {
-        //$arr = \XeRegister::all();
-        $arr = \XeRegister::get('settings/menu');
-
-//        dd($arr);
     }
 
     protected function loadCpts()
@@ -104,6 +92,18 @@ class Plugin extends AbstractPlugin
                 'display' => true,
                 'ordering' => $val->menu_order
             ]);
+        }
+
+        $dynamic_factory_containers = \XeRegister::get('dynamic_factory');
+        if($dynamic_factory_containers) {
+            foreach ($dynamic_factory_containers as $val) {
+                \XeRegister::push('settings/menu', $val->cpt_id, [
+                    'title' => $val->menu_name,
+                    'description' => $val->description,
+                    'display' => true,
+                    'ordering' => $val->menu_order
+                ]);
+            }
         }
     }
 
