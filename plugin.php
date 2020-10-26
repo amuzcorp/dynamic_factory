@@ -12,6 +12,8 @@ class Plugin extends AbstractPlugin
 {
     protected $cpts;
 
+    protected $cpts_from_plugin;
+
     public function register()
     {
         app()->singleton(DynamicFactoryService::class, function () {
@@ -68,6 +70,8 @@ class Plugin extends AbstractPlugin
     {
         $dfService = app('overcode.df.service');
         $this->cpts = $dfService->getItems();
+
+        $this->cpts_from_plugin = \XeRegister::get('dynamic_factory');
     }
 
     protected function registerSettingsMenus()
@@ -94,9 +98,8 @@ class Plugin extends AbstractPlugin
             ]);
         }
 
-        $dynamic_factory_containers = \XeRegister::get('dynamic_factory');
-        if($dynamic_factory_containers) {
-            foreach ($dynamic_factory_containers as $val) {
+        if($this->cpts_from_plugin) {
+            foreach ($this->cpts_from_plugin as $val) {
                 \XeRegister::push('settings/menu', $val->cpt_id, [
                     'title' => $val->menu_name,
                     'description' => $val->description,
@@ -138,6 +141,18 @@ class Plugin extends AbstractPlugin
                 ]);
             }
         },['namespace' => 'Overcode\XePlugin\DynamicFactory\Controllers']);
+
+        if($this->cpts_from_plugin) {
+            Route::settings(static::getId(), function () {
+                foreach ($this->cpts_from_plugin as $val) {
+                    Route::get('/'.$val->cpt_id. '/{type?}', [
+                        'as' => 'dyFac.setting.'.$val->cpt_id,
+                        'uses' => 'DynamicFactorySettingController@cptDocument',
+                        'settings_menu' => $val->cpt_id
+                    ]);
+                }
+            },['namespace' => 'Overcode\XePlugin\DynamicFactory\Controllers']);
+        }
     }
 
     protected function route()
