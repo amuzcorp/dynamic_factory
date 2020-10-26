@@ -13,6 +13,7 @@ use XeFrontend;
 use XePresenter;
 use XeLang;
 use XeDB;
+use Route;
 use Xpressengine\Category\Models\Category;
 use Xpressengine\Http\Request;
 use App\Http\Controllers\Controller as BaseController;
@@ -110,8 +111,16 @@ class DynamicFactorySettingController extends BaseController
 
     public function cptDocument($type = 'list')
     {
+        $current_route_name = Route::currentRouteName();
+        $route_names = explode('.', $current_route_name);
+        $cpt_id = $route_names[count($route_names) - 1];
 
-        return XePresenter::make('dynamic_factory::views.documents.list');
+        $cpt = $this->dfService->getItem($cpt_id);
+
+        return XePresenter::make('dynamic_factory::views.documents.list',[
+            'cpt' => $cpt,
+            'current_route_name' => $current_route_name
+        ]);
     }
 
     public function createTaxonomy($tax_id = null)
