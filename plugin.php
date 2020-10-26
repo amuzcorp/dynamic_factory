@@ -3,6 +3,7 @@ namespace Overcode\XePlugin\DynamicFactory;
 
 use Overcode\XePlugin\DynamicFactory\Handlers\DynamicFactoryConfigHandler;
 use Overcode\XePlugin\DynamicFactory\Handlers\DynamicFactoryHandler;
+use Overcode\XePlugin\DynamicFactory\Handlers\DynamicFactoryTaxonomyHandler;
 use Overcode\XePlugin\DynamicFactory\Services\DynamicFactoryService;
 use Route;
 use Xpressengine\Plugin\AbstractPlugin;
@@ -17,10 +18,12 @@ class Plugin extends AbstractPlugin
         app()->singleton(DynamicFactoryService::class, function () {
             $dynamicFactoryHandler = app('overcode.df.handler');
             $dynamicFactoryConfigHandler = app('overcode.df.configHandler');
+            $dynamicFactoryTaxonomyHandler = app('overcode.df.taxonomyHandler');
 
             return new DynamicFactoryService(
                 $dynamicFactoryHandler,
-                $dynamicFactoryConfigHandler
+                $dynamicFactoryConfigHandler,
+                $dynamicFactoryTaxonomyHandler
             );
         });
         app()->alias(DynamicFactoryService::class, 'overcode.df.service');
@@ -36,6 +39,11 @@ class Plugin extends AbstractPlugin
             return new DynamicFactoryConfigHandler($configManager);
         });
         app()->alias(DynamicFactoryConfigHandler::class, 'overcode.df.configHandler');
+
+        app()->singleton(DynamicFactoryTaxonomyHandler::class, function() {
+            return new DynamicFactoryTaxonomyHandler();
+        });
+        app()->alias(DynamicFactoryTaxonomyHandler::class, 'overcode.df.taxonomyHandler');
     }
 
     /**
@@ -117,7 +125,7 @@ class Plugin extends AbstractPlugin
                 Route::get('/edit/{cpt_id}', [ 'as' => 'edit', 'uses' => 'DynamicFactoryController@edit' ]);
                 Route::post('/update/{cpt_id?}', [ 'as' => 'update', 'uses' => 'DynamicFactoryController@update' ]);
                 Route::get('/create_taxonomy/{tax_id?}', [ 'as' => 'create_taxonomy', 'uses' => 'DynamicFactoryController@createTaxonomy' ]);
-                Route::post('/store_cpt_tax', ['as' => 'store_cpt_tax', 'uses' => 'DynamicFactoryController@storeCategory']);
+                Route::post('/store_cpt_tax', ['as' => 'store_cpt_tax', 'uses' => 'DynamicFactoryController@storeTaxonomy']);
             });
         });
 

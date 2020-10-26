@@ -2,6 +2,7 @@
 namespace Overcode\XePlugin\DynamicFactory\Services;
 
 use Overcode\XePlugin\DynamicFactory\Handlers\DynamicFactoryConfigHandler;
+use Overcode\XePlugin\DynamicFactory\Handlers\DynamicFactoryTaxonomyHandler;
 use XeDB;
 use Overcode\XePlugin\DynamicFactory\Handlers\DynamicFactoryHandler;
 use Xpressengine\Http\Request;
@@ -12,13 +13,17 @@ class DynamicFactoryService
 
     protected $dfConfigHandler;
 
+    protected $dfTaxonomyHandler;
+
     public function __construct(
         DynamicFactoryHandler $dfHandler,
-        DynamicFactoryConfigHandler $dfConfigHandler
+        DynamicFactoryConfigHandler $dfConfigHandler,
+        DynamicFactoryTaxonomyHandler $dfTaxonomyHandler
     )
     {
         $this->dfHandler = $dfHandler;
         $this->dfConfigHandler = $dfConfigHandler;
+        $this->dfTaxonomyHandler = $dfTaxonomyHandler;
     }
 
     public function getItemsJson(array $attr)
@@ -45,6 +50,22 @@ class DynamicFactoryService
         return $cpt;
     }
 
+    public function storeCptTaxonomy(Request $request)
+    {
+        $inputs = $request->except('_token');
+
+        XeDB::beginTransaction();
+        try {
+            $category_id = $this->dfTaxonomyHandler->createTaxonomy($inputs);
+        }catch (\Exception $e) {
+            XeDB::rollback();
+            throw $e;
+        }
+        XeDB::commit();
+
+        return $category_id;
+    }
+
     public function updateCpt(Request $request)
     {
         $inputs = $request->originExcept('_token');
@@ -65,5 +86,12 @@ class DynamicFactoryService
         $cpt = $this->dfHandler->getItem($cpt_id);
 
         return $cpt;
+    }
+
+    public function getCategories($cpt_id)
+    {
+        $categories = $this->dfTaxonomyHandler->getTaxonomies($cpt_id);
+
+        return $categories;
     }
 }

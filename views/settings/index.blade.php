@@ -33,7 +33,14 @@
                             </ul>
                             <a href="{{ route('dyFac.setting.create_extra', ['cpt_id' => $cpt->cpt_id]) }}" class="btn btn-sm btn-warning">확장 필드 관리</a>
                         </td>
-                        <td></td>
+                        <td>
+                            <ul class="list-group">
+                            @foreach($cpt->categories as $cate)
+                                <li class="list-group-item"><a href="{{ route('dyFac.setting.create_taxonomy',[ 'tax_id' => $cate->id]) }}">{{ xe_trans($cate->name) }}</a></li>
+                            @endforeach
+                            </ul>
+                            <a href="{{ route('dyFac.setting.create_taxonomy') }}" class="btn btn-sm btn-warning">분류 추가</a>
+                        </td>
                     </tr>
                     @endforeach
                     </tbody>

@@ -4,6 +4,8 @@ namespace Overcode\XePlugin\DynamicFactory\Controllers;
 use App\Http\Sections\DynamicFieldSection;
 use Overcode\XePlugin\DynamicFactory\Handlers\DynamicFactoryHandler;
 use Overcode\XePlugin\DynamicFactory\Handlers\DynamicFactoryTaxonomyHandler;
+use Overcode\XePlugin\DynamicFactory\Models\CategoryExtra;
+use Overcode\XePlugin\DynamicFactory\Models\CptTaxonomy;
 use Overcode\XePlugin\DynamicFactory\Plugin;
 use Overcode\XePlugin\DynamicFactory\Services\DynamicFactoryService;
 use App\Http\Sections\EditorSection;
@@ -11,6 +13,7 @@ use XeFrontend;
 use XePresenter;
 use XeLang;
 use XeDB;
+use Xpressengine\Category\Models\Category;
 use Xpressengine\Http\Request;
 use App\Http\Controllers\Controller as BaseController;
 
@@ -43,6 +46,11 @@ class DynamicFactoryController extends BaseController
         XeFrontend::title($title);
 
         $cpts = $this->dfService->getItems();
+
+        foreach ($cpts as $cpt) {
+            $categories = $this->dfService->getCategories($cpt->cpt_id);
+            $cpt->categories = $categories;
+        }
 
         // output
         return XePresenter::make('dynamic_factory::views.settings.index', [
@@ -109,18 +117,40 @@ class DynamicFactoryController extends BaseController
 
     public function createTaxonomy($tax_id = null)
     {
-        //$cpt = $this->dfService->getItem($cpt_id);
+        $cpt_cate_extra = new CategoryExtra();
+        $cpt_taxonomy = [];
+        $cpt_cate_extra->is_hierarchy = true;
+
+        $cpt_ids = [];
+        $category = new Category();
+        if($tax_id){
+            $category = $this->taxonomyHandler->getCategory($tax_id);
+            $cpt_cate_extra = CategoryExtra::where('category_id', $tax_id)->first();
+            $cpt_taxonomy = CptTaxonomy::where('category_id', $tax_id)->get();
+        }
+
+        foreach ($cpt_taxonomy as $cptx) {
+            $cpt_ids[] = $cptx->cpt_id;
+        }
+
+        // 1. 유형 목록 불러오기 TODO 2. 다른 플러그인에서 생성된 유형 목록 불러오기
+        $cpts = $this->dfService->getItems();
 
         //TODO tax_id 가 있으면 로드 하여 프레젠터에 보낸다.
 
-        return XePresenter::make('dynamic_factory::views.settings.create_taxonomy');
+        return XePresenter::make('dynamic_factory::views.settings.create_taxonomy',
+        [
+            'category' => $category,
+            'cpt_cate_extra' => $cpt_cate_extra,
+            'cpt_ids' => $cpt_ids,
+            'cpts' => $cpts
+        ]);
     }
 
-    public function storeCategory(Request $request)
+    public function storeTaxonomy(Request $request)
     {
-        $taxonomyAttribute = $request->except('_token');
-
-        $taxonomyItem = $this->taxonomyHandler->createTaxonomy($taxonomyAttribute);
+        //$taxonomyItem = $this->taxonomyHandler->createTaxonomy($taxonomyAttribute);
+        $temp = $this->dfService->storeCptTaxonomy($request);
 
         return redirect()->back();  //TODO 경로 수정
     }

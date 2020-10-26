@@ -12,7 +12,7 @@ class Cpt extends DynamicModel
     protected $casts = ['sections' => 'array', 'options' => 'array', 'labels' => 'array'];
 
     protected $primaryKey = 'cpt_id';
-    //protected $incrementing = false;
+
     protected $keyType = 'string';
 
     public $timestamps = false;
@@ -20,5 +20,9 @@ class Cpt extends DynamicModel
     public function getNextId() {
         $statement = XeDB::select("show table status like 'xe_".$this->table."'");
         return $statement[0]->Auto_increment ?? 1;
+    }
+
+    public function taxonomy() {
+        return $this->hasMany(CptTaxonomy::class, 'cpt_id', 'cpt_id');
     }
 }
