@@ -135,6 +135,8 @@ class DynamicFactorySettingController extends BaseController
             $category = $this->taxonomyHandler->getCategory($tax_id);
             $cpt_cate_extra = CategoryExtra::where('category_id', $tax_id)->first();
             $cpt_taxonomy = CptTaxonomy::where('category_id', $tax_id)->get();
+
+
         }
 
         foreach ($cpt_taxonomy as $cptx) {
@@ -145,6 +147,25 @@ class DynamicFactorySettingController extends BaseController
         $cpts = $this->dfService->getItems();
 
         //TODO tax_id 가 있으면 로드 하여 프레젠터에 보낸다.
+
+        XeFrontend::js('/assets/core/common/js/xe.tree.js')->appendTo('body')->load();
+        XeFrontend::js('/assets/core/category/Category.js')->appendTo('body')->load();
+
+        XeFrontend::translation([
+            'xe::required',
+            'xe::addItem',
+            'xe::create',
+            'xe::createChild',
+            'xe::edit',
+            'xe::unknown',
+            'xe::word',
+            'xe::description',
+            'xe::save',
+            'xe::delete',
+            'xe::close',
+            'xe::subCategoryDestroy',
+            'xe::confirmDelete',
+        ]);
 
         return XePresenter::make('dynamic_factory::views.settings.create_taxonomy',
         [
@@ -157,9 +178,8 @@ class DynamicFactorySettingController extends BaseController
 
     public function storeTaxonomy(Request $request)
     {
-        //$taxonomyItem = $this->taxonomyHandler->createTaxonomy($taxonomyAttribute);
-        $temp = $this->dfService->storeCptTaxonomy($request);
+        $category_id = $this->dfService->storeCptTaxonomy($request);
 
-        return redirect()->back();  //TODO 경로 수정
+        return redirect()->route('dyFac.setting.create_taxonomy', ['tax_id' => $category_id]);  //TODO 경로 수정
     }
 }

@@ -78,13 +78,12 @@ class Plugin extends AbstractPlugin
     {
         \XeRegister::push('settings/menu', 'dynamic_factory', [
             'title' => 'Dynamic Factory',
-            'description' => 'CPT를 생성하고 관리합니다.',
+            'description' => '사용자 정의 유형과 확장 필드와 분류를 생성하고 관리합니다.',
             'display' => true,
             'ordering' => 5000
         ]);
         \XeRegister::push('settings/menu', 'dynamic_factory.index', [
-            'title' => '유형 관리',
-            'description' => '생성된 CPT를 열람합니다.',
+            'title' => '사용자 정의 유형 관리',
             'display' => true,
             'ordering' => 1000
         ]);

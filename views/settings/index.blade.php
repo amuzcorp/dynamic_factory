@@ -3,7 +3,7 @@
 @endphp
 @section('page_title')
     <div class="clearfix">
-        <h2 class="pull-left">CPT 관리</h2>
+        <h2 class="pull-left">사용자 정의 유형 관리</h2>
         <a href="{{ route('dyFac.setting.create') }}" class="xu-button xu-button--primary pull-right">새 유형 추가</a>
     </div>
 @endsection
@@ -16,7 +16,7 @@
                     <tr>
                         <th>글 유형</th>
                         <th>확장 필드</th>
-                        <th>분류</th>
+                        <th>카테고리</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -39,7 +39,7 @@
                                 <li class="list-group-item"><a href="{{ route('dyFac.setting.create_taxonomy',[ 'tax_id' => $cate->id]) }}">{{ xe_trans($cate->name) }}</a></li>
                             @endforeach
                             </ul>
-                            <a href="{{ route('dyFac.setting.create_taxonomy') }}" class="btn btn-sm btn-warning">분류 추가</a>
+                            <a href="{{ route('dyFac.setting.create_taxonomy') }}" class="btn btn-sm btn-warning">카테고리 추가</a>
                         </td>
                     </tr>
                     @endforeach

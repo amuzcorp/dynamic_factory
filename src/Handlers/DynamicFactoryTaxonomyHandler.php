@@ -47,7 +47,7 @@ class DynamicFactoryTaxonomyHandler
         }
 
         $cateExtra->slug = $inputs['slug'];
-        $cateExtra->is_hierarchy = $inputs['is_hierarchy'];
+//        $cateExtra->is_hierarchy = $inputs['is_hierarchy'];
         $cateExtra->save();
 
         foreach($inputs['cpts'] as $val) {
