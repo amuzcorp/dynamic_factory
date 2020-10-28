@@ -99,7 +99,7 @@ class Plugin extends AbstractPlugin
 
         if($this->cpts_from_plugin) {
             foreach ($this->cpts_from_plugin as $val) {
-                \XeRegister::push('settings/menu', $val->cpt_id, [
+                \XeRegister::push('settings/menu', $val->menu_path . $val->cpt_id, [
                     'title' => $val->menu_name,
                     'description' => $val->description,
                     'display' => true,
@@ -147,7 +147,7 @@ class Plugin extends AbstractPlugin
                     Route::get('/'.$val->cpt_id. '/{type?}', [
                         'as' => 'dyFac.setting.'.$val->cpt_id,
                         'uses' => 'DynamicFactorySettingController@cptDocument',
-                        'settings_menu' => $val->cpt_id
+                        'settings_menu' => $val->menu_path . $val->cpt_id
                     ]);
                 }
             },['namespace' => 'Overcode\XePlugin\DynamicFactory\Controllers']);
