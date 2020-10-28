@@ -5,6 +5,7 @@ namespace Overcode\XePlugin\DynamicFactory\Handlers;
 use Overcode\XePlugin\DynamicFactory\Models\Cpt;
 use Overcode\XePlugin\DynamicFactory\Plugin;
 use XeSite;
+use Xpressengine\Document\DocumentHandler;
 
 class DynamicFactoryHandler
 {

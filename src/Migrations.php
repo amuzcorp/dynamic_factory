@@ -96,6 +96,7 @@ class Migrations
             $table->engine = "InnoDB";
 
             $table->string('target_id');
+            $table->integer('category_id');
             $table->integer('item_id');
         });
     }

@@ -4,6 +4,8 @@ namespace Overcode\XePlugin\DynamicFactory\Handlers;
 
 use Overcode\XePlugin\DynamicFactory\Models\CategoryExtra;
 use Overcode\XePlugin\DynamicFactory\Models\CptTaxonomy;
+use Overcode\XePlugin\DynamicFactory\Models\DfTaxonomy;
+use Xpressengine\Category\Models\CategoryItem;
 
 class DynamicFactoryTaxonomyHandler
 {
@@ -76,6 +78,46 @@ class DynamicFactoryTaxonomyHandler
     public function getCategory($category_id)
     {
         return $this->categoryHandler->cates()->find($category_id);
+    }
+
+    public function getTaxonomyItems($category_id)
+    {
+        $items = [];
+        $taxonomyItems = CategoryItem::where('category_id', $category_id)->orderBy('ordering')->get();
+        foreach ($taxonomyItems as $taxonomyItem) {
+            $items[] = [
+                'value' => $taxonomyItem->id,
+                'text' => $taxonomyItem->word
+            ];
+        }
+
+        return $items;
+    }
+
+    public function storeTaxonomy($document, $inputs)
+    {
+        $taxonomies = $this->getTaxonomies($inputs['cpt_id']);
+
+        foreach ($taxonomies as $taxonomy) {
+            $categoryId = $taxonomy->id;
+            if (isset($inputs[$categoryId]) === false) {
+                continue;
+            }
+            $taxonomyItemId = $inputs[$categoryId];
+
+            if ($taxonomyItemId === null || $taxonomyItemId === '') {
+                continue;
+            }
+
+            $newDfTaxonomy = new DfTaxonomy();
+            $newDfTaxonomy->fill([
+                'target_id' => $document->id,
+                'category_id' => $categoryId,
+                'item_id' => $taxonomyItemId
+            ]);
+
+            $newDfTaxonomy->save();
+        }
     }
 
 }

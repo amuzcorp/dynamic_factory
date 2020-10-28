@@ -3,7 +3,6 @@ namespace Overcode\XePlugin\DynamicFactory\Controllers;
 
 use App\Http\Sections\DynamicFieldSection;
 use Overcode\XePlugin\DynamicFactory\Handlers\DynamicFactoryHandler;
-use Overcode\XePlugin\DynamicFactory\Handlers\DynamicFactorySettingMenuHandler;
 use Overcode\XePlugin\DynamicFactory\Handlers\DynamicFactoryTaxonomyHandler;
 use Overcode\XePlugin\DynamicFactory\Models\CategoryExtra;
 use Overcode\XePlugin\DynamicFactory\Models\CptTaxonomy;
@@ -27,6 +26,9 @@ class DynamicFactorySettingController extends BaseController
 
     protected $taxonomyHandler;
 
+    /** @var ConfigHandler $dynamicFieldConfigHandler */
+    protected $dynamicFieldConfigHandler;
+
     const DEFAULT_MENU_ORDER = '500';
 
     public function __construct(
@@ -38,6 +40,7 @@ class DynamicFactorySettingController extends BaseController
         $this->dfService = $dynamicFactoryService;
         $this->dfHandler = $dynamicFactoryHandler;
         $this->taxonomyHandler = $dynamicFactoryTaxonomyHandler;
+        $this->dynamicFieldConfigHandler = app('xe.dynamicField');
     }
 
     /**
@@ -161,10 +164,16 @@ class DynamicFactorySettingController extends BaseController
 
         $cpt = $this->dfService->getItem($cpt_id);
 
+        $taxonomies = $this->taxonomyHandler->getTaxonomies($cpt_id);
+
+        $dynamicFields = $this->dynamicFieldConfigHandler->gets('dynamic_factory_' . $cpt_id);
+
         if($type == 'create'){
             return XePresenter::make('dynamic_factory::views.documents.create',[
                 'cpt' => $cpt,
-                'current_route_name' => $current_route_name
+                'current_route_name' => $current_route_name,
+                'taxonomies' => $taxonomies,
+                'dynamicFields' => $dynamicFields
             ]);
         }
 
@@ -172,6 +181,15 @@ class DynamicFactorySettingController extends BaseController
             'cpt' => $cpt,
             'current_route_name' => $current_route_name
         ]);
+    }
+
+    public function storeCptDocument(Request $request)
+    {
+        //Todo 퍼미션 체크
+
+        $document = $this->dfService->storeCptDocument($request);
+
+        return redirect()->route('dyFac.setting.'.$request->cpt_id, ['type' => 'list']);
     }
 
     /**

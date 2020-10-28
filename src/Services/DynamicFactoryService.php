@@ -2,6 +2,7 @@
 namespace Overcode\XePlugin\DynamicFactory\Services;
 
 use Overcode\XePlugin\DynamicFactory\Handlers\DynamicFactoryConfigHandler;
+use Overcode\XePlugin\DynamicFactory\Handlers\DynamicFactoryDocumentHandler;
 use Overcode\XePlugin\DynamicFactory\Handlers\DynamicFactoryTaxonomyHandler;
 use XeDB;
 use Overcode\XePlugin\DynamicFactory\Handlers\DynamicFactoryHandler;
@@ -15,15 +16,19 @@ class DynamicFactoryService
 
     protected $dfTaxonomyHandler;
 
+    protected $dfDocumentHandler;
+
     public function __construct(
         DynamicFactoryHandler $dfHandler,
         DynamicFactoryConfigHandler $dfConfigHandler,
-        DynamicFactoryTaxonomyHandler $dfTaxonomyHandler
+        DynamicFactoryTaxonomyHandler $dfTaxonomyHandler,
+        DynamicFactoryDocumentHandler $dfDocumentHandler
     )
     {
         $this->dfHandler = $dfHandler;
         $this->dfConfigHandler = $dfConfigHandler;
         $this->dfTaxonomyHandler = $dfTaxonomyHandler;
+        $this->dfDocumentHandler = $dfDocumentHandler;
     }
 
     public function getItemsJson(array $attr)
@@ -98,5 +103,32 @@ class DynamicFactoryService
         $categories = $this->dfTaxonomyHandler->getTaxonomies($cpt_id);
 
         return $categories;
+    }
+
+    public function storeCptDocument(Request $request)
+    {
+        $inputs = $request->originExcept('_token');
+
+        if (isset($inputs['user_id']) === false) {
+            $inputs['user_id'] = auth()->user()->getId();
+        }
+
+        if (isset($inputs['writer']) === false) {
+            $inputs['writer'] = auth()->user()->getDisplayName();
+        }
+
+        XeDB::beginTransaction();
+        try {
+            $document = $this->dfDocumentHandler->store($inputs);
+            $this->dfTaxonomyHandler->storeTaxonomy($document, $inputs);
+
+        }catch (\Exception $e) {
+            XeDB::rollback();
+
+            throw $e;
+        }
+        XeDB::commit();
+
+        return $document;
     }
 }

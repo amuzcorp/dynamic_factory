@@ -2,10 +2,12 @@
 namespace Overcode\XePlugin\DynamicFactory;
 
 use Overcode\XePlugin\DynamicFactory\Handlers\DynamicFactoryConfigHandler;
+use Overcode\XePlugin\DynamicFactory\Handlers\DynamicFactoryDocumentHandler;
 use Overcode\XePlugin\DynamicFactory\Handlers\DynamicFactoryHandler;
 use Overcode\XePlugin\DynamicFactory\Handlers\DynamicFactoryTaxonomyHandler;
 use Overcode\XePlugin\DynamicFactory\Services\DynamicFactoryService;
 use Route;
+use XeInterception;
 use Xpressengine\Plugin\AbstractPlugin;
 
 class Plugin extends AbstractPlugin
@@ -16,15 +18,29 @@ class Plugin extends AbstractPlugin
 
     public function register()
     {
+        app()->singleton(DynamicFactoryDocumentHandler::class, function() {
+            $proxyHandler = XeInterception::proxy(DynamicFactoryDocumentHandler::class);
+
+            return new $proxyHandler(
+                app('xe.db')->connection(),
+                app('xe.document.config'),
+                app('xe.document.instance'),
+                app('request')
+            );
+        });
+        app()->alias(DynamicFactoryDocumentHandler::class, 'overcode.df.documentHandler');
+
         app()->singleton(DynamicFactoryService::class, function () {
             $dynamicFactoryHandler = app('overcode.df.handler');
             $dynamicFactoryConfigHandler = app('overcode.df.configHandler');
             $dynamicFactoryTaxonomyHandler = app('overcode.df.taxonomyHandler');
+            $dynamicFactoryDocumentHandler = app('overcode.df.documentHandler');
 
             return new DynamicFactoryService(
                 $dynamicFactoryHandler,
                 $dynamicFactoryConfigHandler,
-                $dynamicFactoryTaxonomyHandler
+                $dynamicFactoryTaxonomyHandler,
+                $dynamicFactoryDocumentHandler
             );
         });
         app()->alias(DynamicFactoryService::class, 'overcode.df.service');
@@ -128,6 +144,7 @@ class Plugin extends AbstractPlugin
                 Route::post('/update/{cpt_id?}', [ 'as' => 'update', 'uses' => 'DynamicFactorySettingController@update' ]);
                 Route::get('/create_taxonomy/{tax_id?}', [ 'as' => 'create_taxonomy', 'uses' => 'DynamicFactorySettingController@createTaxonomy' ]);
                 Route::post('/store_cpt_tax', ['as' => 'store_cpt_tax', 'uses' => 'DynamicFactorySettingController@storeTaxonomy']);
+                Route::post('/store_cpt_document', ['as' => 'store_cpt_document', 'uses' => 'DynamicFactorySettingController@storeCptDocument']);
             });
         });
 
