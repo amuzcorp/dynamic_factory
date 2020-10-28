@@ -29,8 +29,19 @@
                         </div>
                     </div>
                     <div class="form-group row">
+                        <label class="col-sm-2 col-form-label">상위 메뉴 (필수)</label>
+                        <div class="col-sm-5">
+                            <select class="form-control" name="menu_path">
+                                <option value="">- 최상위 -</option>
+                                @foreach($menus as $menu)
+                                <option value="{{ $menu['menu_path'] }}">{{ xe_trans($menu['title']) }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group row">
                         <label class="col-sm-2 col-form-label">슬러그 (필수)</label>
-                        <div class="col-sm-10">
+                        <div class="col-sm-5">
                             <input type="text" class="form-control" name="slug">
                         </div>
                     </div>

@@ -103,6 +103,7 @@ class DynamicFactoryHandler
             'cpt_name' => $inputs['cpt_name'],
             'menu_name' => $inputs['menu_name'],
             'menu_order' => $inputs['menu_order'] ?? '500',
+            'menu_path' => $inputs['menu_path'] ?? '',
             'slug' => $inputs['slug'],
             'description' => $inputs['description'] ?? '',
             'editor' => $inputs['editor'] ?? '',
@@ -124,6 +125,7 @@ class DynamicFactoryHandler
             'cpt_name' => $inputs['cpt_name'],
             'menu_name' => $inputs['menu_name'],
             'menu_order' => $inputs['menu_order'] ?? '500',
+            'menu_path' => $inputs['menu_path'] ?? '',
             'slug' => $inputs['slug'],
             'description' => $inputs['description'] ?? '',
             'editor' => $inputs['editor'] ?? '',
@@ -167,5 +169,17 @@ class DynamicFactoryHandler
         }
 
         return $list;
+    }
+
+    public function getAdminMenus()
+    {
+        $menus = \XeRegister::get('settings/menu');
+
+        foreach ($menus as $key => $val){
+            if(substr_count($key, '.') > 0) unset($menus[$key]);    // 상위 메뉴만 호출
+            else $menus[$key]['menu_path'] = $key . '.';
+        }
+
+        return $menus;
     }
 }

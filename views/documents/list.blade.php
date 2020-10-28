@@ -1,6 +1,6 @@
 @section('page_title')
     <div class="clearfix">
-        <h2 class="pull-left">{{ $cpt->menu_name }}</h2>
+        <h2 class="pull-left">{{ $cpt->cpt_name }} 리스트</h2>
         <a href="{{ route($current_route_name, ['type' => 'create']) }}" class="xu-button xu-button--primary pull-right">새 글 추가</a>
     </div>
 @endsection

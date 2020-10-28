@@ -3,6 +3,7 @@ namespace Overcode\XePlugin\DynamicFactory\Controllers;
 
 use App\Http\Sections\DynamicFieldSection;
 use Overcode\XePlugin\DynamicFactory\Handlers\DynamicFactoryHandler;
+use Overcode\XePlugin\DynamicFactory\Handlers\DynamicFactorySettingMenuHandler;
 use Overcode\XePlugin\DynamicFactory\Handlers\DynamicFactoryTaxonomyHandler;
 use Overcode\XePlugin\DynamicFactory\Models\CategoryExtra;
 use Overcode\XePlugin\DynamicFactory\Models\CptTaxonomy;
@@ -39,6 +40,11 @@ class DynamicFactorySettingController extends BaseController
         $this->taxonomyHandler = $dynamicFactoryTaxonomyHandler;
     }
 
+    /**
+     * CPT 리스트 화면
+     *
+     * @return mixed
+     */
     public function index()
     {
         $title = "다이나믹 팩토리";
@@ -60,14 +66,31 @@ class DynamicFactorySettingController extends BaseController
         ]);
     }
 
+    /**
+     * CPT 생성 화면
+     *
+     * @return mixed
+     */
     public function create()
     {
+        $labels = $this->dfHandler->getDefaultLabels();
+        $menus = $this->dfHandler->getAdminMenus();
+
+//        dd($menus);
+
         return XePresenter::make('dynamic_factory::views.settings.create', [
             'menu_order' => self::DEFAULT_MENU_ORDER,
-             'labels' => $this->dfHandler->getDefaultLabels()
+            'labels' => $labels,
+            'menus' => $menus
         ]);
     }
 
+    /**
+     * 다이나믹 필드 관리 화면
+     *
+     * @param $cpt_id
+     * @return mixed
+     */
     public function createExtra($cpt_id)
     {
         $cpt = $this->dfService->getItem($cpt_id);
@@ -83,6 +106,13 @@ class DynamicFactorySettingController extends BaseController
             compact('dynamicFieldSection', 'cpt'));
     }
 
+    /**
+     * CPT 저장 ACTION
+     *
+     * @param Request $request
+     * @return \Illuminate\Http\RedirectResponse
+     * @throws \Exception
+     */
     public function storeCpt(Request $request)
     {
         // TODO 권한체크
@@ -92,15 +122,29 @@ class DynamicFactorySettingController extends BaseController
         return redirect()->route('dyFac.setting.index');
     }
 
+    /**
+     * CPT 수정 화면
+     *
+     * @param $cpt_id
+     * @return mixed
+     */
     public function edit($cpt_id)
     {
         $cpt = $this->dfService->getItem($cpt_id);
+        $menus = $this->dfHandler->getAdminMenus();
 
         return XePresenter::make('dynamic_factory::views.settings.edit', [
-            'cpt' => $cpt
+            'cpt' => $cpt,
+            'menus' => $menus
         ]);
     }
 
+    /**
+     * CPT 수정 ACTION
+     *
+     * @param Request $request
+     * @return \Illuminate\Http\RedirectResponse
+     */
     public function update(Request $request)
     {
         // TODO 권한체크
@@ -117,17 +161,30 @@ class DynamicFactorySettingController extends BaseController
 
         $cpt = $this->dfService->getItem($cpt_id);
 
+        if($type == 'create'){
+            return XePresenter::make('dynamic_factory::views.documents.create',[
+                'cpt' => $cpt,
+                'current_route_name' => $current_route_name
+            ]);
+        }
+
         return XePresenter::make('dynamic_factory::views.documents.list',[
             'cpt' => $cpt,
             'current_route_name' => $current_route_name
         ]);
     }
 
+    /**
+     * 카테고리 등록/수정 화면
+     *
+     * @param null $tax_id
+     * @return mixed
+     */
     public function createTaxonomy($tax_id = null)
     {
         $cpt_cate_extra = new CategoryExtra();
         $cpt_taxonomy = [];
-        $cpt_cate_extra->is_hierarchy = true;
+        //$cpt_cate_extra->is_hierarchy = true;
 
         $cpt_ids = [];
         $category = new Category();
@@ -176,6 +233,13 @@ class DynamicFactorySettingController extends BaseController
         ]);
     }
 
+    /**
+     * 카테고리 저장 ACTION
+     *
+     * @param Request $request
+     * @return \Illuminate\Http\RedirectResponse
+     * @throws \Exception
+     */
     public function storeTaxonomy(Request $request)
     {
         $category_id = $this->dfService->storeCptTaxonomy($request);

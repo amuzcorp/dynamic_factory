@@ -7,7 +7,7 @@ class CategoryExtra extends DynamicModel
 {
     protected $table = 'df_category_extra';
 
-    protected $fillable = ['category_id', 'slug', 'is_hierarchy'];
+    protected $fillable = ['category_id', 'slug'];
 
     public $primaryKey = 'category_id';
 
