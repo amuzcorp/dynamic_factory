@@ -93,7 +93,7 @@ class DynamicFactoryService
         $cpt = $this->dfHandler->getItem($cpt_id);
 
         $cpts = \XeRegister::get('dynamic_factory');    // register 에 등록된 cpt 를 가져온다
-        if(array_key_exists($cpt_id, $cpts)){
+        if($cpts && array_key_exists($cpt_id, $cpts)){
             $cpt = $cpts[$cpt_id];
         }
 

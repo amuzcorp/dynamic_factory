@@ -5,6 +5,7 @@ use App\Http\Sections\DynamicFieldSection;
 use Overcode\XePlugin\DynamicFactory\Handlers\DynamicFactoryHandler;
 use Overcode\XePlugin\DynamicFactory\Handlers\DynamicFactoryTaxonomyHandler;
 use Overcode\XePlugin\DynamicFactory\Models\CategoryExtra;
+use Overcode\XePlugin\DynamicFactory\Models\Cpt;
 use Overcode\XePlugin\DynamicFactory\Models\CptTaxonomy;
 use Overcode\XePlugin\DynamicFactory\Plugin;
 use Overcode\XePlugin\DynamicFactory\Services\DynamicFactoryService;
@@ -157,31 +158,58 @@ class DynamicFactorySettingController extends BaseController
         return redirect()->route('dyFac.setting.edit', ['cpt_id' => $request->cpt_id]);
     }
 
-    public function cptDocument($type = 'list')
+    public function cptDocument($type = 'list', Request $request)
     {
         $current_route_name = Route::currentRouteName();
         $route_names = explode('.', $current_route_name);
         $cpt_id = $route_names[count($route_names) - 1];
 
+        $request->current_route_name = $current_route_name;
+
         $cpt = $this->dfService->getItem($cpt_id);
 
-        $taxonomies = $this->taxonomyHandler->getTaxonomies($cpt_id);
-
-        $dynamicFields = $this->dynamicFieldConfigHandler->gets('documents_' . $cpt_id);
-
         if($type == 'create'){
-            return XePresenter::make('dynamic_factory::views.documents.create',[
-                'cpt' => $cpt,
-                'current_route_name' => $current_route_name,
-                'taxonomies' => $taxonomies,
-                'dynamicFields' => $dynamicFields
-            ]);
+            return $this->documentCreate($cpt, $request);
+        }
+        else if($type == 'update'){
+            return $this->documentUpdate($cpt, $request);
+        }
+        else if($type == 'delete'){
+            return $this->documentDelete($cpt, $request);
         }
 
+        return $this->documentList($cpt, $request);
+    }
+
+    public function documentList(Cpt $cpt, Request $request)
+    {
         return XePresenter::make('dynamic_factory::views.documents.list',[
             'cpt' => $cpt,
-            'current_route_name' => $current_route_name
+            'current_route_name' => $request->current_route_name
         ]);
+    }
+
+    public function documentCreate(Cpt $cpt, Request $request)
+    {
+        $taxonomies = $this->taxonomyHandler->getTaxonomies($cpt->cpt_id);
+
+        $dynamicFields = $this->dynamicFieldConfigHandler->gets('documents_' . $cpt->cpt_id);
+
+        return XePresenter::make('dynamic_factory::views.documents.create',[
+            'cpt' => $cpt,
+            'taxonomies' => $taxonomies,
+            'dynamicFields' => $dynamicFields
+        ]);
+    }
+
+    public function documentUpdate(Cpt $cpt, Request $request)
+    {
+
+    }
+
+    public function documentDelete(Cpt $cpt, Request $request)
+    {
+
     }
 
     public function storeCptDocument(Request $request)
