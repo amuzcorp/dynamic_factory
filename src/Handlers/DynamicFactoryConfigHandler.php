@@ -22,7 +22,9 @@ class DynamicFactoryConfigHandler
 
     public function storeDfConfig()
     {
-        $this->removeConfig($this->get(self::CONFIG_NAME));
+        if($this->get(self::CONFIG_NAME) !== null) {
+            $this->removeConfig($this->get(self::CONFIG_NAME));
+        }
         $this->configManager->add(self::CONFIG_NAME, $this->defaultConfig);
     }
 
