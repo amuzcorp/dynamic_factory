@@ -4,7 +4,9 @@ namespace Overcode\XePlugin\DynamicFactory\Services;
 use Overcode\XePlugin\DynamicFactory\Handlers\DynamicFactoryConfigHandler;
 use Overcode\XePlugin\DynamicFactory\Handlers\DynamicFactoryDocumentHandler;
 use Overcode\XePlugin\DynamicFactory\Handlers\DynamicFactoryTaxonomyHandler;
+use Overcode\XePlugin\DynamicFactory\Plugin;
 use XeDB;
+use XeSite;
 use Overcode\XePlugin\DynamicFactory\Handlers\DynamicFactoryHandler;
 use Xpressengine\Http\Request;
 
@@ -119,6 +121,14 @@ class DynamicFactoryService
 
         XeDB::beginTransaction();
         try {
+            $cpt_id = $request->cpt_id;
+
+            /** @var DocumentHandler $documentConfigHandler */
+            $documentConfigHandler = app('xe.document');
+            $config = $documentConfigHandler->getConfigHandler()->get($cpt_id);
+            if(!$config){
+                $documentConfigHandler->createInstance($cpt_id, ['instanceId' => $cpt_id, 'group' => Plugin::getId() . '_' . $cpt_id, 'siteKey' => XeSite::getCurrentSiteKey()]);
+            }
             $document = $this->dfDocumentHandler->store($inputs);
             $this->dfTaxonomyHandler->storeTaxonomy($document, $inputs);
 

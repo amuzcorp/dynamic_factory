@@ -99,7 +99,8 @@ class DynamicFactorySettingController extends BaseController
         $cpt = $this->dfService->getItem($cpt_id);
 
         $dynamicFieldSection = new DynamicFieldSection(
-            Plugin::getId() . '_' . $cpt_id,
+//            Plugin::getId() . '_' . $cpt_id,
+            'documents_' . $cpt_id,
             \XeDB::connection(),
             true
         );
@@ -166,7 +167,7 @@ class DynamicFactorySettingController extends BaseController
 
         $taxonomies = $this->taxonomyHandler->getTaxonomies($cpt_id);
 
-        $dynamicFields = $this->dynamicFieldConfigHandler->gets('dynamic_factory_' . $cpt_id);
+        $dynamicFields = $this->dynamicFieldConfigHandler->gets('documents_' . $cpt_id);
 
         if($type == 'create'){
             return XePresenter::make('dynamic_factory::views.documents.create',[
@@ -186,7 +187,6 @@ class DynamicFactorySettingController extends BaseController
     public function storeCptDocument(Request $request)
     {
         //Todo 퍼미션 체크
-
         $document = $this->dfService->storeCptDocument($request);
 
         return redirect()->route('dyFac.setting.'.$request->cpt_id, ['type' => 'list']);

@@ -100,7 +100,7 @@ class DynamicFactoryHandler
         $newCpt = new Cpt();
         $newCpt->fill([
             'site_key' => XeSite::getCurrentSiteKey(),
-            'cpt_id' => 'df_' . $newCpt->getNextId(),
+            'cpt_id' => 'df' . $newCpt->getNextId(),
             'cpt_name' => $inputs['cpt_name'],
             'menu_name' => $inputs['menu_name'],
             'menu_order' => $inputs['menu_order'] ?? '500',
@@ -152,7 +152,7 @@ class DynamicFactoryHandler
 
     public static function getDynamicFields($cpt_id)
     {
-        $group = Plugin::getId() . '_' . $cpt_id;
+        $group = 'documents_' . $cpt_id;
 
         $dynamicField = app('xe.dynamicField');
 

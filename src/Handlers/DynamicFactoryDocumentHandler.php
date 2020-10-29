@@ -9,8 +9,11 @@ class DynamicFactoryDocumentHandler extends DocumentHandler
 {
     public function store($attributes)
     {
-        $attributes['instance_id'] = $attributes['cpt_id'];
-        $attributes['type'] = Plugin::getId();
+        $cpt_id = $attributes['cpt_id'];
+
+        $attributes['instance_id'] = $cpt_id;
+//        $attributes['type'] = Plugin::getId();
+        $attributes['type'] = $cpt_id;
 
         return parent::add($attributes);
     }
