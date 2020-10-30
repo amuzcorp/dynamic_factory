@@ -1,10 +1,8 @@
 @section('page_title')
-    <h2>[{{ $cpt['cpt_name'] }}] 유형 수정하기</h2>
+    <h2>[{{ $cpt['cpt_name'] }}] 기본정보</h2>
 @endsection
-<ul class="nav nav-tabs">
-    <li class="active" ><a href="#">기본정보</a></li>
-    <li><a href="{{ route('dyFac.setting.create_extra', ['cpt_id' => $cpt['cpt_id']]) }}">확장필드</a></li>
-</ul>
+
+@include('dynamic_factory::views.settings.tab')
 <div class="row">
     <div class="col-sm-12">
         <form method="post" action="{{ route('dyFac.setting.update') }}">
@@ -17,19 +15,19 @@
                 <div class="panel-body">
                     <div class="form-group row">
                         <label class="col-sm-2 col-form-label">유형 이름 (필수)</label>
-                        <div class="col-sm-10">
+                        <div class="col-sm-5">
                             <input type="text" class="form-control" name="cpt_name" value="{{ $cpt['cpt_name'] }}">
                         </div>
                     </div>
                     <div class="form-group row">
                         <label class="col-sm-2 col-form-label">메뉴 이름 (필수)</label>
-                        <div class="col-sm-10">
+                        <div class="col-sm-5">
                             <input type="text" class="form-control" name="menu_name" value="{{ $cpt['menu_name'] }}">
                         </div>
                     </div>
                     <div class="form-group row">
                         <label class="col-sm-2 col-form-label">메뉴 순서 (필수)</label>
-                        <div class="col-sm-10">
+                        <div class="col-sm-5">
                             <input type="text" class="form-control" name="menu_order" value="{{ $cpt['menu_order'] }}">
                         </div>
                     </div>
@@ -48,6 +46,12 @@
                         <label class="col-sm-2 col-form-label">슬러그 (필수)</label>
                         <div class="col-sm-5">
                             <input type="text" class="form-control" name="slug" value="{{ $cpt['slug'] }}">
+                        </div>
+                        <div class="col-sm-5">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" value="1" id="has_archive" name="has_archive" @if($cpt['has_archive'])checked="checked"@endif>
+                                <label class="form-check-label" for="has_archive">아카이브 슬러그 사용</label>
+                            </div>
                         </div>
                     </div>
                     <div class="form-group row">
@@ -154,23 +158,7 @@
                 </div>
             </div>
 
-            <div class="panel">
-                <div class="panel-heading">
-                    <h4>옵션</h4>
-                </div>
-                <div class="panel-body">
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" value="Y" id="opt_has_archive" name="opt_has_archive">
-                        <label class="form-check-label" for="opt_has_archive">아카이브 슬러그 사용</label>
-                    </div>
-                    <input type="text" class="form-control" name="opt_archive_slug">
-                </div>
-            </div>
-            <div class="form-group row">
-                <div class="col-sm-10">
-                    <button type="button" class="btn" onclick="javascript:history.back();">뒤로가기</button><button type="submit" class="btn btn-primary">수정하기</button>
-                </div>
-            </div>
+            <button type="submit" class="btn btn-primary"><i class="xi-download"></i>저장</button>
         </form>
     </div>
 </div>

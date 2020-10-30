@@ -153,68 +153,6 @@ class DynamicFactorySettingController extends BaseController
         return redirect()->route('dyFac.setting.edit', ['cpt_id' => $request->cpt_id]);
     }
 
-    public function cptDocument($type = 'list', Request $request)
-    {
-        $current_route_name = Route::currentRouteName();
-        $route_names = explode('.', $current_route_name);
-        $cpt_id = $route_names[count($route_names) - 1];
-
-        $request->current_route_name = $current_route_name;
-
-        $cpt = $this->dfService->getItem($cpt_id);
-
-        if($type == 'create'){
-            return $this->documentCreate($cpt, $request);
-        }
-        else if($type == 'edit'){
-            return $this->documentEdit($cpt, $request);
-        }
-        else if($type == 'delete'){
-            return $this->documentDelete($cpt, $request);
-        }
-
-        return $this->documentList($cpt, $request);
-    }
-
-    public function documentList(Cpt $cpt, Request $request)
-    {
-        return XePresenter::make('dynamic_factory::views.documents.list',[
-            'cpt' => $cpt,
-            'current_route_name' => $request->current_route_name
-        ]);
-    }
-
-    public function documentCreate(Cpt $cpt, Request $request)
-    {
-        $taxonomies = $this->taxonomyHandler->getTaxonomies($cpt->cpt_id);
-
-        $dynamicFields = $this->dynamicFieldConfigHandler->gets('documents_' . $cpt->cpt_id);
-
-        return XePresenter::make('dynamic_factory::views.documents.create',[
-            'cpt' => $cpt,
-            'taxonomies' => $taxonomies,
-            'dynamicFields' => $dynamicFields
-        ]);
-    }
-
-    public function documentEdit(Cpt $cpt, Request $request)
-    {
-
-    }
-
-    public function documentDelete(Cpt $cpt, Request $request)
-    {
-
-    }
-
-    public function storeCptDocument(Request $request)
-    {
-        //Todo 퍼미션 체크
-        $document = $this->dfService->storeCptDocument($request);
-
-        return redirect()->route('dyFac.setting.'.$request->cpt_id, ['type' => 'list']);
-    }
-
     /**
      * 카테고리 등록/수정 화면
      *
@@ -286,5 +224,78 @@ class DynamicFactorySettingController extends BaseController
         $category_id = $this->dfService->storeCptTaxonomy($request);
 
         return redirect()->route('dyFac.setting.create_taxonomy', ['tax_id' => $category_id]);  //TODO 경로 수정
+    }
+
+    public function editEditor($cpt_id)
+    {
+        $cpt = $this->dfService->getItem($cpt_id);
+
+        return XePresenter::make(
+            'dynamic_factory::views.settings.edit_editor', [
+                'cpt' => $cpt
+            ]
+        );
+    }
+
+    public function cptDocument($type = 'list', Request $request)
+    {
+        $current_route_name = Route::currentRouteName();
+        $route_names = explode('.', $current_route_name);
+        $cpt_id = $route_names[count($route_names) - 1];
+
+        $request->current_route_name = $current_route_name;
+
+        $cpt = $this->dfService->getItem($cpt_id);
+
+        if($type == 'create'){
+            return $this->documentCreate($cpt, $request);
+        }
+        else if($type == 'edit'){
+            return $this->documentEdit($cpt, $request);
+        }
+        else if($type == 'delete'){
+            return $this->documentDelete($cpt, $request);
+        }
+
+        return $this->documentList($cpt, $request);
+    }
+
+    public function documentList(Cpt $cpt, Request $request)
+    {
+        return XePresenter::make('dynamic_factory::views.documents.list',[
+            'cpt' => $cpt,
+            'current_route_name' => $request->current_route_name
+        ]);
+    }
+
+    public function documentCreate(Cpt $cpt, Request $request)
+    {
+        $taxonomies = $this->taxonomyHandler->getTaxonomies($cpt->cpt_id);
+
+        $dynamicFields = $this->dynamicFieldConfigHandler->gets('documents_' . $cpt->cpt_id);
+
+        return XePresenter::make('dynamic_factory::views.documents.create',[
+            'cpt' => $cpt,
+            'taxonomies' => $taxonomies,
+            'dynamicFields' => $dynamicFields
+        ]);
+    }
+
+    public function documentEdit(Cpt $cpt, Request $request)
+    {
+
+    }
+
+    public function documentDelete(Cpt $cpt, Request $request)
+    {
+
+    }
+
+    public function storeCptDocument(Request $request)
+    {
+        //Todo 퍼미션 체크
+        $document = $this->dfService->storeCptDocument($request);
+
+        return redirect()->route('dyFac.setting.'.$request->cpt_id, ['type' => 'list']);
     }
 }
