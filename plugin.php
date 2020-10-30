@@ -7,6 +7,7 @@ use Overcode\XePlugin\DynamicFactory\Handlers\DynamicFactoryHandler;
 use Overcode\XePlugin\DynamicFactory\Handlers\DynamicFactoryTaxonomyHandler;
 use Overcode\XePlugin\DynamicFactory\Services\DynamicFactoryService;
 use Route;
+use XeDynamicField;
 use XeInterception;
 use Xpressengine\Plugin\AbstractPlugin;
 
@@ -51,9 +52,10 @@ class Plugin extends AbstractPlugin
         app()->alias(DynamicFactoryHandler::class, 'overcode.df.handler');
 
         app()->singleton(DynamicFactoryConfigHandler::class, function () {
-            $configManager = app('xe.config');
-
-            return new DynamicFactoryConfigHandler($configManager);
+            return new DynamicFactoryConfigHandler(
+                app('xe.config'),
+                XeDynamicField::getConfigHandler()
+            );
         });
         app()->alias(DynamicFactoryConfigHandler::class, 'overcode.df.configHandler');
 
@@ -140,6 +142,7 @@ class Plugin extends AbstractPlugin
                 Route::get('/create', [ 'as' => 'create', 'uses' => 'DynamicFactorySettingController@create' ]);
                 Route::post('/store_cpt', ['as' => 'store_cpt', 'uses' => 'DynamicFactorySettingController@storeCpt']);
                 Route::get('/edit_editor/{cpt_id}', [ 'as' => 'edit_editor', 'uses' => 'DynamicFactorySettingController@editEditor' ]);
+                Route::get('/edit_columns/{cpt_id}', [ 'as' => 'edit_columns', 'uses' => 'DynamicFactorySettingController@editColumns' ]);
                 Route::get('/create_extra/{cpt_id}', [ 'as' => 'create_extra', 'uses' => 'DynamicFactorySettingController@createExtra' ]);
                 Route::get('/edit/{cpt_id}', [ 'as' => 'edit', 'uses' => 'DynamicFactorySettingController@edit' ]);
                 Route::post('/update/{cpt_id?}', [ 'as' => 'update', 'uses' => 'DynamicFactorySettingController@update' ]);

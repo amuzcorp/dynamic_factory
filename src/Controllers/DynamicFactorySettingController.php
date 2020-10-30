@@ -2,6 +2,7 @@
 namespace Overcode\XePlugin\DynamicFactory\Controllers;
 
 use App\Http\Sections\DynamicFieldSection;
+use Overcode\XePlugin\DynamicFactory\Handlers\DynamicFactoryConfigHandler;
 use Overcode\XePlugin\DynamicFactory\Handlers\DynamicFactoryHandler;
 use Overcode\XePlugin\DynamicFactory\Handlers\DynamicFactoryTaxonomyHandler;
 use Overcode\XePlugin\DynamicFactory\Models\CategoryExtra;
@@ -27,19 +28,24 @@ class DynamicFactorySettingController extends BaseController
 
     protected $taxonomyHandler;
 
+    protected $configHandler;
+
     /** @var ConfigHandler $dynamicFieldConfigHandler */
     protected $dynamicFieldConfigHandler;
 
     public function __construct(
         DynamicFactoryService $dynamicFactoryService,
         DynamicFactoryHandler $dynamicFactoryHandler,
-        DynamicFactoryTaxonomyHandler $dynamicFactoryTaxonomyHandler
+        DynamicFactoryTaxonomyHandler $dynamicFactoryTaxonomyHandler,
+        DynamicFactoryConfigHandler $configHandler
     )
     {
         $this->dfService = $dynamicFactoryService;
         $this->dfHandler = $dynamicFactoryHandler;
         $this->taxonomyHandler = $dynamicFactoryTaxonomyHandler;
         $this->dynamicFieldConfigHandler = app('xe.dynamicField');
+//        $this->configHandler = app('overcode.df.configHandler');
+        $this->configHandler = $configHandler;
     }
 
     /**
@@ -230,9 +236,35 @@ class DynamicFactorySettingController extends BaseController
     {
         $cpt = $this->dfService->getItem($cpt_id);
 
+        $editorSection = new EditorSection($cpt_id);
+
         return XePresenter::make(
             'dynamic_factory::views.settings.edit_editor', [
-                'cpt' => $cpt
+                'cpt' => $cpt,
+                'editorSection' => $editorSection
+            ]
+        );
+    }
+
+    public function editColumns($cpt_id)
+    {
+        $cpt = $this->dfService->getItem($cpt_id);
+
+        $configName = $this->configHandler->getConfigName($cpt_id);
+
+        $config = $this->configHandler->get($configName);
+        if(!$config) {
+            $this->configHandler->addConfig(['documentGroup' => 'documents_' . $cpt_id], $this->configHandler->getConfigName($cpt_id));
+        }
+
+        $sortListColumns = $this->configHandler->getSortListColumns($config);
+        //$sortFormColumns = $this->configHandler->getSortFormColumns($config);
+
+        return XePresenter::make(
+            'dynamic_factory::views.settings.edit_columns', [
+                'cpt' => $cpt,
+                'sortListColumns' => $sortListColumns,
+                'config' => $config
             ]
         );
     }
