@@ -12,20 +12,20 @@
                 <div class="panel-body">
                     <div class="form-group row">
                         <label class="col-sm-2 col-form-label">유형 이름 (필수)</label>
-                        <div class="col-sm-10">
+                        <div class="col-sm-5">
                             <input type="text" class="form-control" name="cpt_name">
                         </div>
                     </div>
                     <div class="form-group row">
                         <label class="col-sm-2 col-form-label">메뉴 이름 (필수)</label>
-                        <div class="col-sm-10">
+                        <div class="col-sm-5">
                             <input type="text" class="form-control" name="menu_name">
                         </div>
                     </div>
                     <div class="form-group row">
                         <label class="col-sm-2 col-form-label">메뉴 순서 (필수)</label>
-                        <div class="col-sm-10">
-                            <input type="text" class="form-control" name="menu_order" value="{{ $menu_order }}">
+                        <div class="col-sm-5">
+                            <input type="text" class="form-control" name="menu_order" value="1000">
                         </div>
                     </div>
                     <div class="form-group row">
@@ -34,7 +34,7 @@
                             <select class="form-control" name="menu_path">
                                 <option value="">- 최상위 -</option>
                                 @foreach($menus as $menu)
-                                <option value="{{ $menu['menu_path'] }}">{{ xe_trans($menu['title']) }}</option>
+                                <option value="{{ $menu['menu_path'] }}" @if($menu['menu_path'] === 'dynamic_factory.') selected="selected"@endif>{{ xe_trans($menu['title']) }}</option>
                                 @endforeach
                             </select>
                         </div>
@@ -43,6 +43,12 @@
                         <label class="col-sm-2 col-form-label">슬러그 (필수)</label>
                         <div class="col-sm-5">
                             <input type="text" class="form-control" name="slug">
+                        </div>
+                        <div class="col-sm-5">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" value="1" id="has_archive" name="has_archive">
+                                <label class="form-check-label" for="has_archive">아카이브 슬러그 사용</label>
+                            </div>
                         </div>
                     </div>
                     <div class="form-group row">
@@ -59,15 +65,15 @@
                 </div>
                 <div class="panel-body">
                     <div class="form-check">
-                        <input class="form-check-input" type="checkbox" value="title" id="sec_title" name="sections[]">
+                        <input class="form-check-input" type="checkbox" value="title" id="sec_title" name="sections[]" checked="checked">
                         <label class="form-check-label" for="sec_title">제목</label>
                     </div>
                     <div class="form-check">
-                        <input class="form-check-input" type="checkbox" value="content" id="sec_content" name="sections[]">
+                        <input class="form-check-input" type="checkbox" value="content" id="sec_content" name="sections[]" checked="checked">
                         <label class="form-check-label" for="sec_content">내용</label>
                     </div>
                     <div class="form-check">
-                        <input class="form-check-input" type="checkbox" value="comment" id="sec_comment" name="sections[]">
+                        <input class="form-check-input" type="checkbox" value="comment" id="sec_comment" name="sections[]" checked="checked">
                         <label class="form-check-label" for="sec_comment">댓글</label>
                     </div>
                 </div>
@@ -149,23 +155,7 @@
                 </div>
             </div>
 
-            <div class="panel">
-                <div class="panel-heading">
-                    <h4>옵션</h4>
-                </div>
-                <div class="panel-body">
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" value="Y" id="opt_has_archive" name="opt_has_archive">
-                        <label class="form-check-label" for="opt_has_archive">아카이브 슬러그 사용</label>
-                    </div>
-                    <input type="text" class="form-control" name="opt_archive_slug">
-                </div>
-            </div>
-            <div class="form-group row">
-                <div class="col-sm-10">
-                    <button type="submit" class="btn btn-primary">생성하기</button>
-                </div>
-            </div>
+            <button type="submit" class="btn btn-primary"><i class="xi-download"></i>저장</button>
         </form>
     </div>
 </div>

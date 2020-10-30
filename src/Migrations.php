@@ -58,12 +58,12 @@ class Migrations
             $table->string('cpt_id', 36);   //documents 에서 instance_id 로 사용
             $table->string('cpt_name');
             $table->string('menu_name');
-            $table->string('menu_order');
+            $table->integer('menu_order');
             $table->string('menu_path');
             $table->string('slug');
+            $table->boolean('has_archive');
             $table->string('description');
             $table->text('sections');
-            $table->text('options');
             $table->text('labels');
 
             $table->unique('slug');
@@ -76,7 +76,7 @@ class Migrations
 
             $table->integer('category_id');
             $table->string('slug');
-            //$table->boolean('is_hierarchy');
+            $table->string('template', 50);
         });
     }
 

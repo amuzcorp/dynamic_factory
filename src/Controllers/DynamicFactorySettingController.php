@@ -30,8 +30,6 @@ class DynamicFactorySettingController extends BaseController
     /** @var ConfigHandler $dynamicFieldConfigHandler */
     protected $dynamicFieldConfigHandler;
 
-    const DEFAULT_MENU_ORDER = '500';
-
     public function __construct(
         DynamicFactoryService $dynamicFactoryService,
         DynamicFactoryHandler $dynamicFactoryHandler,
@@ -80,10 +78,7 @@ class DynamicFactorySettingController extends BaseController
         $labels = $this->dfHandler->getDefaultLabels();
         $menus = $this->dfHandler->getAdminMenus();
 
-//        dd($menus);
-
         return XePresenter::make('dynamic_factory::views.settings.create', [
-            'menu_order' => self::DEFAULT_MENU_ORDER,
             'labels' => $labels,
             'menus' => $menus
         ]);
@@ -171,8 +166,8 @@ class DynamicFactorySettingController extends BaseController
         if($type == 'create'){
             return $this->documentCreate($cpt, $request);
         }
-        else if($type == 'update'){
-            return $this->documentUpdate($cpt, $request);
+        else if($type == 'edit'){
+            return $this->documentEdit($cpt, $request);
         }
         else if($type == 'delete'){
             return $this->documentDelete($cpt, $request);
@@ -202,7 +197,7 @@ class DynamicFactorySettingController extends BaseController
         ]);
     }
 
-    public function documentUpdate(Cpt $cpt, Request $request)
+    public function documentEdit(Cpt $cpt, Request $request)
     {
 
     }

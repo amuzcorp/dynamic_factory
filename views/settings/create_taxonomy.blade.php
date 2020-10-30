@@ -28,6 +28,17 @@
                                 <input type="text" class="form-control" name="slug" value="{{ $cpt_cate_extra->slug }}">
                             </div>
                         </div>
+                        <div class="form-group row">
+                            <label class="col-sm-2 col-form-label">템플릿</label>
+                            <div class="col-sm-10">
+                                <select class="form-control" name="template">
+                                    <option value="select">Select</option>
+                                    <option value="multi_select">Multi Select</option>
+                                    <option value="hierarchy">Hierarchy</option>
+                                    <option value="check_list">Check List</option>
+                                </select>
+                            </div>
+                        </div>
                     </div>
                     <div class="panel-footer">
                         <h4>이 분류와 함께 사용할 유형</h4>

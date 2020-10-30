@@ -7,7 +7,7 @@ class Cpt extends DynamicModel
 {
     protected $table = 'df_cpts';
 
-    protected $fillable = ['site_key', 'cpt_id', 'cpt_name', 'menu_name', 'menu_order', 'menu_path', 'slug', 'description', 'sections', 'options', 'labels'];
+    protected $fillable = ['site_key', 'cpt_id', 'cpt_name', 'menu_name', 'menu_order', 'menu_path', 'slug', 'has_archive', 'description', 'sections', 'labels'];
 
     protected $casts = ['sections' => 'array', 'options' => 'array', 'labels' => 'array'];
 
@@ -20,9 +20,5 @@ class Cpt extends DynamicModel
     public function getNextId() {
         $statement = XeDB::select("show table status like 'xe_".$this->table."'");
         return $statement[0]->Auto_increment ?? 1;
-    }
-
-    public function taxonomy() {
-        return $this->hasMany(CptTaxonomy::class, 'cpt_id', 'cpt_id');
     }
 }

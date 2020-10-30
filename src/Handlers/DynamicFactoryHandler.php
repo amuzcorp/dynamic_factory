@@ -106,10 +106,10 @@ class DynamicFactoryHandler
             'menu_order' => $inputs['menu_order'] ?? '500',
             'menu_path' => $inputs['menu_path'] ?? '',
             'slug' => $inputs['slug'],
+            'has_archive' => $inputs['has_archive'] ?? 0,
             'description' => $inputs['description'] ?? '',
             'editor' => $inputs['editor'] ?? '',
             'sections' => $inputs['sections'] ?? '',
-            'options' => $inputs['options'] ?? '',
             'labels' => $inputs['labels'] ?? ''
         ]);
 
@@ -128,10 +128,10 @@ class DynamicFactoryHandler
             'menu_order' => $inputs['menu_order'] ?? '500',
             'menu_path' => $inputs['menu_path'] ?? '',
             'slug' => $inputs['slug'],
+            'has_archive' => $inputs['has_archive'] ?? 0,
             'description' => $inputs['description'] ?? '',
             'editor' => $inputs['editor'] ?? '',
             'sections' => $inputs['sections'] ?? '',
-            'options' => $inputs['options'] ?? '',
             'labels' => $inputs['labels'] ?? ''
         ]);
 
