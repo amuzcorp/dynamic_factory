@@ -36,7 +36,7 @@
                                                 @foreach($sortListColumns as $columnName)
                                                     <tr>
                                                         <td>
-                                                            <button class="btn handler"><i class="xi-drag-vertical"></i></button>
+                                                            <button type="button" class="btn handler"><i class="xi-drag-vertical"></i></button>
                                                             <em class="item-title">{{ $columnName }}</em>
                                                         </td>
                                                         <td>
@@ -87,6 +87,7 @@
             },
             stop: function(e, ui) {
                 $(ui.item.context).css("display", "table-row");
+                ui.item.attr('style', '');  // overcode added!
             }
         }).disableSelection();
 
