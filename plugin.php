@@ -100,16 +100,11 @@ class Plugin extends AbstractPlugin
 
     protected function registerSettingsMenus()
     {
-        \XeRegister::push('settings/menu', 'dynamic_factory', [
-            'title' => 'Dynamic Factory',
+        \XeRegister::push('settings/menu', 'setting.dynamic_factory', [
+            'title' => '사용자 정의 문서',
             'description' => '사용자 정의 유형과 확장 필드와 분류를 생성하고 관리합니다.',
             'display' => true,
-            'ordering' => 5000
-        ]);
-        \XeRegister::push('settings/menu', 'dynamic_factory.index', [
-            'title' => '사용자 정의 유형 관리',
-            'display' => true,
-            'ordering' => 1000
+            'ordering' => 100
         ]);
 
         foreach($this->cpts as $val){
@@ -143,14 +138,19 @@ class Plugin extends AbstractPlugin
                 Route::get('/', [
                     'as' => 'index',
                     'uses' => 'DynamicFactorySettingController@index',
-                    'settings_menu' => 'dynamic_factory.index'
+                    'settings_menu' => 'setting.dynamic_factory'
                 ]);
                 Route::get('/create', [ 'as' => 'create', 'uses' => 'DynamicFactorySettingController@create' ]);
                 Route::post('/store_cpt', ['as' => 'store_cpt', 'uses' => 'DynamicFactorySettingController@storeCpt']);
                 Route::get('/edit_editor/{cpt_id}', [ 'as' => 'edit_editor', 'uses' => 'DynamicFactorySettingController@editEditor' ]);
+
                 Route::get('/edit_columns/{cpt_id}', [ 'as' => 'edit_columns', 'uses' => 'DynamicFactorySettingController@editColumns' ]);
                 Route::post('/update_columns/{cpt_id}', [ 'as' => 'update_columns', 'uses' => 'DynamicFactorySettingController@updateColumns' ]);
+                Route::get('/edit_category/{cpt_id}', [ 'as' => 'edit_category', 'uses' => 'DynamicFactorySettingController@editCategory' ]);
+                Route::post('/update_category/{cpt_id}', [ 'as' => 'update_category', 'uses' => 'DynamicFactorySettingController@updateCategory' ]);
+
                 Route::get('/create_extra/{cpt_id}', [ 'as' => 'create_extra', 'uses' => 'DynamicFactorySettingController@createExtra' ]);
+
                 Route::get('/edit/{cpt_id}', [ 'as' => 'edit', 'uses' => 'DynamicFactorySettingController@edit' ]);
                 Route::post('/update/{cpt_id?}', [ 'as' => 'update', 'uses' => 'DynamicFactorySettingController@update' ]);
                 Route::get('/create_taxonomy/{tax_id?}', [ 'as' => 'create_taxonomy', 'uses' => 'DynamicFactorySettingController@createTaxonomy' ]);

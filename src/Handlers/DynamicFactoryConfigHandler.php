@@ -172,4 +172,14 @@ class DynamicFactoryConfigHandler
 
         return $columnLables;
     }
+
+    public function getCategoryConfig($cpt_id)
+    {
+        $configName = $this->getConfigName($cpt_id);
+        $config = $this->get($configName);
+
+        //dd($config);
+
+        return $config;
+    }
 }

@@ -108,8 +108,6 @@ class DynamicFactoryHandler
             'slug' => $inputs['slug'],
             'has_archive' => $inputs['has_archive'] ?? 0,
             'description' => $inputs['description'] ?? '',
-            'editor' => $inputs['editor'] ?? '',
-            'sections' => $inputs['sections'] ?? '',
             'labels' => $inputs['labels'] ?? ''
         ]);
 
@@ -130,8 +128,6 @@ class DynamicFactoryHandler
             'slug' => $inputs['slug'],
             'has_archive' => $inputs['has_archive'] ?? 0,
             'description' => $inputs['description'] ?? '',
-            'editor' => $inputs['editor'] ?? '',
-            'sections' => $inputs['sections'] ?? '',
             'labels' => $inputs['labels'] ?? ''
         ]);
 
