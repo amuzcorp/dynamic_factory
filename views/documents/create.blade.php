@@ -55,6 +55,7 @@
                                         {!! uio('uiobject/df@taxo_select', [
                                             'name' => $taxonomy->id,
                                             'label' => xe_trans($taxonomy->name),
+                                            'template' => $taxonomy->getAttribute('extra')->template,
                                             'items' => app('overcode.df.taxonomyHandler')->getTaxonomyItems($taxonomy->id),
                                         ]) !!}
                                     </div>

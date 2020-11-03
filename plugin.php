@@ -19,7 +19,8 @@ class Plugin extends AbstractPlugin
 
     public function register()
     {
-        app()->singleton(DynamicFactoryDocumentHandler::class, function() {
+        $app = app();
+        $app->singleton(DynamicFactoryDocumentHandler::class, function() {
             $proxyHandler = XeInterception::proxy(DynamicFactoryDocumentHandler::class);
 
             return new $proxyHandler(
@@ -29,9 +30,9 @@ class Plugin extends AbstractPlugin
                 app('request')
             );
         });
-        app()->alias(DynamicFactoryDocumentHandler::class, 'overcode.df.documentHandler');
+        $app->alias(DynamicFactoryDocumentHandler::class, 'overcode.df.documentHandler');
 
-        app()->singleton(DynamicFactoryService::class, function () {
+        $app->singleton(DynamicFactoryService::class, function () {
             $dynamicFactoryHandler = app('overcode.df.handler');
             $dynamicFactoryConfigHandler = app('overcode.df.configHandler');
             $dynamicFactoryTaxonomyHandler = app('overcode.df.taxonomyHandler');
@@ -44,25 +45,30 @@ class Plugin extends AbstractPlugin
                 $dynamicFactoryDocumentHandler
             );
         });
-        app()->alias(DynamicFactoryService::class, 'overcode.df.service');
+        $app->alias(DynamicFactoryService::class, 'overcode.df.service');
 
-        app()->singleton(DynamicFactoryHandler::class, function () {
+        $app->singleton(DynamicFactoryHandler::class, function () {
             return new DynamicFactoryHandler();
         });
-        app()->alias(DynamicFactoryHandler::class, 'overcode.df.handler');
+        $app->alias(DynamicFactoryHandler::class, 'overcode.df.handler');
 
-        app()->singleton(DynamicFactoryConfigHandler::class, function () {
+        $app->singleton(DynamicFactoryConfigHandler::class, function () {
             return new DynamicFactoryConfigHandler(
                 app('xe.config'),
                 XeDynamicField::getConfigHandler()
             );
         });
-        app()->alias(DynamicFactoryConfigHandler::class, 'overcode.df.configHandler');
+        $app->alias(DynamicFactoryConfigHandler::class, 'overcode.df.configHandler');
 
-        app()->singleton(DynamicFactoryTaxonomyHandler::class, function() {
+        $app->singleton(UrlHandler::class, function ($app) {
+            return new UrlHandler();
+        });
+        $app->alias(UrlHandler::class, 'overcode.df.url');
+
+        $app->singleton(DynamicFactoryTaxonomyHandler::class, function() {
             return new DynamicFactoryTaxonomyHandler();
         });
-        app()->alias(DynamicFactoryTaxonomyHandler::class, 'overcode.df.taxonomyHandler');
+        $app->alias(DynamicFactoryTaxonomyHandler::class, 'overcode.df.taxonomyHandler');
     }
 
     /**
@@ -143,6 +149,7 @@ class Plugin extends AbstractPlugin
                 Route::post('/store_cpt', ['as' => 'store_cpt', 'uses' => 'DynamicFactorySettingController@storeCpt']);
                 Route::get('/edit_editor/{cpt_id}', [ 'as' => 'edit_editor', 'uses' => 'DynamicFactorySettingController@editEditor' ]);
                 Route::get('/edit_columns/{cpt_id}', [ 'as' => 'edit_columns', 'uses' => 'DynamicFactorySettingController@editColumns' ]);
+                Route::post('/update_columns/{cpt_id}', [ 'as' => 'update_columns', 'uses' => 'DynamicFactorySettingController@updateColumns' ]);
                 Route::get('/create_extra/{cpt_id}', [ 'as' => 'create_extra', 'uses' => 'DynamicFactorySettingController@createExtra' ]);
                 Route::get('/edit/{cpt_id}', [ 'as' => 'edit', 'uses' => 'DynamicFactorySettingController@edit' ]);
                 Route::post('/update/{cpt_id?}', [ 'as' => 'update', 'uses' => 'DynamicFactorySettingController@update' ]);

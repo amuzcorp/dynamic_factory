@@ -18,6 +18,11 @@ class DynamicFactoryConfigHandler
         'temp' => '어떤 정보를 저장할까?'
     ];
 
+    // id 에 따른 text 는 여기에 저장
+    const COLUMN_LABELS = [
+        'title' => '제목', 'content' => '내용', 'writer' => '작성자', 'assent_count' => '추천', 'read_count' => '읽음', 'created_at' => '작성일', 'updated_at' => '수정일', 'dissent_count' => '비추천',
+    ];
+
     const DEFAULT_LIST_COLUMNS = [
         'title', 'writer', 'assent_count', 'read_count', 'created_at', 'updated_at', 'dissent_count',
     ];
@@ -124,6 +129,47 @@ class DynamicFactoryConfigHandler
 
     public function getSortFormColumns(ConfigEntity $config)
     {
+        if (empty($config->get('sortFormColumns'))) {
+            $sortFormColumns = self::DEFAULT_FORM_COLUMNS;
+        } else {
+            $sortFormColumns = $config->get('sortFormColumns');
+        }
 
+        $dynamicFields = $this->getDynamicFields($config);
+        $currentDynamicFields = [];
+
+        foreach ($dynamicFields as $dynamicFieldConfig) {
+            if ($dynamicFieldConfig->get('use') === true) {
+                $currentDynamicFields[] = $dynamicFieldConfig->get('id');
+            }
+
+            if ($dynamicFieldConfig->get('use') === true &&
+                in_array($dynamicFieldConfig->get('id'), $sortFormColumns) === false) {
+                $sortFormColumns[] = $dynamicFieldConfig->get('id');
+            }
+        }
+
+        $usableColumns = array_merge(self::DEFAULT_FORM_COLUMNS, $currentDynamicFields);
+        foreach ($sortFormColumns as $index => $column) {
+            if (in_array($column, $usableColumns) === false) {
+                unset($sortFormColumns[$index]);
+            }
+        }
+
+        return $sortFormColumns;
+    }
+
+    // 컬럼의 LABEL 을 구한다
+    public function getColumnLabels(ConfigEntity $config)
+    {
+        $columnLables = self::COLUMN_LABELS;
+
+        $dynamicFields = $this->getDynamicFields($config);
+
+        foreach ($dynamicFields as $val) {
+            $columnLables[$val->get('id')] = $val->get('label');
+        }
+
+        return $columnLables;
     }
 }

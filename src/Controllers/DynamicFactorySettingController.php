@@ -5,6 +5,7 @@ use App\Http\Sections\DynamicFieldSection;
 use Overcode\XePlugin\DynamicFactory\Handlers\DynamicFactoryConfigHandler;
 use Overcode\XePlugin\DynamicFactory\Handlers\DynamicFactoryHandler;
 use Overcode\XePlugin\DynamicFactory\Handlers\DynamicFactoryTaxonomyHandler;
+use Overcode\XePlugin\DynamicFactory\Handlers\UrlHandler;
 use Overcode\XePlugin\DynamicFactory\Models\CategoryExtra;
 use Overcode\XePlugin\DynamicFactory\Models\Cpt;
 use Overcode\XePlugin\DynamicFactory\Models\CptTaxonomy;
@@ -33,11 +34,16 @@ class DynamicFactorySettingController extends BaseController
     /** @var ConfigHandler $dynamicFieldConfigHandler */
     protected $dynamicFieldConfigHandler;
 
+    protected $presenter;
+
+    protected $urlHandler;
+
     public function __construct(
         DynamicFactoryService $dynamicFactoryService,
         DynamicFactoryHandler $dynamicFactoryHandler,
         DynamicFactoryTaxonomyHandler $dynamicFactoryTaxonomyHandler,
-        DynamicFactoryConfigHandler $configHandler
+        DynamicFactoryConfigHandler $configHandler,
+        UrlHandler $urlHandler
     )
     {
         $this->dfService = $dynamicFactoryService;
@@ -46,6 +52,11 @@ class DynamicFactorySettingController extends BaseController
         $this->dynamicFieldConfigHandler = app('xe.dynamicField');
 //        $this->configHandler = app('overcode.df.configHandler');
         $this->configHandler = $configHandler;
+        $this->urlHandler = $urlHandler;
+
+        $this->presenter = app('xe.presenter');
+
+        $this->presenter->share('urlHandler', $this->urlHandler);
     }
 
     /**
@@ -68,7 +79,7 @@ class DynamicFactorySettingController extends BaseController
         }
 
         // output
-        return XePresenter::make('dynamic_factory::views.settings.index', [
+        return $this->presenter->make('dynamic_factory::views.settings.index', [
             'title' => $title,
             'cpts' => $cpts
         ]);
@@ -84,7 +95,7 @@ class DynamicFactorySettingController extends BaseController
         $labels = $this->dfHandler->getDefaultLabels();
         $menus = $this->dfHandler->getAdminMenus();
 
-        return XePresenter::make('dynamic_factory::views.settings.create', [
+        return $this->presenter->make('dynamic_factory::views.settings.create', [
             'labels' => $labels,
             'menus' => $menus
         ]);
@@ -107,7 +118,7 @@ class DynamicFactorySettingController extends BaseController
             true
         );
 
-        return XePresenter::make(
+        return $this->presenter->make(
             'dynamic_factory::views.settings.create_extra',
             compact('dynamicFieldSection', 'cpt'));
     }
@@ -139,7 +150,7 @@ class DynamicFactorySettingController extends BaseController
         $cpt = $this->dfService->getItem($cpt_id);
         $menus = $this->dfHandler->getAdminMenus();
 
-        return XePresenter::make('dynamic_factory::views.settings.edit', [
+        return $this->presenter->make('dynamic_factory::views.settings.edit', [
             'cpt' => $cpt,
             'menus' => $menus
         ]);
@@ -209,7 +220,7 @@ class DynamicFactorySettingController extends BaseController
             'xe::confirmDelete',
         ]);
 
-        return XePresenter::make('dynamic_factory::views.settings.create_taxonomy',
+        return $this->presenter->make('dynamic_factory::views.settings.create_taxonomy',
         [
             'category' => $category,
             'cpt_cate_extra' => $cpt_cate_extra,
@@ -238,7 +249,7 @@ class DynamicFactorySettingController extends BaseController
 
         $editorSection = new EditorSection($cpt_id);
 
-        return XePresenter::make(
+        return $this->presenter->make(
             'dynamic_factory::views.settings.edit_editor', [
                 'cpt' => $cpt,
                 'editorSection' => $editorSection
@@ -251,22 +262,37 @@ class DynamicFactorySettingController extends BaseController
         $cpt = $this->dfService->getItem($cpt_id);
 
         $configName = $this->configHandler->getConfigName($cpt_id);
-
         $config = $this->configHandler->get($configName);
-        if(!$config) {
-            $this->configHandler->addConfig(['documentGroup' => 'documents_' . $cpt_id], $this->configHandler->getConfigName($cpt_id));
-        }
 
         $sortListColumns = $this->configHandler->getSortListColumns($config);
-        //$sortFormColumns = $this->configHandler->getSortFormColumns($config);
+        $sortFormColumns = $this->configHandler->getSortFormColumns($config);
+        $columnLabels = $this->configHandler->getColumnLabels($config);
 
-        return XePresenter::make(
+        return $this->presenter->make(
             'dynamic_factory::views.settings.edit_columns', [
                 'cpt' => $cpt,
                 'sortListColumns' => $sortListColumns,
+                'sortFormColumns' => $sortFormColumns,
+                'columnLabels' => $columnLabels,
                 'config' => $config
             ]
         );
+    }
+
+    public function updateColumns($cpt_id, Request $request)
+    {
+        $configName = $this->configHandler->getConfigName($cpt_id);
+
+        $config = $this->configHandler->get($configName);
+        $inputs = $request->except('_token');
+
+        foreach ($inputs as $key => $val) {
+            $config->set($key, $val);
+        }
+
+        $this->configHandler->modifyConfig($config);
+
+        return redirect()->route('dyFac.setting.edit_columns', ['cpt_id' => $cpt_id]);
     }
 
     public function cptDocument($type = 'list', Request $request)
@@ -294,7 +320,7 @@ class DynamicFactorySettingController extends BaseController
 
     public function documentList(Cpt $cpt, Request $request)
     {
-        return XePresenter::make('dynamic_factory::views.documents.list',[
+        return $this->presenter->make('dynamic_factory::views.documents.list',[
             'cpt' => $cpt,
             'current_route_name' => $request->current_route_name
         ]);
@@ -306,7 +332,7 @@ class DynamicFactorySettingController extends BaseController
 
         $dynamicFields = $this->dynamicFieldConfigHandler->gets('documents_' . $cpt->cpt_id);
 
-        return XePresenter::make('dynamic_factory::views.documents.create',[
+        return $this->presenter->make('dynamic_factory::views.documents.create',[
             'cpt' => $cpt,
             'taxonomies' => $taxonomies,
             'dynamicFields' => $dynamicFields

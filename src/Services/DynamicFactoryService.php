@@ -8,6 +8,7 @@ use Overcode\XePlugin\DynamicFactory\Plugin;
 use XeDB;
 use XeSite;
 use Overcode\XePlugin\DynamicFactory\Handlers\DynamicFactoryHandler;
+use Xpressengine\Category\Models\CategoryItem;
 use Xpressengine\Http\Request;
 
 class DynamicFactoryService
@@ -47,6 +48,16 @@ class DynamicFactoryService
         XeDB::beginTransaction();
         try {
             $cpt = $this->dfHandler->store_cpt($inputs);
+
+            $configName = $this->dfConfigHandler->getConfigName('df' . $cpt->cpt_id);
+            $this->dfConfigHandler->addConfig([
+                'documentGroup' => 'documents_df' . $cpt->cpt_id,
+                'listColumns' => DynamicFactoryConfigHandler::DEFAULT_SELECTED_LIST_COLUMNS,
+                'sortListColumns' => DynamicFactoryConfigHandler::DEFAULT_LIST_COLUMNS,
+                'formColumns' => DynamicFactoryConfigHandler::DEFAULT_SELECTED_FORM_COLUMNS,
+                'sortFormColumns' => DynamicFactoryConfigHandler::DEFAULT_FORM_COLUMNS
+            ], $configName);
+
         }catch (\Exception $e) {
             XeDB::rollback();
 

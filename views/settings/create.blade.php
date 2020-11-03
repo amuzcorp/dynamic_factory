@@ -59,7 +59,7 @@
                     </div>
                 </div>
             </div>
-            <div class="panel">
+            {{--<div class="panel">
                 <div class="panel-heading">
                     <h4>편집 시 표시할 섹션</h4>
                 </div>
@@ -77,7 +77,7 @@
                         <label class="form-check-label" for="sec_comment">댓글</label>
                     </div>
                 </div>
-            </div>
+            </div>--}}
 
             <div class="panel accordion" id="accordion_ex">
                 <div class="panel-heading clearfix" id="headingOne" data-toggle="collapse" data-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne">

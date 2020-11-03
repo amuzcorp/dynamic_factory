@@ -19,6 +19,8 @@ class DynamicFactoryTaxonomyHandler
 
     protected $dfConfigHandler;
 
+    protected $dfService;
+
     public function __construct()
     {
         $this->categoryHandler = app('xe.category');
@@ -43,7 +45,7 @@ class DynamicFactoryTaxonomyHandler
             $category->name = $inputs['name'];
             $taxonomyItem = $this->categoryHandler->updateCate($category);
 
-            $cateExtra = CategoryExtra::where('category_id', $category_id)->first();
+            $cateExtra = $this->getCategoryExtra($category_id);
 
             CptTaxonomy::where('category_id', $category_id)->delete();
         }
@@ -68,8 +70,10 @@ class DynamicFactoryTaxonomyHandler
 
         $taxonomies = [];
 
-        foreach ($cptTaxonomies as $val) {
+        foreach ($cptTaxonomies as $key => $val) {
+            //$taxonomies[] = $this->getCategoryItemsTree($val->category_id);
             $taxonomies[] = $this->categoryHandler->cates()->find($val->category_id);
+            //$taxonomies[$key]['extra'] = $this->getCategoryExtra($val->category_id);
         }
 
         return $taxonomies;
@@ -78,6 +82,46 @@ class DynamicFactoryTaxonomyHandler
     public function getCategory($category_id)
     {
         return $this->categoryHandler->cates()->find($category_id);
+    }
+
+    public function getCategoryItemsTree($category_id)
+    {
+        $items = [];
+
+        $categoryItems = CategoryItem::where('category_id', $category_id)
+            ->where('parent_id', null)
+            ->orderBy('ordering')->get();
+        foreach ($categoryItems as $categoryItem) {
+            $categoryItemData = [
+                'value' => $categoryItem->id,
+                'text' => xe_trans($categoryItem->word),
+                'children' => $this->getCategoryItemChildrenData($categoryItem)
+            ];
+
+            $items[] = $categoryItemData;
+        }
+
+        return $items;
+    }
+
+    public function getCategoryItemChildrenData(CategoryItem $categoryItem)
+    {
+        $children = $categoryItem->getChildren();
+
+        if($children->isEmpty() === true) {
+            return [];
+        }
+
+        $childrenData = [];
+        foreach ($children as $child) {
+            $childrenData[] = [
+                'value' => $child->id,
+                'text' =>xe_trans($child->word),
+                'children' => $this->getCategoryItemChildrenData($child)
+            ];
+        }
+
+        return $childrenData;
     }
 
     public function getTaxonomyItems($category_id)
@@ -118,6 +162,11 @@ class DynamicFactoryTaxonomyHandler
 
             $newDfTaxonomy->save();
         }
+    }
+
+    public function getCategoryExtra($category_id)
+    {
+        return CategoryExtra::where('category_id', $category_id)->first();
     }
 
 }
