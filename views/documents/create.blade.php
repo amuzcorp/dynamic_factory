@@ -17,8 +17,11 @@
                         <input type="text" class="form-control" id="title" name="title" placeholder="{{ sprintf($cpt->labels['here_title'], $cpt->cpt_name) }}">
                     </div>
                     <div class="form-group">
-                        <label for="df_content">내용</label>
-                        <textarea class="form-control" id="df_content" name="content"></textarea>
+                        <label for="xeContentEditor">내용</label>
+                        {!! editor($cpt->cpt_id, [
+                            'content' => Request::old('content'),
+                            'cover' => true
+                        ]) !!}
                     </div>
                 </div>
             </div>
@@ -49,7 +52,7 @@
                                 </label>
                                 <div class="__taxonomy-field">
                                     <div class="components-base-control__field" data-required-title="{{ xe_trans($taxonomy->name) }}">
-                                        {!! uio('uiobject/board@select', [
+                                        {!! uio('uiobject/df@taxo_select', [
                                             'name' => $taxonomy->id,
                                             'label' => xe_trans($taxonomy->name),
                                             'items' => app('overcode.df.taxonomyHandler')->getTaxonomyItems($taxonomy->id),
