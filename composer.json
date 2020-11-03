@@ -22,7 +22,13 @@
   "extra": {
     "xpressengine": {
       "title": "다이나믹 팩토리",
-      "component": {}
+      "component": {
+        "uiobject/df@taxo_select": {
+          "class": "Overcode\\XePlugin\\DynamicFactory\\Components\\UIObjects\\TaxoSelect\\TaxoSelectUIObject",
+          "name": "Taxonomy select UIO",
+          "description": "Taxonomy Select UIObject"
+        }
+      }
     }
   },
   "require": {
@@ -30,7 +36,8 @@
   },
   "autoload": {
     "psr-4": {
-      "Overcode\\XePlugin\\DynamicFactory\\": "src/"
+      "Overcode\\XePlugin\\DynamicFactory\\": "src/",
+      "Overcode\\XePlugin\\DynamicFactory\\Components\\": "components/"
     }
   }
 }
