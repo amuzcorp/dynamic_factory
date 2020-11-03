@@ -63,7 +63,7 @@ class Migrations
             $table->string('slug');
             $table->boolean('has_archive');
             $table->string('description');
-            $table->text('sections');
+//            $table->text('sections');
             $table->text('labels');
 
             $table->unique('slug');
