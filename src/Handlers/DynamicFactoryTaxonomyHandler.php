@@ -73,7 +73,7 @@ class DynamicFactoryTaxonomyHandler
         foreach ($cptTaxonomies as $key => $val) {
             //$taxonomies[] = $this->getCategoryItemsTree($val->category_id);
             $taxonomies[] = $this->categoryHandler->cates()->find($val->category_id);
-            //$taxonomies[$key]['extra'] = $this->getCategoryExtra($val->category_id);
+            $taxonomies[$key]['extra'] = $this->getCategoryExtra($val->category_id);
         }
 
         return $taxonomies;

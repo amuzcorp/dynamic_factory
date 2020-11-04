@@ -61,7 +61,7 @@
                                         {!! uio('uiobject/df@taxo_select', [
                                             'name' => $taxonomy->id,
                                             'label' => xe_trans($taxonomy->name),
-                                            'template' => '템플릿 종류를 선택하게',
+                                            'template' => $taxonomy->extra->template,
                                             'items' => app('overcode.df.taxonomyHandler')->getCategoryItemsTree($taxonomy->id),
                                         ]) !!}
                                     </div>
