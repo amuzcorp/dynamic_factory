@@ -9,6 +9,7 @@ use XeDB;
 use XeSite;
 use Overcode\XePlugin\DynamicFactory\Handlers\DynamicFactoryHandler;
 use Xpressengine\Category\Models\CategoryItem;
+use Xpressengine\Config\ConfigEntity;
 use Xpressengine\Http\Request;
 
 class DynamicFactoryService
@@ -109,6 +110,17 @@ class DynamicFactoryService
         }
 
         return $cpt;
+    }
+
+    public function getCptConfig($cpt_id)
+    {
+        $configName = $this->dfConfigHandler->getConfigName($cpt_id);
+        return $this->dfConfigHandler->get($configName);
+    }
+
+    public function getFieldTypes(ConfigEntity $config)
+    {
+        return (array)$this->dfConfigHandler->getDynamicFields($config);
     }
 
     public function getCategories($cpt_id)

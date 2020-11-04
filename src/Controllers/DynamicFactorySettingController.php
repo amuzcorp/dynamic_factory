@@ -188,8 +188,6 @@ class DynamicFactorySettingController extends BaseController
             $category = $this->taxonomyHandler->getCategory($tax_id);
             $cpt_cate_extra = CategoryExtra::where('category_id', $tax_id)->first();
             $cpt_taxonomy = CptTaxonomy::where('category_id', $tax_id)->get();
-
-
         }
 
         foreach ($cpt_taxonomy as $cptx) {
@@ -295,22 +293,6 @@ class DynamicFactorySettingController extends BaseController
         return redirect()->route('dyFac.setting.edit_columns', ['cpt_id' => $cpt_id]);
     }
 
-    public function editCategory($cpt_id)
-    {
-        $categories = $this->configHandler->getCategoryConfig($cpt_id);
-
-        return $this->presenter->make(
-            'dynamic_factory::views.setting.edit_category', [
-
-            ]
-        );
-    }
-
-    public function updateCategory($cpt_id, Request $request)
-    {
-        return '';
-    }
-
     public function cptDocument($type = 'list', Request $request)
     {
         $current_route_name = Route::currentRouteName();
@@ -348,10 +330,18 @@ class DynamicFactorySettingController extends BaseController
 
         $dynamicFields = $this->dynamicFieldConfigHandler->gets('documents_' . $cpt->cpt_id);
 
+        $dynamicFieldsById = [];
+        foreach ($dynamicFields as $dyField) {
+            $dynamicFieldsById[$dyField->getConfig()->get('id')] = $dyField->getConfig();
+        }
+        $cptConfig = $this->dfService->getCptConfig($cpt->cpt_id);
+
         return $this->presenter->make('dynamic_factory::views.documents.create',[
             'cpt' => $cpt,
             'taxonomies' => $taxonomies,
-            'dynamicFields' => $dynamicFields
+            'dynamicFields' => $dynamicFields,
+            'cptConfig' => $cptConfig,
+            'dynamicFieldsById' => $dynamicFieldsById
         ]);
     }
 

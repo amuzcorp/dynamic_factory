@@ -178,8 +178,10 @@ class DynamicFactoryConfigHandler
         $configName = $this->getConfigName($cpt_id);
         $config = $this->get($configName);
 
-        //dd($config);
+        if(empty($config->get('categories'))) {
+            $config->set('categories', []);
+        }
 
-        return $config;
+        return $config->get('categories');
     }
 }

@@ -10,12 +10,15 @@
     <div class="row">
         <div class="col-sm-8">
             <div class="panel">
-                <div class="panel-heading"><h4>기본 정보</h4></div>
+                <div class="panel-heading"><h4>입력 필드</h4></div>
                 <div class="panel-body">
+                @foreach($cptConfig['formColumns'] as $columnName)
+                    @if($columnName === 'title')
                     <div class="form-group">
                         <label for="">제목</label>
                         <input type="text" class="form-control" id="title" name="title" placeholder="{{ sprintf($cpt->labels['here_title'], $cpt->cpt_name) }}">
                     </div>
+                    @elseif($columnName === 'content')
                     <div class="form-group">
                         <label for="xeContentEditor">내용</label>
                         {!! editor($cpt->cpt_id, [
@@ -23,20 +26,23 @@
                             'cover' => true
                         ]) !!}
                     </div>
-                </div>
-            </div>
-
-            <div class="panel">
-                <div class="panel-heading"><h4>확장 필드</h4></div>
-                <div class="panel-body">
-                    @foreach ($dynamicFields as $dynamicField)
-                        @if ($dynamicField->getConfig()->get('use') === true)
-                            {!! df_create($dynamicField->getConfig()->get('group'), $dynamicField->getConfig()->get('id'), Request::all()) !!}
+                    @else
+                        @if(isset($dynamicFieldsById[$columnName]) && $dynamicFieldsById[$columnName]->get('use') == true)
+                        <div class="__xe_{{$columnName}} __xe_section">
+                            {!! df_create($cptConfig->get('documentGroup'), $columnName, Request::all()) !!}
+                        </div>
+                        {{--
+                        @foreach ($dynamicFields as $dynamicField)
+                            @if ($dynamicField->getConfig()->get('use') === true)
+                                {!! df_create($dynamicField->getConfig()->get('group'), $dynamicField->getConfig()->get('id'), Request::all()) !!}
+                            @endif
+                        @endforeach
+                        --}}
                         @endif
-                    @endforeach
+                    @endif
+                @endforeach
                 </div>
             </div>
-
             <button type="submit" class="btn btn-primary"><i class="xi-download"></i>저장</button>
         </div>
 
