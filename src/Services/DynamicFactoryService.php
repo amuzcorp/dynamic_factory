@@ -4,6 +4,9 @@ namespace Overcode\XePlugin\DynamicFactory\Services;
 use Overcode\XePlugin\DynamicFactory\Handlers\DynamicFactoryConfigHandler;
 use Overcode\XePlugin\DynamicFactory\Handlers\DynamicFactoryDocumentHandler;
 use Overcode\XePlugin\DynamicFactory\Handlers\DynamicFactoryTaxonomyHandler;
+use Overcode\XePlugin\DynamicFactory\Interfaces\Orderable;
+use Overcode\XePlugin\DynamicFactory\Interfaces\Searchable;
+use Overcode\XePlugin\DynamicFactory\Models\CptDocument;
 use Overcode\XePlugin\DynamicFactory\Plugin;
 use XeDB;
 use XeSite;
@@ -22,6 +25,8 @@ class DynamicFactoryService
 
     protected $dfDocumentHandler;
 
+    protected $handlers = [];
+
     public function __construct(
         DynamicFactoryHandler $dfHandler,
         DynamicFactoryConfigHandler $dfConfigHandler,
@@ -33,6 +38,11 @@ class DynamicFactoryService
         $this->dfConfigHandler = $dfConfigHandler;
         $this->dfTaxonomyHandler = $dfTaxonomyHandler;
         $this->dfDocumentHandler = $dfDocumentHandler;
+    }
+
+    public function addHandlers($handler)
+    {
+        $this->handlers[] = $handler;
     }
 
     public function getItemsJson(array $attr)
@@ -155,5 +165,31 @@ class DynamicFactoryService
         XeDB::commit();
 
         return $document;
+    }
+
+    public function getItemsWhereQuery(array $attributes)
+    {
+        $instance_id = $attributes['cpt_id'];
+
+        $query = CptDocument::division($instance_id)->where('instance_id', $instance_id);
+
+        foreach ($this->handlers as $handler) {
+            if ($handler instanceof Searchable) {
+                $query = $handler->getItems($query, $attributes);
+            }
+        }
+
+        return $query;
+    }
+
+    public function getItemsOrderQuery($query, $attributes)
+    {
+        foreach ($this->handlers as $handler) {
+            if ($handler instanceof Orderable) {
+                $query = $handler->getOrder($query, $attributes);
+            }
+        }
+
+        return $query;
     }
 }

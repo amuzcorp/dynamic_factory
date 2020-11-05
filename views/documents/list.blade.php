@@ -11,17 +11,29 @@
                 <table class="table table-bordered">
                     <thead>
                     <tr>
-                        <th></th>
-                        <th></th>
-                        <th></th>
+                        <th>제목</th>
+                        <th>작성자</th>
+                        <th>작성일</th>
+                        <th>수정일</th>
                     </tr>
                     </thead>
                     <tbody>
+                @if ($cptDocs->count() > 0)
+                    @foreach($cptDocs as $doc)
                     <tr>
-                        <td></td>
-                        <td></td>
-                        <td></td>
+                        <td>{{ $doc->title }}</td>
+                        <td>
+                            @if ($doc->user !== null)
+                                {{ $doc->user->getDisplayName() }}
+                            @else
+                                Guest
+                            @endif
+                        </td>
+                        <td>{{ $doc->created_at->format('Y-m-d H:i:s') }}</td>
+                        <td>{{ $doc->updated_at->format('Y-m-d H:i:s') }}</td>
                     </tr>
+                    @endforeach
+                @endif
                     </tbody>
                 </table>
             </div>

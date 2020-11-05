@@ -318,9 +318,12 @@ class DynamicFactorySettingController extends BaseController
 
     public function documentList(Cpt $cpt, Request $request)
     {
+        $cptDocs = $this->getCptDocuments($request, $cpt);
+
         return $this->presenter->make('dynamic_factory::views.documents.list',[
             'cpt' => $cpt,
-            'current_route_name' => $request->current_route_name
+            'current_route_name' => $request->current_route_name,
+            'cptDocs' => $cptDocs
         ]);
     }
 
@@ -361,5 +364,23 @@ class DynamicFactorySettingController extends BaseController
         $document = $this->dfService->storeCptDocument($request);
 
         return redirect()->route('dyFac.setting.'.$request->cpt_id, ['type' => 'list']);
+    }
+
+    public function getCptDocuments($request, $cpt)
+    {
+        $perPage = $request->get('perPage', 20);
+
+        $cpt_id = $cpt->cpt_id;
+
+        $cptDocQuery = $this->dfService->getItemsWhereQuery(array_merge($request->all(), [
+            'force' => true,
+            'cpt_id' => $cpt_id
+        ]));
+
+        // TODO 검색 조건 설정
+
+        $cptDocQuery = $this->dfService->getItemsOrderQuery($cptDocQuery, $request->all());
+
+        return $cptDocQuery->paginate($perPage, ['*'], 'page')->appends($request->except('page'));
     }
 }
