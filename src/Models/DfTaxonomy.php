@@ -12,15 +12,17 @@ class DfTaxonomy extends DynamicModel
 
     public $timestamps = false;
 
-    protected $fillable = ['target_id', 'category_id', 'item_id'];
+    protected $fillable = ['target_id', 'category_id', 'item_ids'];
+
+    protected $casts = ['item_ids' => 'array'];
 
     public function taxonomy()
     {
         return $this->belongsTo(Category::class, 'category_id');
     }
 
-    public function taxonomyItem()
+    /*public function taxonomyItem()
     {
         return $this->belongsTo(CategoryItem::class, 'item_id');
-    }
+    }*/
 }

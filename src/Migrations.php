@@ -97,7 +97,8 @@ class Migrations
 
             $table->string('target_id');
             $table->integer('category_id');
-            $table->integer('item_id');
+//            $table->integer('item_id');
+            $table->text('item_ids');
         });
     }
 

@@ -5,6 +5,7 @@ namespace Overcode\XePlugin\DynamicFactory\Handlers;
 use Overcode\XePlugin\DynamicFactory\Models\CategoryExtra;
 use Overcode\XePlugin\DynamicFactory\Models\CptTaxonomy;
 use Overcode\XePlugin\DynamicFactory\Models\DfTaxonomy;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 use Xpressengine\Category\Models\CategoryItem;
 
 class DynamicFactoryTaxonomyHandler
@@ -13,7 +14,7 @@ class DynamicFactoryTaxonomyHandler
 
     const TAXONOMY_ITEM_CONFIG_NAME = 'taxonomyItem';
 
-    const TAXONOMY_ITEM_ID_ATTRIBUTE_NAME_PREFIX = 'taxonomy_item_id_';
+    const TAXONOMY_ITEM_ID_ATTRIBUTE_NAME_PREFIX = 'cate_item_id_';
 
     protected $categoryHandler;
 
@@ -29,37 +30,50 @@ class DynamicFactoryTaxonomyHandler
 
     public function createTaxonomy($inputs)
     {
-        $category_id = $inputs['category_id'];
+        \XeDB::beginTransaction();
+        try {
+            $category_id = $inputs['category_id'];
 
-        // Todo slug 중복 체크
-        // Todo taxonomy 중복 체크
+            // menu item slug 중복 체크
+            $slugUrl = isset($inputs['slug']) === true ? $inputs['slug'] : null;
+            if ($slugUrl !== null && \XeMenu::items()->query()->where('url', $slugUrl)->exists()) {
+                throw new HttpException(422, xe_trans('xe::menuItemUrlAlreadyExists'));
+            }
 
-        $cateExtra = new CategoryExtra();
+            // TODO category_extra 슬러그 중복 검사
 
-        if(!$category_id) {
-            $taxonomyItem = $this->categoryHandler->createCate($inputs);
-            $cateExtra->category_id = $taxonomyItem->id;
+            $cateExtra = new CategoryExtra();
 
-        }else{
-            $category = $this->categoryHandler->cates()->find($category_id);
-            $category->name = $inputs['name'];
-            $taxonomyItem = $this->categoryHandler->updateCate($category);
+            if (!$category_id) {
+                $taxonomyItem = $this->categoryHandler->createCate($inputs);
+                $cateExtra->category_id = $taxonomyItem->id;
 
-            $cateExtra = $this->getCategoryExtra($category_id);
+            } else {
+                $category = $this->categoryHandler->cates()->find($category_id);
+                $category->name = $inputs['name'];
+                $taxonomyItem = $this->categoryHandler->updateCate($category);
 
-            CptTaxonomy::where('category_id', $category_id)->delete();
+                $cateExtra = $this->getCategoryExtra($category_id);
+
+                CptTaxonomy::where('category_id', $category_id)->delete();
+            }
+
+            $cateExtra->slug = $inputs['slug'];
+            $cateExtra->template = $inputs['template'];
+            $cateExtra->save();
+
+            foreach ($inputs['cpts'] as $val) {
+                $cptTaxonomy = new CptTaxonomy();
+                $cptTaxonomy->cpt_id = $val;
+                $cptTaxonomy->category_id = $taxonomyItem->id;
+                $cptTaxonomy->save();
+            }
+        } catch (\Exception $e) {
+            \XeDB::rollback();
+
+            throw $e;
         }
-
-        $cateExtra->slug = $inputs['slug'];
-        $cateExtra->template = $inputs['template'];
-        $cateExtra->save();
-
-        foreach($inputs['cpts'] as $val) {
-            $cptTaxonomy = new CptTaxonomy();
-            $cptTaxonomy->cpt_id = $val;
-            $cptTaxonomy->category_id = $taxonomyItem->id;
-            $cptTaxonomy->save();
-        }
+        \XeDB::commit();
 
         return $taxonomyItem->id;
     }
@@ -143,21 +157,26 @@ class DynamicFactoryTaxonomyHandler
         $taxonomies = $this->getTaxonomies($inputs['cpt_id']);
 
         foreach ($taxonomies as $taxonomy) {
-            $categoryId = $taxonomy->id;
-            if (isset($inputs[$categoryId]) === false) {
+            $taxonomyAttributeName = $this->getTaxonomyItemAttributeName($taxonomy->id);
+            if (isset($inputs[$taxonomyAttributeName]) === false) {
                 continue;
             }
-            $taxonomyItemId = $inputs[$categoryId];
+            $taxonomyItemId = $inputs[$taxonomyAttributeName];
 
             if ($taxonomyItemId === null || $taxonomyItemId === '') {
+                continue;
+            }
+
+            $taxonomyItem = CategoryItem::find($taxonomyItemId);
+            if ($taxonomyItem === null) {
                 continue;
             }
 
             $newDfTaxonomy = new DfTaxonomy();
             $newDfTaxonomy->fill([
                 'target_id' => $document->id,
-                'category_id' => $categoryId,
-                'item_id' => $taxonomyItemId
+                'category_id' => $taxonomyItem[0]->category_id,
+                'item_ids' => $taxonomyItemId
             ]);
 
             $newDfTaxonomy->save();
@@ -167,6 +186,11 @@ class DynamicFactoryTaxonomyHandler
     public function getCategoryExtra($category_id)
     {
         return CategoryExtra::where('category_id', $category_id)->first();
+    }
+
+    public function getTaxonomyItemAttributeName($taxonomyId)
+    {
+        return self::TAXONOMY_ITEM_ID_ATTRIBUTE_NAME_PREFIX . $taxonomyId;
     }
 
 }

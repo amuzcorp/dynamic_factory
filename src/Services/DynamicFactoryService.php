@@ -69,20 +69,12 @@ class DynamicFactoryService
         return $cpt;
     }
 
+    // return category_id
     public function storeCptTaxonomy(Request $request)
     {
         $inputs = $request->except('_token');
 
-        XeDB::beginTransaction();
-        try {
-            $category_id = $this->dfTaxonomyHandler->createTaxonomy($inputs);
-        }catch (\Exception $e) {
-            XeDB::rollback();
-            throw $e;
-        }
-        XeDB::commit();
-
-        return $category_id;
+        return $this->dfTaxonomyHandler->createTaxonomy($inputs);
     }
 
     public function updateCpt(Request $request)

@@ -27,6 +27,7 @@ use View;
  * uio('uiobject/df@taxo_select', [
  *      'name' => 'selectNameAttribute',
  *      'label' => 'label',
+ *      'template' => 'template',
  *      'value' => 'value',
  *      'items' => [
  *          ['value' => 'value1', 'text' => 'text1'],
@@ -86,7 +87,13 @@ class TaxoSelectUIObject extends AbstractUIObject
             $args['scriptInit'] = true;
         }
 
-        return View::make('dynamic_factory::components/UIObjects/TaxoSelect/taxoSelect', $args)->render();
+        $blade = 'taxoSelect';
+
+        if($args['template'] === 'multi_select') $blade = 'taxoMultiSelect';
+        else if($args['template'] === 'check_list') $blade = 'taxoCheckList';
+        else if($args['template'] === 'hierarchy') $blade = 'taxoHierarchy';
+
+        return View::make('dynamic_factory::components/UIObjects/TaxoSelect/'. $blade, $args)->render();
     }
 
     private static function getSelectedItem ($items, $selectedValue)
@@ -140,5 +147,14 @@ class TaxoSelectUIObject extends AbstractUIObject
         ];
 
         return View::make('dynamic_factory::components/UIObjects/TaxoSelect/taxoSelectItem', $args)->render();
+    }
+
+    public static function renderMultiList ($items, $value = null)
+    {
+        $args = [
+            'items' => $items,
+            'selectedItemValue' => $value
+        ];
+        return View::make('dynamic_factory::components/UIObjects/TaxoSelect/taxoMultiSelectItem', $args)->render();
     }
 }

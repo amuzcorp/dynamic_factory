@@ -59,7 +59,7 @@
                                 <div class="__taxonomy-field">
                                     <div class="components-base-control__field" data-required-title="{{ xe_trans($taxonomy->name) }}">
                                         {!! uio('uiobject/df@taxo_select', [
-                                            'name' => $taxonomy->id,
+                                            'name' => app('overcode.df.taxonomyHandler')->getTaxonomyItemAttributeName($taxonomy->id),
                                             'label' => xe_trans($taxonomy->name),
                                             'template' => $taxonomy->extra->template,
                                             'items' => app('overcode.df.taxonomyHandler')->getCategoryItemsTree($taxonomy->id),
