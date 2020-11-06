@@ -1,5 +1,8 @@
 @section('page_title')
-    <h2>카테고리 관리</h2>
+    <div class="clearfix">
+        <h2 class="pull-left">카테고리 관리</h2>
+        <a href="{{ route('dyFac.setting.create_taxonomy') }}" class="xu-button xu-button--primary pull-right">새 카테고리 추가</a>
+    </div>
 @endsection
 <div class="row">
     <div class="col-sm-12">
