@@ -14,9 +14,7 @@ class DynamicFactoryConfigHandler
 
     const CONFIG_NAME = 'dyFac';
 
-    protected $defaultConfig = [
-        'temp' => '어떤 정보를 저장할까?'
-    ];
+    protected $defaultConfig = [];
 
     // id 에 따른 text 는 여기에 저장
     const COLUMN_LABELS = [

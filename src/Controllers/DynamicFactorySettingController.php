@@ -78,10 +78,18 @@ class DynamicFactorySettingController extends BaseController
             $cpt->categories = $categories;
         }
 
+        $cpts_from_plugin = $this->dfService->getItemsFromPlugin();
+
+        foreach ($cpts_from_plugin as $cpt_fp) {
+            $categories = $this->dfService->getCategories($cpt_fp->cpt_id);
+            $cpt_fp->categories = $categories;
+        }
+
         // output
         return $this->presenter->make('dynamic_factory::views.settings.index', [
             'title' => $title,
-            'cpts' => $cpts
+            'cpts' => $cpts,
+            'cpts_fp' => $cpts_from_plugin
         ]);
     }
 

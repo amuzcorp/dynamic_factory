@@ -11,6 +11,7 @@
     <div class="col-sm-12">
         <div class="panel">
             <div class="panel-body">
+                <h4>다이나믹 팩토리에서 생성한 사용자 정의 문서</h4>
                 <table class="table table-bordered">
                     <thead>
                     <tr>
@@ -42,6 +43,41 @@
                             <a href="{{ route('dyFac.setting.create_taxonomy') }}" class="btn btn-sm btn-warning">카테고리 추가</a>
                         </td>
                     </tr>
+                    @endforeach
+                    </tbody>
+                </table>
+                <h4>다른 플러그인에서 생성한 사용자 정의 문서</h4>
+                <table class="table table-bordered">
+                    <thead>
+                    <tr>
+                        <th>글 유형</th>
+                        <th>확장 필드</th>
+                        <th>카테고리</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    @foreach($cpts_fp as $cpt)
+                        <tr>
+                            <td>
+                                <a href="{{ route('dyFac.setting.edit', ['cpt_id' => $cpt->cpt_id]) }}">{{ $cpt->cpt_name }}</a>
+                            </td>
+                            <td>
+                                <ul class="list-group">
+                                    @foreach(DynamicFactoryHandler::getDynamicFields($cpt->cpt_id) as $dyFi)
+                                        <li class="list-group-item">{{ $dyFi['label'] }} ({{ $dyFi['typeName'] }})</li>
+                                    @endforeach
+                                </ul>
+                                <a href="{{ route('dyFac.setting.create_extra', ['cpt_id' => $cpt->cpt_id]) }}" class="btn btn-sm btn-warning">확장 필드 관리</a>
+                            </td>
+                            <td>
+                                <ul class="list-group">
+                                    @foreach($cpt->categories as $cate)
+                                        <li class="list-group-item"><a href="{{ route('dyFac.setting.create_taxonomy',[ 'tax_id' => $cate->id]) }}">{{ xe_trans($cate->name) }}</a></li>
+                                    @endforeach
+                                </ul>
+                                <a href="{{ route('dyFac.setting.create_taxonomy') }}" class="btn btn-sm btn-warning">카테고리 추가</a>
+                            </td>
+                        </tr>
                     @endforeach
                     </tbody>
                 </table>

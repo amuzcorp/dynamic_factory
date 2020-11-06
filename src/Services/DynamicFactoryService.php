@@ -6,6 +6,7 @@ use Overcode\XePlugin\DynamicFactory\Handlers\DynamicFactoryDocumentHandler;
 use Overcode\XePlugin\DynamicFactory\Handlers\DynamicFactoryTaxonomyHandler;
 use Overcode\XePlugin\DynamicFactory\Interfaces\Orderable;
 use Overcode\XePlugin\DynamicFactory\Interfaces\Searchable;
+use Overcode\XePlugin\DynamicFactory\Models\Cpt;
 use Overcode\XePlugin\DynamicFactory\Models\CptDocument;
 use Overcode\XePlugin\DynamicFactory\Plugin;
 use XeDB;
@@ -102,15 +103,23 @@ class DynamicFactoryService
         return $cpt;
     }
 
+    public function getItemsFromPlugin()
+    {
+        $cpt = $this->dfHandler->getItemsFromPlugin();
+
+        return $cpt;
+    }
+
     public function getItem($cpt_id)
     {
         $cpt = $this->dfHandler->getItem($cpt_id);
 
         $cpts = \XeRegister::get('dynamic_factory');    // register 에 등록된 cpt 를 가져온다
         if($cpts && array_key_exists($cpt_id, $cpts)){
-            $cpt = $cpts[$cpt_id];
+            $temp_cpt = $cpts[$cpt_id];
+            $cpt = new Cpt();
+            $cpt->setRawAttributes($temp_cpt);
         }
-
         return $cpt;
     }
 

@@ -17,6 +17,8 @@ class Plugin extends AbstractPlugin
 
     protected $cpts_from_plugin;
 
+    protected $df_config;
+
     public function register()
     {
         $app = app();
@@ -79,6 +81,7 @@ class Plugin extends AbstractPlugin
     public function boot()
     {
         $this->loadCpts();
+        $this->CptConfigSettingFromPlugin();
 
         $this->route();
         $this->registerSettingsMenus();
@@ -93,9 +96,47 @@ class Plugin extends AbstractPlugin
     protected function loadCpts()
     {
         $dfService = app('overcode.df.service');
+        // DB 에 저장된 cpt 를 불러온다.
         $this->cpts = $dfService->getItems();
 
+        // 타 플러그인에서 등록한 cpt 를 불러온다.
         $this->cpts_from_plugin = \XeRegister::get('dynamic_factory');
+
+        // 타 플러그인에서 등록한 cpt 의 config 를 불러온다.
+        $this->df_config = \XeRegister::get('df_config');
+    }
+
+    /**
+     * 타 플러그인에서 지정한 Config 를 체크하여 없으면 생성해준다.
+     */
+    protected function CptConfigSettingFromPlugin()
+    {
+        $dfConfigHandler = app('overcode.df.configHandler');
+        foreach ($this->cpts_from_plugin as $key => $val) {
+            $configName = $dfConfigHandler->getConfigName($val['cpt_id']);
+            $config = $dfConfigHandler->get($configName);
+
+            // 해당 cpt_id 로 config 를 가져와서 없으면 타 플러그인에서 불러온 config 값으로 생성해준다.
+            if($config === null || !isset($config)) {
+                $dfConfigHandler->addConfig($this->df_config[ $val['cpt_id'] ], $configName);
+            }
+        }
+    }
+
+    /**
+     * 타 플러그인에서 지정한 Category 를 체크하여 없으면 생성해준다.
+     */
+    protected function CptCategorySettingFromPlugin()
+    {
+
+    }
+
+    /**
+     * 타 플러그인에서 지정한 Dynamic Field 를 체크하여 없으면 생성해준다.
+     */
+    protected function CptDynamicFieldSettingFromPlugin()
+    {
+
     }
 
     protected function registerSettingsMenus()
@@ -117,12 +158,21 @@ class Plugin extends AbstractPlugin
         }
 
         if($this->cpts_from_plugin) {
-            foreach ($this->cpts_from_plugin as $val) {
+            /*foreach ($this->cpts_from_plugin as $val) {
                 \XeRegister::push('settings/menu', $val->menu_path . $val->cpt_id, [
                     'title' => $val->menu_name,
                     'description' => $val->description,
                     'display' => true,
                     'ordering' => $val->menu_order
+                ]);
+            }*/
+
+            foreach ($this->cpts_from_plugin as $val) {
+                \XeRegister::push('settings/menu', $val['menu_path'] . $val['cpt_id'], [
+                    'title' => $val['menu_name'],
+                    'description' => $val['description'],
+                    'display' => true,
+                    'ordering' => $val['menu_order']
                 ]);
             }
         }
@@ -170,11 +220,18 @@ class Plugin extends AbstractPlugin
 
         if($this->cpts_from_plugin) {
             Route::settings(static::getId(), function () {
-                foreach ($this->cpts_from_plugin as $val) {
+                /*foreach ($this->cpts_from_plugin as $val) {
                     Route::get('/'.$val->cpt_id. '/{type?}', [
                         'as' => 'dyFac.setting.'.$val->cpt_id,
                         'uses' => 'DynamicFactorySettingController@cptDocument',
                         'settings_menu' => $val->menu_path . $val->cpt_id
+                    ]);
+                }*/
+                foreach ($this->cpts_from_plugin as $val) {
+                    Route::get('/'.$val['cpt_id']. '/{type?}', [
+                        'as' => 'dyFac.setting.'.$val['cpt_id'],
+                        'uses' => 'DynamicFactorySettingController@cptDocument',
+                        'settings_menu' => $val['menu_path'] . $val['cpt_id']
                     ]);
                 }
             },['namespace' => 'Overcode\XePlugin\DynamicFactory\Controllers']);
