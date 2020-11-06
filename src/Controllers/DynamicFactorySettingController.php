@@ -204,6 +204,7 @@ class DynamicFactorySettingController extends BaseController
 
         // 1. 유형 목록 불러오기 TODO 2. 다른 플러그인에서 생성된 유형 목록 불러오기
         $cpts = $this->dfService->getItems();
+        $cpts_fp = $this->dfService->getItemsFromPlugin();
 
         //TODO tax_id 가 있으면 로드 하여 프레젠터에 보낸다.
 
@@ -231,7 +232,8 @@ class DynamicFactorySettingController extends BaseController
             'category' => $category,
             'cpt_cate_extra' => $cpt_cate_extra,
             'cpt_ids' => $cpt_ids,
-            'cpts' => $cpts
+            'cpts' => $cpts,
+            'cpts_fp' => $cpts_fp
         ]);
     }
 

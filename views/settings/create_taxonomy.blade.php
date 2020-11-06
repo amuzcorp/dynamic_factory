@@ -48,6 +48,10 @@
                         <input class="form-check-input" type="checkbox" id="chk{{ $cpt->cpt_id }}" name="cpts[]" value="{{ $cpt->cpt_id }}" @if(in_array($cpt->cpt_id, $cpt_ids)) checked="checked"@endif>
                         <label class="form-check-label" for="chk{{ $cpt->cpt_id }}">{{ $cpt->cpt_name }}</label>
                         @endforeach
+                        @foreach($cpts_fp as $fp)
+                        <input class="form-check-input" type="checkbox" id="chk{{ $fp->cpt_id }}" name="cpts[]" value="{{ $fp->cpt_id }}" @if(in_array($fp->cpt_id, $cpt_ids)) checked="checked"@endif>
+                        <label class="form-check-label" for="chk{{ $fp->cpt_id }}">{{ $fp->cpt_name }}</label>
+                        @endforeach
                         <div class="clearfix">
                             <button type="submit" class="btn btn-primary pull-right">@if(!$category->id)생성@else수정@endif</button>
                         </div>
