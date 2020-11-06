@@ -112,13 +112,15 @@ class Plugin extends AbstractPlugin
     protected function CptConfigSettingFromPlugin()
     {
         $dfConfigHandler = app('overcode.df.configHandler');
-        foreach ($this->cpts_from_plugin as $key => $val) {
-            $configName = $dfConfigHandler->getConfigName($val['cpt_id']);
-            $config = $dfConfigHandler->get($configName);
+        if(isset($this->cpts_from_plugin)) {
+            foreach ($this->cpts_from_plugin as $key => $val) {
+                $configName = $dfConfigHandler->getConfigName($val['cpt_id']);
+                $config = $dfConfigHandler->get($configName);
 
-            // 해당 cpt_id 로 config 를 가져와서 없으면 타 플러그인에서 불러온 config 값으로 생성해준다.
-            if($config === null || !isset($config)) {
-                $dfConfigHandler->addConfig($this->df_config[ $val['cpt_id'] ], $configName);
+                // 해당 cpt_id 로 config 를 가져와서 없으면 타 플러그인에서 불러온 config 값으로 생성해준다.
+                if ($config === null || !isset($config)) {
+                    $dfConfigHandler->addConfig($this->df_config[$val['cpt_id']], $configName);
+                }
             }
         }
     }

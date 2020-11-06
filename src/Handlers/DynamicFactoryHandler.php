@@ -146,10 +146,12 @@ class DynamicFactoryHandler
         $cptsFromPlugin = \XeRegister::get('dynamic_factory');    // register 에 등록된 cpt 를 가져온다
 
         $cpts = [];
-        foreach ($cptsFromPlugin as $cpt_fp) {
-            $cpt = new Cpt();
-            $cpt->setRawAttributes($cpt_fp);
-            $cpts[] = $cpt;
+        if(isset($cptsFromPlugin)) {
+            foreach ($cptsFromPlugin as $cpt_fp) {
+                $cpt = new Cpt();
+                $cpt->setRawAttributes($cpt_fp);
+                $cpts[] = $cpt;
+            }
         }
         return $cpts;
     }
