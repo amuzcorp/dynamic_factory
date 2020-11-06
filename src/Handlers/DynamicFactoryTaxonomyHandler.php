@@ -188,6 +188,11 @@ class DynamicFactoryTaxonomyHandler
         return CategoryExtra::where('category_id', $category_id)->first();
     }
 
+    public function getCategoryExtras()
+    {
+        return CategoryExtra::all();
+    }
+
     public function getTaxonomyItemAttributeName($taxonomyId)
     {
         return self::TAXONOMY_ITEM_ID_ATTRIBUTE_NAME_PREFIX . $taxonomyId;

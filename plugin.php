@@ -144,10 +144,20 @@ class Plugin extends AbstractPlugin
     protected function registerSettingsMenus()
     {
         \XeRegister::push('settings/menu', 'setting.dynamic_factory', [
-            'title' => '사용자 정의 문서',
-            'description' => '사용자 정의 유형과 확장 필드와 분류를 생성하고 관리합니다.',
+            'title' => 'Dynamic Factory',
+            'description' => '확장 필드와 카테고리를 조합한 사용자 정의 문서 생성 및 관리를 할 수 있습니다.',
             'display' => true,
             'ordering' => 100
+        ]);
+        \XeRegister::push('settings/menu', 'setting.dynamic_factory.index', [
+            'title' => '사용자 정의 문서',
+            'display' => true,
+            'ordering' => 1000
+        ]);
+        \XeRegister::push('settings/menu', 'setting.dynamic_factory.category', [
+            'title' => '카테고리',
+            'display' => true,
+            'ordering' => 1000
         ]);
 
         foreach($this->cpts as $val){
@@ -190,8 +200,10 @@ class Plugin extends AbstractPlugin
                 Route::get('/', [
                     'as' => 'index',
                     'uses' => 'DynamicFactorySettingController@index',
-                    'settings_menu' => 'setting.dynamic_factory'
+                    'settings_menu' => 'setting.dynamic_factory.index'
                 ]);
+                Route::get('/category_list', [ 'as' => 'category', 'uses' => 'DynamicFactorySettingController@categoryList', 'settings_menu' => 'setting.dynamic_factory.category' ]);
+
                 Route::get('/create', [ 'as' => 'create', 'uses' => 'DynamicFactorySettingController@create' ]);
                 Route::post('/store_cpt', ['as' => 'store_cpt', 'uses' => 'DynamicFactorySettingController@storeCpt']);
                 Route::get('/edit_editor/{cpt_id}', [ 'as' => 'edit_editor', 'uses' => 'DynamicFactorySettingController@editEditor' ]);

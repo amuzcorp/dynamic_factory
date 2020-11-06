@@ -114,12 +114,15 @@ class DynamicFactoryService
     {
         $cpt = $this->dfHandler->getItem($cpt_id);
 
-        $cpts = \XeRegister::get('dynamic_factory');    // register 에 등록된 cpt 를 가져온다
-        if($cpts && array_key_exists($cpt_id, $cpts)){
-            $temp_cpt = $cpts[$cpt_id];
+        if(empty($cpt)) {
+            $cpts = \XeRegister::get('dynamic_factory');    // register 에 등록된 cpt 를 가져온다
             $cpt = new Cpt();
-            $cpt->setRawAttributes($temp_cpt);
+            if ($cpts && array_key_exists($cpt_id, $cpts)) {
+                $temp_cpt = $cpts[$cpt_id];
+                $cpt->setRawAttributes($temp_cpt);
+            }
         }
+
         return $cpt;
     }
 
@@ -200,5 +203,10 @@ class DynamicFactoryService
         }
 
         return $query;
+    }
+
+    public function getCategoryExtras()
+    {
+        return $this->dfTaxonomyHandler->getCategoryExtras();
     }
 }

@@ -393,4 +393,13 @@ class DynamicFactorySettingController extends BaseController
 
         return $cptDocQuery->paginate($perPage, ['*'], 'page')->appends($request->except('page'));
     }
+
+    public function categoryList()
+    {
+        $categories = $this->dfService->getCategoryExtras();
+
+        return $this->presenter->make('dynamic_factory::views.settings.category', [
+            'categories' => $categories
+        ]);
+    }
 }
