@@ -16,6 +16,7 @@
                         <th>슬러그</th>
                         <th>템플릿</th>
                         <th>사용중인 유형</th>
+                        <th>삭제</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -38,6 +39,9 @@
                                 @endif
                             @endforeach
                             </td>
+                            <td>
+                                <a class="btn btn-danger cate_del_btn" data-category_id="{{ $category->category_id }}">삭제</a>
+                            </td>
                         </tr>
                     @endforeach
                     </tbody>
@@ -46,3 +50,21 @@
         </div>
     </div>
 </div>
+<script type="text/javascript">
+$(document).ready(function() {
+    $('.cate_del_btn').on('click', function() {
+        var category_id = $(this).data('category_id');
+
+        if(confirm('정말 이 카테고리를 삭제 하시겠습니까?')) {
+            window.XE.ajax({
+                url: '{{ route('dyFac.setting.category.delete') }}',
+                type: 'post',
+                dataType: 'json',
+                data: {id: category_id}
+            }).done(function (json) {
+                console.log(json);
+            })
+        }
+    });
+});
+</script>

@@ -2,10 +2,13 @@
 
 namespace Overcode\XePlugin\DynamicFactory\Handlers;
 
+use XeLang;
+use App\Facades\XeCategory;
 use Overcode\XePlugin\DynamicFactory\Models\CategoryExtra;
 use Overcode\XePlugin\DynamicFactory\Models\CptTaxonomy;
 use Overcode\XePlugin\DynamicFactory\Models\DfTaxonomy;
 use Symfony\Component\HttpKernel\Exception\HttpException;
+use Xpressengine\Category\Models\Category;
 use Xpressengine\Category\Models\CategoryItem;
 
 class DynamicFactoryTaxonomyHandler
@@ -78,6 +81,67 @@ class DynamicFactoryTaxonomyHandler
         return $taxonomyItem->id;
     }
 
+    // plugin.php 에서 호출
+    public function createCategoryForOut()
+    {
+        $df_categories = \XeRegister::get('df_category');
+        \XeDB::beginTransaction();
+        try {
+            foreach($df_categories as $cate) {
+                $slug = $cate['slug'];
+                $cate_extra = $this->getCategoryExtraBySlug($slug);
+                if (!isset($cate_extra)) {
+                    $langKey = XeLang::genUserKey();
+                    XeLang::save($langKey, 'ko', $cate['name'], false);
+
+                    $category = $this->categoryHandler->createCate(['name' => $langKey]);
+                    $category_id = $category->id;
+
+                    $this->addCategoryItemForOut($category, $cate['items']);
+
+                    $cateExtra = new CategoryExtra();
+                    $cateExtra->category_id = $category_id;
+                    $cateExtra->slug = $slug;
+                    $cateExtra->template = $cate['template'];
+                    $cateExtra->save();
+
+                    foreach ($cate['cpt_ids'] as $cpt_id) {
+                        $cptTaxonomy = new CptTaxonomy();
+                        $cptTaxonomy->cpt_id = $cpt_id;
+                        $cptTaxonomy->category_id = $category_id;
+                        $cptTaxonomy->save();
+                    }
+                }
+            }
+        } catch (\Exception $e) {
+            \XeDB::rollback();
+
+            throw $e;
+        }
+        \XeDB::commit();
+    }
+
+    public function addCategoryItemForOut($category, $arr, $parent_id = null)
+    {
+        foreach ($arr as $key => $val) {
+            $langKey = XeLang::genUserKey();
+            XeLang::save($langKey, 'ko', $val['word'], false);
+
+            $param = [
+                'word' => $langKey
+            ];
+            if($parent_id) {
+                $param['parent_id'] = $parent_id;
+            }
+
+            $item = XeCategory::createItem($category, $param);
+
+            if(isset($val['child']) && isset($item)) {
+                $this->addCategoryItemForOut($category, $val['child'], $item->id);
+            }
+        }
+    }
+
     public function getTaxonomies($cpt_id)
     {
         $cptTaxonomies = CptTaxonomy::where('cpt_id', $cpt_id)->get();
@@ -86,8 +150,12 @@ class DynamicFactoryTaxonomyHandler
 
         foreach ($cptTaxonomies as $key => $val) {
             //$taxonomies[] = $this->getCategoryItemsTree($val->category_id);
-            $taxonomies[] = $this->categoryHandler->cates()->find($val->category_id);
-            $taxonomies[$key]['extra'] = $this->getCategoryExtra($val->category_id);
+
+            $category = $this->categoryHandler->cates()->find($val->category_id);
+            if(isset($category)) {
+                $taxonomies[] = $category;
+                $taxonomies[$key]['extra'] = $this->getCategoryExtra($val->category_id);
+            }
         }
 
         return $taxonomies;
@@ -188,6 +256,11 @@ class DynamicFactoryTaxonomyHandler
         return CategoryExtra::where('category_id', $category_id)->first();
     }
 
+    public function getCategoryExtraBySlug($slug)
+    {
+        return CategoryExtra::where('slug', $slug)->first();
+    }
+
     public function getCategoryExtras()
     {
         return CategoryExtra::all();
@@ -198,4 +271,22 @@ class DynamicFactoryTaxonomyHandler
         return self::TAXONOMY_ITEM_ID_ATTRIBUTE_NAME_PREFIX . $taxonomyId;
     }
 
+    public function deleteCategory($category_id)
+    {
+        \XeDB::beginTransaction();
+        try {
+            $category = $this->categoryHandler->cates()->find($category_id);
+            XeCategory::deleteCate($category);
+            CategoryExtra::where('category_id', $category_id)->delete();
+            CptTaxonomy::where('category_id', $category_id)->delete();
+        } catch (\Exception $e) {
+            \XeDB::rollback();
+
+            //throw $e;
+            return false;
+        }
+        \XeDB::commit();
+
+        return true;
+    }
 }

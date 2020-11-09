@@ -402,4 +402,15 @@ class DynamicFactorySettingController extends BaseController
             'categories' => $categories
         ]);
     }
+
+    public function categoryDelete(Request $request)
+    {
+        $return_value = '';
+
+        if(isset($request->id)){
+            $return_value = $this->taxonomyHandler->deleteCategory($request->id);
+        }
+
+        return $this->presenter->makeApi([ 'return_value' => $return_value]);
+    }
 }

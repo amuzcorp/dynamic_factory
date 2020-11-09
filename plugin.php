@@ -19,6 +19,8 @@ class Plugin extends AbstractPlugin
 
     protected $df_config;
 
+    protected $df_categories;
+
     public function register()
     {
         $app = app();
@@ -82,6 +84,7 @@ class Plugin extends AbstractPlugin
     {
         $this->loadCpts();
         $this->CptConfigSettingFromPlugin();
+        $this->CptCategorySettingFromPlugin();
 
         $this->route();
         $this->registerSettingsMenus();
@@ -104,6 +107,15 @@ class Plugin extends AbstractPlugin
 
         // 타 플러그인에서 등록한 cpt 의 config 를 불러온다.
         $this->df_config = \XeRegister::get('df_config');
+
+        // 타 플러그인에서 등록한 cpt 의 category 를 불러온다.
+        //$this->df_categories = \XeRegister::get('df_category');
+        $this->df_categories = [
+            [
+                'slug' => 'city',
+                'template' => 'select'
+            ]
+        ];
     }
 
     /**
@@ -130,7 +142,8 @@ class Plugin extends AbstractPlugin
      */
     protected function CptCategorySettingFromPlugin()
     {
-
+        $dfTaxonomyHandler = app('overcode.df.taxonomyHandler');
+        $dfTaxonomyHandler->createCategoryForOut();
     }
 
     /**
@@ -203,6 +216,7 @@ class Plugin extends AbstractPlugin
                     'settings_menu' => 'setting.dynamic_factory.index'
                 ]);
                 Route::get('/category_list', [ 'as' => 'category', 'uses' => 'DynamicFactorySettingController@categoryList', 'settings_menu' => 'setting.dynamic_factory.category' ]);
+                Route::post('/delete_category', [ 'as' => 'category.delete', 'uses' => 'DynamicFactorySettingController@categoryDelete' ]);
 
                 Route::get('/create', [ 'as' => 'create', 'uses' => 'DynamicFactorySettingController@create' ]);
                 Route::post('/store_cpt', ['as' => 'store_cpt', 'uses' => 'DynamicFactorySettingController@storeCpt']);
