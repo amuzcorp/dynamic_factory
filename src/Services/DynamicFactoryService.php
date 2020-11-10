@@ -120,6 +120,7 @@ class DynamicFactoryService
             if ($cpts && array_key_exists($cpt_id, $cpts)) {
                 $temp_cpt = $cpts[$cpt_id];
                 $cpt->setRawAttributes($temp_cpt);
+                $cpt->is_made_plugin = true;    // plugin 에서 생성한 cpt 인지 구분
             }
         }
 

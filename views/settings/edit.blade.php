@@ -1,6 +1,9 @@
 @section('page_title')
     <h2>[{{ $cpt['cpt_name'] }}] 기본정보</h2>
 @endsection
+@php
+    $readonly = $cpt['is_made_plugin'];
+@endphp
 
 @include('dynamic_factory::views.settings.tab')
 <div class="row">
@@ -16,25 +19,25 @@
                     <div class="form-group row">
                         <label class="col-sm-2 col-form-label">유형 이름 (필수)</label>
                         <div class="col-sm-5">
-                            <input type="text" class="form-control" name="cpt_name" value="{{ $cpt['cpt_name'] }}">
+                            <input type="text" class="form-control" name="cpt_name" value="{{ $cpt['cpt_name'] }}" @if($readonly) disabled="disabled" @endif>
                         </div>
                     </div>
                     <div class="form-group row">
                         <label class="col-sm-2 col-form-label">메뉴 이름 (필수)</label>
                         <div class="col-sm-5">
-                            <input type="text" class="form-control" name="menu_name" value="{{ $cpt['menu_name'] }}">
+                            <input type="text" class="form-control" name="menu_name" value="{{ $cpt['menu_name'] }}" @if($readonly) disabled="disabled" @endif>
                         </div>
                     </div>
                     <div class="form-group row">
                         <label class="col-sm-2 col-form-label">메뉴 순서 (필수)</label>
                         <div class="col-sm-5">
-                            <input type="text" class="form-control" name="menu_order" value="{{ $cpt['menu_order'] }}">
+                            <input type="text" class="form-control" name="menu_order" value="{{ $cpt['menu_order'] }}" @if($readonly) disabled="disabled" @endif>
                         </div>
                     </div>
                     <div class="form-group row">
                         <label class="col-sm-2 col-form-label">상위 메뉴 (필수)</label>
                         <div class="col-sm-5">
-                            <select class="form-control" name="menu_path">
+                            <select class="form-control" name="menu_path" @if($readonly) disabled="disabled" @endif>
                                 <option value="">- 최상위 -</option>
                                 @foreach($menus as $menu)
                                     <option value="{{ $menu['menu_path'] }}" @if($cpt['menu_path'] == $menu['menu_path']) selected="selected"@endif>{{ xe_trans($menu['title']) }}</option>
@@ -45,11 +48,11 @@
                     <div class="form-group row">
                         <label class="col-sm-2 col-form-label">슬러그 (필수)</label>
                         <div class="col-sm-5">
-                            <input type="text" class="form-control" name="slug" value="{{ $cpt['slug'] }}">
+                            <input type="text" class="form-control" name="slug" value="{{ $cpt['slug'] }}" @if($readonly) disabled="disabled" @endif>
                         </div>
                         <div class="col-sm-5">
                             <div class="form-check">
-                                <input class="form-check-input" type="checkbox" value="1" id="has_archive" name="has_archive" @if($cpt['has_archive'])checked="checked"@endif>
+                                <input class="form-check-input" type="checkbox" value="1" id="has_archive" name="has_archive" @if($cpt['has_archive'])checked="checked"@endif  @if($readonly) disabled="disabled" @endif>
                                 <label class="form-check-label" for="has_archive">아카이브 슬러그 사용</label>
                             </div>
                         </div>
@@ -57,7 +60,7 @@
                     <div class="form-group row">
                         <label class="col-sm-2 col-form-label">설명</label>
                         <div class="col-sm-10">
-                            <input type="text" class="form-control" name="description" value="{{ $cpt['description'] }}">
+                            <input type="text" class="form-control" name="description" value="{{ $cpt['description'] }}" @if($readonly) disabled="disabled" @endif>
                         </div>
                     </div>
                 </div>
@@ -91,74 +94,75 @@
                         <div class="form-group row">
                             <label class="col-sm-2 col-form-label">새로 추가</label>
                             <div class="col-sm-10">
-                                <input type="text" class="form-control" name="labels[new_add]" value="{{ $cpt['labels']['new_add'] }}">
+                                <input type="text" class="form-control" name="labels[new_add]" value="{{ $cpt['labels']['new_add'] }}" @if($readonly) disabled="disabled" @endif>
                             </div>
                         </div>
                         <div class="form-group row">
                             <label class="col-sm-2 col-form-label">새 항목 추가</label>
                             <div class="col-sm-10">
-                                <input type="text" class="form-control" name="labels[new_add_cpt]" value="{{ $cpt['labels']['new_add_cpt'] }}">
+                                <input type="text" class="form-control" name="labels[new_add_cpt]" value="{{ $cpt['labels']['new_add_cpt'] }}" @if($readonly) disabled="disabled" @endif>
                             </div>
                         </div>
                         <div class="form-group row">
                             <label class="col-sm-2 col-form-label">항목 편집</label>
                             <div class="col-sm-10">
-                                <input type="text" class="form-control" name="labels[cpt_edit]" value="{{ $cpt['labels']['cpt_edit'] }}">
+                                <input type="text" class="form-control" name="labels[cpt_edit]" value="{{ $cpt['labels']['cpt_edit'] }}" @if($readonly) disabled="disabled" @endif>
                             </div>
                         </div>
                         <div class="form-group row">
                             <label class="col-sm-2 col-form-label">새 항목</label>
                             <div class="col-sm-10">
-                                <input type="text" class="form-control" name="labels[new_cpt]" value="{{ $cpt['labels']['new_cpt'] }}">
+                                <input type="text" class="form-control" name="labels[new_cpt]" value="{{ $cpt['labels']['new_cpt'] }}" @if($readonly) disabled="disabled" @endif>
                             </div>
                         </div>
                         <div class="form-group row">
                             <label class="col-sm-2 col-form-label">항목 보기</label>
                             <div class="col-sm-10">
-                                <input type="text" class="form-control" name="labels[cpt_view]" value="{{ $cpt['labels']['cpt_view'] }}">
+                                <input type="text" class="form-control" name="labels[cpt_view]" value="{{ $cpt['labels']['cpt_view'] }}" @if($readonly) disabled="disabled" @endif>
                             </div>
                         </div>
                         <div class="form-group row">
                             <label class="col-sm-2 col-form-label">항목 검색</label>
                             <div class="col-sm-10">
-                                <input type="text" class="form-control" name="labels[cpt_search]" value="{{ $cpt['labels']['cpt_search'] }}">
+                                <input type="text" class="form-control" name="labels[cpt_search]" value="{{ $cpt['labels']['cpt_search'] }}" @if($readonly) disabled="disabled" @endif>
                             </div>
                         </div>
                         <div class="form-group row">
                             <label class="col-sm-2 col-form-label">찾을 수 없음</label>
                             <div class="col-sm-10">
-                                <input type="text" class="form-control" name="labels[no_search]" value="{{ $cpt['labels']['no_search'] }}">
+                                <input type="text" class="form-control" name="labels[no_search]" value="{{ $cpt['labels']['no_search'] }}" @if($readonly) disabled="disabled" @endif>
                             </div>
                         </div>
                         <div class="form-group row">
                             <label class="col-sm-2 col-form-label">휴지통에서 찾을 수 없음</label>
                             <div class="col-sm-10">
-                                <input type="text" class="form-control" name="labels[no_trash]" value="{{ $cpt['labels']['no_trash'] }}">
+                                <input type="text" class="form-control" name="labels[no_trash]" value="{{ $cpt['labels']['no_trash'] }}" @if($readonly) disabled="disabled" @endif>
                             </div>
                         </div>
                         <div class="form-group row">
                             <label class="col-sm-2 col-form-label">상위 항목 설명</label>
                             <div class="col-sm-10">
-                                <input type="text" class="form-control" name="labels[parent_txt]" value="{{ $cpt['labels']['parent_txt'] }}">
+                                <input type="text" class="form-control" name="labels[parent_txt]" value="{{ $cpt['labels']['parent_txt'] }}" @if($readonly) disabled="disabled" @endif>
                             </div>
                         </div>
                         <div class="form-group row">
                             <label class="col-sm-2 col-form-label">모든 항목</label>
                             <div class="col-sm-10">
-                                <input type="text" class="form-control" name="labels[all_cpt]" value="{{ $cpt['labels']['all_cpt'] }}">
+                                <input type="text" class="form-control" name="labels[all_cpt]" value="{{ $cpt['labels']['all_cpt'] }}" @if($readonly) disabled="disabled" @endif>
                             </div>
                         </div>
                         <div class="form-group row">
                             <label class="col-sm-2 col-form-label">여기에 제목 입력</label>
                             <div class="col-sm-10">
-                                <input type="text" class="form-control" name="labels[here_title]" value="{{ $cpt['labels']['here_title'] }}">
+                                <input type="text" class="form-control" name="labels[here_title]" value="{{ $cpt['labels']['here_title'] }}" @if($readonly) disabled="disabled" @endif>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-
+            @if(!$readonly)
             <button type="submit" class="btn btn-primary"><i class="xi-download"></i>저장</button>
+            @endif
         </form>
     </div>
 </div>
