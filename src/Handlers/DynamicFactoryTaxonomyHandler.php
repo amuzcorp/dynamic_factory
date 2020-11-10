@@ -81,7 +81,10 @@ class DynamicFactoryTaxonomyHandler
         return $taxonomyItem->id;
     }
 
-    // plugin.php 에서 호출
+    /**
+     * plugin boot 단계에서 실행됨
+     * 다른 플러그인이 등록한 카테고리를 불러와서 있으면 무시, 없으면 카테고리를 생성해 준다.
+    */
     public function createCategoryForOut()
     {
         $df_categories = \XeRegister::get('df_category');

@@ -2,8 +2,12 @@
 
 namespace Overcode\XePlugin\DynamicFactory\Handlers;
 
+use App\Http\Sections\DynamicFieldSection;
 use Overcode\XePlugin\DynamicFactory\Models\Cpt;
 use Overcode\XePlugin\DynamicFactory\Plugin;
+use XeConfig;
+use XeDB;
+use XeLang;
 use XeSite;
 use Xpressengine\Document\DocumentHandler;
 
@@ -193,5 +197,56 @@ class DynamicFactoryHandler
         }
 
         return $menus;
+    }
+
+    /**
+     * plugin boot 단계에서 실행됨
+     * 다른 플러그인이 등록한 확장필드를 불러와서 있으면 무시, 없으면 생성해 준다.
+     */
+    public function createDynamicFieldForOut()
+    {
+        $df_dfs = \XeRegister::get('df_df');
+
+        \XeDB::beginTransaction();
+        try {
+            $dynamicField = app('xe.dynamicField');
+            //$registerHandler = $dynamicField->getRegisterHandler();
+            $configHandler = $dynamicField->getConfigHandler();
+
+            foreach ((array)$df_dfs as $dfs) {
+                foreach ((array)$dfs as $df) {
+                    $configName = 'dynamicField.' . $df['group'] . '.' . $df['id'];
+
+                    if (XeConfig::get($configName) === null) {
+                        $config = $configHandler->getDefault();
+                        foreach ($df as $name => $value) {
+                            if($name === 'label') {
+                                $langKey = XeLang::genUserKey();
+                                XeLang::save($langKey, 'ko', $value, false);
+
+                                $config->set($name, $langKey);
+                                continue;
+                            }
+                            if($name === 'placeholder' && !empty($value)) {
+                                $langKey = XeLang::genUserKey();
+                                XeLang::save($langKey, 'ko', $value, false);
+
+                                $config->set($name, $langKey);
+                                continue;
+                            }
+
+                            $config->set($name, $value);
+                        }
+                        $dynamicField->setConnection(\XeDB::connection());
+                        $dynamicField->create($config);
+                    }
+                }
+            }
+        } catch (\Exception $e) {
+            \XeDB::rollback();
+
+            throw $e;
+        }
+        \XeDB::commit();
     }
 }

@@ -85,6 +85,7 @@ class Plugin extends AbstractPlugin
         $this->loadCpts();
         $this->CptConfigSettingFromPlugin();
         $this->CptCategorySettingFromPlugin();
+        $this->CptDynamicFieldSettingFromPlugin();
 
         $this->route();
         $this->registerSettingsMenus();
@@ -151,7 +152,8 @@ class Plugin extends AbstractPlugin
      */
     protected function CptDynamicFieldSettingFromPlugin()
     {
-
+        $dfHandler = app('overcode.df.handler');
+        $dfHandler->createDynamicFieldForOut();
     }
 
     protected function registerSettingsMenus()
