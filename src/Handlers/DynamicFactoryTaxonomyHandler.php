@@ -90,7 +90,7 @@ class DynamicFactoryTaxonomyHandler
         $df_categories = \XeRegister::get('df_category');
         \XeDB::beginTransaction();
         try {
-            foreach($df_categories as $cate) {
+            foreach((array)$df_categories as $cate) {
                 $slug = $cate['slug'];
                 $cate_extra = $this->getCategoryExtraBySlug($slug);
                 if (!isset($cate_extra)) {
