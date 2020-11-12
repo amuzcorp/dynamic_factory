@@ -120,7 +120,6 @@ class DynamicFactorySettingController extends BaseController
         $cpt = $this->dfService->getItem($cpt_id);
 
         $dynamicFieldSection = new DynamicFieldSection(
-//            Plugin::getId() . '_' . $cpt_id,
             'documents_' . $cpt_id,
             \XeDB::connection(),
             true
@@ -235,6 +234,17 @@ class DynamicFactorySettingController extends BaseController
             'cpts' => $cpts,
             'cpts_fp' => $cpts_fp
         ]);
+    }
+
+    public function taxonomyExtra($category_slug)
+    {
+        $dynamicFieldSection = new DynamicFieldSection(
+            'tax_'. $category_slug,
+            \XeDB::connection(),
+            true
+        );
+
+        return $this->presenter->make('dynamic_factory::views.settings.taxonomy_extra', compact('dynamicFieldSection'));
     }
 
     /**

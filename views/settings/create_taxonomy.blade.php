@@ -5,6 +5,13 @@
 
 {{ XeFrontend::css('/assets/core/settings/css/admin_menu.css')->before('/assets/core/settings/css/admin.css')->load() }}
 
+@if(isset($category->id))
+<ul class="nav nav-tabs">
+    <li class="active"><a href="{{ route('dyFac.setting.create_taxonomy', ['tax_id' => $category->id]) }}">기본정보</a></li>
+    <li><a href="{{ route('dyFac.setting.taxonomy_extra', ['category_slug' => $cpt_cate_extra->slug]) }}">확장필드</a></li>
+</ul>
+@endif
+
 <div class="row">
     <div class="col-sm-12">
         <div class="panel-group">
