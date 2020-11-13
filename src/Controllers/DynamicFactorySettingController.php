@@ -208,7 +208,7 @@ class DynamicFactorySettingController extends BaseController
         //TODO tax_id 가 있으면 로드 하여 프레젠터에 보낸다.
 
         XeFrontend::js('/assets/core/common/js/xe.tree.js')->appendTo('body')->load();
-        XeFrontend::js('/assets/core/category/Category.js')->appendTo('body')->load();
+        XeFrontend::js('plugins/dynamic_factory/assets/category/Category.js')->appendTo('body')->load();
 
         XeFrontend::translation([
             'xe::required',
@@ -238,13 +238,16 @@ class DynamicFactorySettingController extends BaseController
 
     public function taxonomyExtra($category_slug)
     {
+        $cateExtra = $this->taxonomyHandler->getCategoryExtraBySlug($category_slug);
+        $category = $this->taxonomyHandler->getCategory($cateExtra->category_id);
         $dynamicFieldSection = new DynamicFieldSection(
             'tax_'. $category_slug,
             \XeDB::connection(),
             true
         );
 
-        return $this->presenter->make('dynamic_factory::views.settings.taxonomy_extra', compact('dynamicFieldSection'));
+        return $this->presenter->make('dynamic_factory::views.settings.taxonomy_extra',
+            compact('dynamicFieldSection', 'cateExtra', 'category'));
     }
 
     /**

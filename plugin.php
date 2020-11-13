@@ -90,6 +90,7 @@ class Plugin extends AbstractPlugin
         $this->route();
         $this->registerSettingsMenus();
         $this->registerSettingsRoute();
+        $this->registerCategoryRoute();
     }
 
     protected function registerSitesPermissions()
@@ -269,6 +270,41 @@ class Plugin extends AbstractPlugin
                 }
             },['namespace' => 'Overcode\XePlugin\DynamicFactory\Controllers']);
         }
+    }
+
+    protected function registerCategoryRoute()
+    {
+        Route::settings('df_category', function () {
+
+            // 이하 신규
+            Route::group(['prefix' => '{id}', 'where' => ['id' => '[0-9]+'], 'namespace' => 'Overcode\XePlugin\DynamicFactory\Controllers'], function () {
+                Route::get('/', ['as' => 'df.category.show', 'uses' => 'CustomCategoryController@show']);
+                Route::post('item/store', [
+                    'as' => 'df.category.edit.item.store',
+                    'uses' => 'CustomCategoryController@storeItem'
+                ]);
+                Route::post('item/update', [
+                    'as' => 'df.category.edit.item.update',
+                    'uses' => 'CustomCategoryController@updateItem'
+                ]);
+                Route::post('item/destroy/{force?}', [
+                    'as' => 'df.category.edit.item.destroy',
+                    'uses' => 'CustomCategoryController@destroyItem'
+                ]);
+                Route::post('item/move', [
+                    'as' => 'df.category.edit.item.move',
+                    'uses' => 'CustomCategoryController@moveItem'
+                ]);
+                Route::get('item/roots', [
+                    'as' => 'df.category.edit.item.roots',
+                    'uses' => 'CustomCategoryController@roots'
+                ]);
+                Route::get('item/children', [
+                    'as' => 'df.category.edit.item.children',
+                    'uses' => 'CustomCategoryController@children'
+                ]);
+            });
+        });
     }
 
     protected function route()

@@ -1,6 +1,6 @@
 @section('page_title')
     @if(!$category->id)<h2>새로운 카테고리 추가</h2>@endif
-    @if($category->id)<h2>[{{ xe_trans($category->name)}}] 카테고리 수정</h2>@endif
+    @if($category->id)<h2>{{ xe_trans($category->name)}} - 카테고리 수정</h2>@endif
 @endsection
 
 {{ XeFrontend::css('/assets/core/settings/css/admin_menu.css')->before('/assets/core/settings/css/admin.css')->load() }}
@@ -76,12 +76,12 @@
 <script type="text/javascript">
     $(function () {
         Category.init({
-            load: '{{ route('manage.category.edit.item.children', ['id' => $category->id]) }}',
-            add: '{{ route('manage.category.edit.item.store', ['id' => $category->id]) }}',
-            modify: '{{ route('manage.category.edit.item.update', ['id' => $category->id]) }}',
-            remove: '{{ route('manage.category.edit.item.destroy', ['id' => $category->id, 'force' => false]) }}',
-            removeAll: '{{ route('manage.category.edit.item.destroy', ['id' => $category->id, 'force' => true]) }}',
-            move: '{{ route('manage.category.edit.item.move', ['id' => $category->id]) }}'
+            load: '{{ route('df.category.edit.item.children', ['id' => $category->id]) }}',
+            add: '{{ route('df.category.edit.item.store', ['id' => $category->id]) }}',
+            modify: '{{ route('df.category.edit.item.update', ['id' => $category->id]) }}',
+            remove: '{{ route('df.category.edit.item.destroy', ['id' => $category->id, 'force' => false]) }}',
+            removeAll: '{{ route('df.category.edit.item.destroy', ['id' => $category->id, 'force' => true]) }}',
+            move: '{{ route('df.category.edit.item.move', ['id' => $category->id]) }}'
         });
     });
 </script>

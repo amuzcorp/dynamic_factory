@@ -259,6 +259,11 @@ class DynamicFactoryTaxonomyHandler
         return CategoryExtra::where('category_id', $category_id)->first();
     }
 
+    public function getCategoryItemExtra($category_item_id)
+    {
+
+    }
+
     public function getCategoryExtraBySlug($slug)
     {
         return CategoryExtra::where('slug', $slug)->first();
