@@ -7,25 +7,44 @@ use Illuminate\Support\Facades\Schema;
 
 class Migrations
 {
+    // 현재 플러그인에서 사용 되는 SLUG 는 CPT_SLUG, CATEGORY_SLUG, CATEGORY_ITEM_SLUG, CPT_DOCUMENT_SLUG 이다.
+
+    // CPT 정보를 저장
     const CPT_TABLE_NAME = 'df_cpts';
+
+    // xe 카테고리의 확장 정보를 저장
     const CATEGORY_EXTRA_TABLE_NAME = 'df_category_extra';
+
+    // xe 카테고리 ITEM 의 확장 정보를 저장
+    const CATEGORY_ITEM_EXTRA_TABLE_NAME = 'df_category_item_extra';
+
+    // CPT 에서 사용하는 CATEGORY_ID 를 저장 n:n
     const CPT_TAXONOMY_TABLE_NAME = 'df_cpt_taxonomy';
-    const TAXONOMY_TABLE_NAME = 'df_taxonomy';
+
+    // CPT 에서 생성한 Document 의 Category 를 저장
+    const CPT_DOCUMENT_TAXONOMY_TABLE_NAME = 'df_taxonomy';
+
+    // CPT 에성 생성한 Document 의 Slug 를 저장
+    const CPT_DOCUMENT_SLUG_TABLE_NAME = 'df_slug';
 
     public function checkInstalled()
     {
         if ($this->checkExistCptTable() === false) return false;
         if ($this->checkExistCategoryExtraTable() === false) return false;
+        if ($this->checkExistCategoryItemExtraTable() === false) return false;
         if ($this->checkExistCptTaxTable() === false) return false;
-        if ($this->checkExistTaxonomyTable() === false) return false;
+        if ($this->checkExistCptDocumentTaxTable() === false) return false;
+        if ($this->checkExistCptDocumentSlugTable() === false) return false;
     }
 
     public function install()
     {
         if ($this->checkExistCptTable() === false) $this->createCptTable();
         if ($this->checkExistCategoryExtraTable() === false) $this->createCategoryExtraTable();
+        if ($this->checkExistCategoryItemExtraTable() === false) $this->createCategoryItemExtraTable();
         if ($this->checkExistCptTaxTable() === false) $this->createCptTaxTable();
-        if ($this->checkExistTaxonomyTable() === false) $this->createTaxonomyTable();
+        if ($this->checkExistCptDocumentTaxTable() === false) $this->createCptDocumentTaxTable();
+        if ($this->checkExistCptDocumentSlugTable() === false) $this->createCptDocumentSlugTable();
     }
 
     protected function checkExistCptTable()
@@ -38,14 +57,24 @@ class Migrations
         return Schema::hasTable(self::CATEGORY_EXTRA_TABLE_NAME);
     }
 
+    protected function checkExistCategoryItemExtraTable()
+    {
+        return Schema::hasTable(self::CATEGORY_ITEM_EXTRA_TABLE_NAME);
+    }
+
     protected function checkExistCptTaxTable()
     {
         return Schema::hasTable(self::CPT_TAXONOMY_TABLE_NAME);
     }
 
-    protected function checkExistTaxonomyTable()
+    protected function checkExistCptDocumentTaxTable()
     {
-        return Schema::hasTable(self::TAXONOMY_TABLE_NAME);
+        return Schema::hasTable(self::CPT_DOCUMENT_TAXONOMY_TABLE_NAME);
+    }
+
+    protected function checkExistCptDocumentSlugTable()
+    {
+        return Schema::hasTable(self::CPT_DOCUMENT_SLUG_TABLE_NAME);
     }
 
     protected function createCptTable()
@@ -82,6 +111,18 @@ class Migrations
         });
     }
 
+    protected function createCategoryItemExtraTable()
+    {
+        Schema::create(self::CATEGORY_ITEM_EXTRA_TABLE_NAME, function (Blueprint $table) {
+            $table->engine = "InnoDB";
+
+            $table->integer('item_id');
+            $table->string('slug');
+
+            $table->primary('item_id');
+        });
+    }
+
     protected function createCptTaxTable()
     {
         Schema::create(self::CPT_TAXONOMY_TABLE_NAME, function (Blueprint $table) {
@@ -92,15 +133,32 @@ class Migrations
         });
     }
 
-    protected function createTaxonomyTable()
+    protected function createCptDocumentTaxTable()
     {
-        Schema::create(self::TAXONOMY_TABLE_NAME, function (Blueprint $table) {
+        Schema::create(self::CPT_DOCUMENT_TAXONOMY_TABLE_NAME, function (Blueprint $table) {
             $table->engine = "InnoDB";
 
             $table->string('target_id');
             $table->integer('category_id');
-//            $table->integer('item_id');
             $table->text('item_ids');
+        });
+    }
+
+    protected function createCptDocumentSlugTable()
+    {
+        Schema::create(self::CPT_DOCUMENT_SLUG_TABLE_NAME, function (Blueprint $table) {
+            $table->engine = "InnoDB";
+
+            $table->increments('id');
+
+            $table->string('target_id', 36);
+            $table->string('instance_id', 36);
+            $table->string('slug');
+            $table->string('title');
+
+            $table->unique('slug');
+            $table->index('title');
+            $table->index('target_id');
         });
     }
 
