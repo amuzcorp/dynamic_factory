@@ -236,6 +236,12 @@ class DynamicFactorySettingController extends BaseController
         ]);
     }
 
+    /**
+     * 카테고리 확장필드 화면
+     *
+     * @param $category_slug
+     * @return mixed
+     */
     public function taxonomyExtra($category_slug)
     {
         $cateExtra = $this->taxonomyHandler->getCategoryExtraBySlug($category_slug);

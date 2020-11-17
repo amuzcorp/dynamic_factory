@@ -24,15 +24,15 @@
                     </div>
                     <div class="panel-body">
                         <div class="form-group row">
-                            <label class="col-sm-2 col-form-label">분류 이름 (필수)</label>
+                            <label class="col-sm-2 col-form-label">ID (필수)</label>
                             <div class="col-sm-10">
-                                {!! uio('langText', ['name'=>'name', 'value'=> $category->name ]) !!}
+                                <input type="text" class="form-control" name="slug" value="{{ $cpt_cate_extra->slug }}">
                             </div>
                         </div>
                         <div class="form-group row">
-                            <label class="col-sm-2 col-form-label">슬러그 (필수)</label>
+                            <label class="col-sm-2 col-form-label">이름 (필수)</label>
                             <div class="col-sm-10">
-                                <input type="text" class="form-control" name="slug" value="{{ $cpt_cate_extra->slug }}">
+                                {!! uio('langText', ['name'=>'name', 'value'=> $category->name ]) !!}
                             </div>
                         </div>
                         <div class="form-group row">
@@ -77,8 +77,8 @@
     $(function () {
         Category.init({
             load: '{{ route('df.category.edit.item.children', ['id' => $category->id]) }}',
-            add: '{{ route('df.category.edit.item.store', ['id' => $category->id]) }}',
-            modify: '{{ route('df.category.edit.item.update', ['id' => $category->id]) }}',
+            add: '{{ route('df.category.edit.item.store', ['id' => $category->id, 'slug' => $cpt_cate_extra->slug]) }}',
+            modify: '{{ route('df.category.edit.item.update', ['id' => $category->id, 'slug' => $cpt_cate_extra->slug]) }}',
             remove: '{{ route('df.category.edit.item.destroy', ['id' => $category->id, 'force' => false]) }}',
             removeAll: '{{ route('df.category.edit.item.destroy', ['id' => $category->id, 'force' => true]) }}',
             move: '{{ route('df.category.edit.item.move', ['id' => $category->id]) }}'

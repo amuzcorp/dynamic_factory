@@ -134,13 +134,13 @@ var Category = (function (XE, $, Tree) {
         var $content = $this.closest('.item').find('> .item-content')
         var $item = $content.closest('.item')
         var item = $content.data('item')
-console.log(item.df);
+// console.log(item.dfs);
         if (!$this.data('open')) {
           var formData = {
             title: XE.Lang.trans('xe::edit'), // 편집
             wordLangKey: item.word,
             descriptionLangKey: item.description,
-            dynamic_field: item.df,
+            dynamic_fields: item.dfs,
             removeButton: true,
             removeAllButton: true,
             saveButton: true,
@@ -236,7 +236,6 @@ console.log(item.df);
      * @return {string}
      */
     getFormTemplate: function (obj) {
-      console.log(obj);
       var wordKeyProp = obj.hasOwnProperty('wordLangKey') ? 'data-lang-key="' + obj.wordLangKey + '"' : ''
       var descriptionKeyProp = obj.hasOwnProperty('descriptionLangKey') ? 'data-lang-key="' + obj.descriptionLangKey + '"' : ''
 
@@ -257,9 +256,11 @@ console.log(item.df);
       template += '<label>' + XE.Lang.trans('xe::description') + '</label>'
       template += '<div class="lang-editor-box" data-name="description" data-autocomplete="false" data-multiline="true" ' + descriptionKeyProp + '></div>'
       template += '</div>'
-      // 여기에 추가
-      template += obj.dynamic_field;
-      template += '<div class="form-group"><label>슬러그 (필수)</label><input type="text" class="form-control" name="slug"></div>';
+      // 다이나믹 필드를 추가한다.
+      for(var key in obj.dynamic_fields) {
+        template += obj.dynamic_fields[key];
+      }
+      // template += '<div class="form-group"><label>슬러그 (필수)</label><input type="text" class="form-control" name="slug"></div>';
       template += '</div>'
       template += '</form>'
 
@@ -364,13 +365,6 @@ console.log(item.df);
      */
     save: function (item) {
       $('button').prop('disabled', true)
-
-      if(item.slug == null || item.slug == '') {
-        alert('slug 는 필수 입력 사항입니다.')
-        $('button').prop('disabled', false)
-        return false
-      }
-
       XE.ajax({
         url: _config[item.type],
         type: 'post',
@@ -378,7 +372,7 @@ console.log(item.df);
         data: item,
         success: function (data) {
           $('button').prop('disabled', false)
-
+console.log(data);
           switch (item.type) {
             case 'add':
               var $container = (item.hasOwnProperty('parent_id')) ? $('#item_' + item.parent_id) : $('.__category_body > .item-container')
@@ -454,16 +448,12 @@ console.log(item.df);
         data.id = id
       }
 
-      console.log(_config);
-
       XE.ajax({
         url: _config.load,
         type: 'get',
         data: data,
         dataType: 'json',
         success: function (nodes) {
-
-          console.log(nodes);
 
           if ($icon) {
             _this.setIconByStatus($icon, 'open')

@@ -1,6 +1,7 @@
 <?php
 namespace Overcode\XePlugin\DynamicFactory;
 
+use Overcode\XePlugin\DynamicFactory\Handlers\CategoryDynamicFieldHandler;
 use Overcode\XePlugin\DynamicFactory\Handlers\DynamicFactoryConfigHandler;
 use Overcode\XePlugin\DynamicFactory\Handlers\DynamicFactoryDocumentHandler;
 use Overcode\XePlugin\DynamicFactory\Handlers\DynamicFactoryHandler;
@@ -9,6 +10,7 @@ use Overcode\XePlugin\DynamicFactory\Services\DynamicFactoryService;
 use Route;
 use XeDynamicField;
 use XeInterception;
+use Xpressengine\DynamicField\ConfigHandler;
 use Xpressengine\Plugin\AbstractPlugin;
 
 class Plugin extends AbstractPlugin
@@ -18,8 +20,6 @@ class Plugin extends AbstractPlugin
     protected $cpts_from_plugin;
 
     protected $df_config;
-
-    protected $df_categories;
 
     public function register()
     {
@@ -109,15 +109,6 @@ class Plugin extends AbstractPlugin
 
         // 타 플러그인에서 등록한 cpt 의 config 를 불러온다.
         $this->df_config = \XeRegister::get('df_config');
-
-        // 타 플러그인에서 등록한 cpt 의 category 를 불러온다.
-        //$this->df_categories = \XeRegister::get('df_category');
-        $this->df_categories = [
-            [
-                'slug' => 'city',
-                'template' => 'select'
-            ]
-        ];
     }
 
     /**
