@@ -190,11 +190,14 @@ class DynamicFactorySettingController extends BaseController
         //$cpt_cate_extra->is_hierarchy = true;
 
         $cpt_ids = [];
+        $items = [];    // 확장필드 정보를 추가한 items
         $category = new Category();
         if($tax_id){
             $category = $this->taxonomyHandler->getCategory($tax_id);
             $cpt_cate_extra = CategoryExtra::where('category_id', $tax_id)->first();
             $cpt_taxonomy = CptTaxonomy::where('category_id', $tax_id)->get();
+
+            $items = $this->taxonomyHandler->getCategoryDynamicField($tax_id);
         }
 
         foreach ($cpt_taxonomy as $cptx) {
@@ -232,7 +235,8 @@ class DynamicFactorySettingController extends BaseController
             'cpt_cate_extra' => $cpt_cate_extra,
             'cpt_ids' => $cpt_ids,
             'cpts' => $cpts,
-            'cpts_fp' => $cpts_fp
+            'cpts_fp' => $cpts_fp,
+            'category_items' => $items
         ]);
     }
 

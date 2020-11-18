@@ -140,7 +140,7 @@ var Category = (function (XE, $, Tree) {
             title: XE.Lang.trans('xe::edit'), // 편집
             wordLangKey: item.word,
             descriptionLangKey: item.description,
-            dynamic_fields: item.dfs,
+// dynamic_fields: item.dfs,
             removeButton: true,
             removeAllButton: true,
             saveButton: true,
@@ -174,7 +174,7 @@ var Category = (function (XE, $, Tree) {
         if (!$this.data('open')) {
           var formData = {
             title: XE.Lang.trans('xe::createChild'), // 하위 목록 생성
-            dynamic_fields: item.dfs,
+// dynamic_fields: item.dfs,
             saveButton: true,
             type: 'add',
             parentId: $this.closest('.item-content').data('item').id
@@ -237,6 +237,8 @@ var Category = (function (XE, $, Tree) {
      * @return {string}
      */
     getFormTemplate: function (obj) {
+console.log('▽ getFormTemplate function - obj ▽');
+console.log(obj);
       var wordKeyProp = obj.hasOwnProperty('wordLangKey') ? 'data-lang-key="' + obj.wordLangKey + '"' : ''
       var descriptionKeyProp = obj.hasOwnProperty('descriptionLangKey') ? 'data-lang-key="' + obj.descriptionLangKey + '"' : ''
 
@@ -258,10 +260,8 @@ var Category = (function (XE, $, Tree) {
       template += '<div class="lang-editor-box" data-name="description" data-autocomplete="false" data-multiline="true" ' + descriptionKeyProp + '></div>'
       template += '</div>'
       // 다이나믹 필드를 추가한다.
-      for(var key in obj.dynamic_fields) {
-        template += obj.dynamic_fields[key];
-      }
-      // template += '<div class="form-group"><label>슬러그 (필수)</label><input type="text" class="form-control" name="slug"></div>';
+      template += _this.getDynamicField(obj.id);
+
       template += '</div>'
       template += '</form>'
 
@@ -449,13 +449,16 @@ var Category = (function (XE, $, Tree) {
       if (id) {
         data.id = id
       }
-// console.log(data);
       XE.ajax({
         url: _config.load,
         type: 'get',
         data: data,
         dataType: 'json',
         success: function (nodes) {
+
+// console.log('▽ load function - success - nodes ▽');
+// console.log(nodes);
+// console.log(_this.getNodeTemplate);
           if ($icon) {
             _this.setIconByStatus($icon, 'open')
           }
@@ -601,6 +604,12 @@ var Category = (function (XE, $, Tree) {
       }
 
       return params
+    },
+    /**
+     * 미리 로드한 DynamicField 를 Item 에 삽입한다.
+     */
+    getDynamicField: function (item_id) {
+      return $('#cate_df_' + item_id).html();
     }
   }
 })(window.XE, window.jQuery, window.Tree)

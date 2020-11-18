@@ -72,6 +72,14 @@
 <div id="__xe_category-tree-container" class="panel board-category">
 </div>
 
+<div id="dynamic_field_hidden" style="display:none;">
+@foreach($category_items as $item)
+    @foreach((array)$item->dfs as $df)
+        <div id="cate_df_{{ $item->id }}">{!! $df !!}</div>
+    @endforeach
+@endforeach
+</div>
+
 @if($category->id)
 <script type="text/javascript">
     $(function () {

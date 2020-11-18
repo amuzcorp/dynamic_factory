@@ -62,7 +62,7 @@ class CustomCategoryController extends CategoryController
 
         return XePresenter::makeApi($item->toArray());
     }
-
+/*
     public function children(Request $request, $id)
     {
         $txHandler = app('overcode.df.taxonomyHandler');
@@ -74,7 +74,6 @@ class CustomCategoryController extends CategoryController
         if ($request->get('id') === null) {
             $children = XeCategory::cates()->find($id)->getProgenitors();
         } else {
-            /** @var CategoryItem $item */
             $item = XeCategory::items()->find($request->get('id'));
             if (!$item || $item->category->id !== Caster::cast($id)) {
                 throw new InvalidArgumentHttpException;
@@ -115,7 +114,7 @@ class CustomCategoryController extends CategoryController
                 }
             }
             $child->readableWord = xe_trans($child->word);
-            $child->dfs = $df;
+            //$child->dfs = $df;
         }
 
         return XePresenter::makeApi($children->toArray());
@@ -145,7 +144,7 @@ class CustomCategoryController extends CategoryController
     {
         return \XeDynamicField::get($group, $columnName);
     }
-
+*/
     /**
      * 해당 Category_item 의 Dynamic Field 를 insert 한다.
      *

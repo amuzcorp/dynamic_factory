@@ -297,4 +297,80 @@ class DynamicFactoryTaxonomyHandler
 
         return true;
     }
+
+    public function getCategoryDynamicField($category_id)
+    {
+        $categoryExtra = $this->getCategoryExtra($category_id);
+
+        $slug = $categoryExtra->slug;
+
+        $group = 'tax_' . $slug;
+
+        $category_items = XeCategory::cates()->find($category_id)->items;
+
+        $dynamicFieldHandler = app('xe.dynamicField');
+        $dynamicFields = $dynamicFieldHandler->gets($group);
+
+        foreach($category_items as $item) {
+            $dfs = [];
+
+            foreach ($dynamicFields as $dfKey => $dfVal) {
+                $fieldType = df($group, $dfKey);
+                $tableName = $fieldType->getTableName();
+
+                foreach ($fieldType->getColumns() as $column) {
+                    $name = $dfKey . '_' . $column->name;
+
+                    $param = [
+                        'field_id' => $dfKey,
+                        'target_id' => $item->id,
+                        'group' => $group
+                    ];
+
+                    // target_id 로 해당 Dynamic Field Table 에서 get 한다.
+                    $die = \XeDB::table($tableName)->where($param)->first();
+                    if($die === null){
+                        $dfs[] = $this->df_create($group, $dfKey, []);
+                    }else{
+                        if(isset($die->{$column->name})) {
+                            $args = [
+                                'id' => $item->id,
+                                $name => $die->{$column->name}
+                            ];
+                            $dfs[] = $this->df_edit($group, $dfKey, $args);
+                        }
+                    }
+                }
+            }
+
+            $item->dfs = $dfs;
+        }
+
+        return $category_items;
+    }
+
+    public function df_create($group, $columnName, $args)
+    {
+        $fieldType = $this->df($group, $columnName);
+        if ($fieldType == null) {
+            return '';
+        }
+
+        return $fieldType->getSkin()->create($args);
+    }
+
+    public function df_edit($group, $columnName, $args)
+    {
+        $fieldType = $this->df($group, $columnName);
+        if ($fieldType == null) {
+            return '';
+        }
+
+        return $fieldType->getSkin()->edit($args);
+    }
+
+    public function df($group, $columnName)
+    {
+        return \XeDynamicField::get($group, $columnName);
+    }
 }
