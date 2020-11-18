@@ -48,9 +48,8 @@ class CustomCategoryController extends CategoryController
         try {
             XeCategory::updateItem($item, $request->all());
             $this->insertDf($request);  // 다이나믹 필드를 저장한다.
-//            $df = $this->insertDf($request);
-
-//            return XePresenter::makeApi($df);
+//            $df = $this->insertDf($request);    //테스트용
+//            return XePresenter::makeApi($df);   //테스트용
         } catch (Exception $e) {
             \XeDB::rollBack();
 
@@ -89,8 +88,31 @@ class CustomCategoryController extends CategoryController
 
         foreach ($children as $child) {
             $df = [];
-            foreach ($dfs as $key => $val) {
-                $df[] = $this->df_create($group, $key, $request->all());
+            foreach ($dfs as $dfKey => $val) {
+                $fieldType = df($group, $dfKey);
+                $tableName = $fieldType->getTableName();
+                foreach($fieldType->getColumns() as $column) {
+                    $name = $dfKey . '_' . $column->name;
+
+                    $param = [];
+                    $param['field_id'] = $dfKey;
+                    $param['target_id'] = $child->id;
+                    $param['group'] = $group;
+
+                    // target_id 로 해당 Dynamic Field Table 에서 get 한다.
+                    $die = \XeDB::table($tableName)->where($param)->first();
+                    if($die === null){
+                        $df[] = $this->df_create($group, $dfKey, $request->all());
+                    }else{
+                        if(isset($die->{$column->name})) {
+                            $args = [
+                                'id' => $child->id,
+                                $name => $die->{$column->name}
+                            ];
+                            $df[] = $this->df_edit($group, $dfKey, $args);
+                        }
+                    }
+                }
             }
             $child->readableWord = xe_trans($child->word);
             $child->dfs = $df;
@@ -109,11 +131,26 @@ class CustomCategoryController extends CategoryController
         return $fieldType->getSkin()->create($args);
     }
 
+    public function df_edit($group, $columnName, $args)
+    {
+        $fieldType = $this->df($group, $columnName);
+        if ($fieldType == null) {
+            return '';
+        }
+
+        return $fieldType->getSkin()->edit($args);
+    }
+
     public function df($group, $columnName)
     {
         return \XeDynamicField::get($group, $columnName);
     }
 
+    /**
+     * 해당 Category_item 의 Dynamic Field 를 insert 한다.
+     *
+     * @param Request $request
+     */
     public function insertDf(Request $request)
     {
         $dynamicField = app('xe.dynamicField');
@@ -135,19 +172,25 @@ class CustomCategoryController extends CategoryController
                 }
             }
 
-            $this->insertDfTable($insertParam, $fieldType->getTableName());
+            $tableName = $fieldType->getTableName();
+
+            $selectParam = ['field_id'=>$id, 'target_id'=>$request->get('id'), 'group'=>$group];
+
+            $df = \XeDB::table($tableName)->where($selectParam)->first();
+            if($df === null) {
+                // select 결과가 없을 경우 insert
+                \XeDB::table($tableName)->insert($insertParam);
+            }else {
+                // select 결과가 있을 경우 update
+                \XeDB::table($tableName)->where($selectParam)->update($insertParam);
+            }
         }
 
-        $args = [
+        /*$args = [
             "field_id" => "board_input",
             "target_id" => "1cf43517-2bf2-43c8-a196-4b6cc2f4f8cf",
             "group" => "documents_d7838ea4",
             "text" => "qwer"
-        ];
-    }
-
-    public function insertDfTable($insertParam, $tableName)
-    {
-        \XeDB::table($tableName)->insert($insertParam);
+        ];*/
     }
 }
