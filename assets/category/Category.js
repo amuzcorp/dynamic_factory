@@ -174,6 +174,7 @@ var Category = (function (XE, $, Tree) {
         if (!$this.data('open')) {
           var formData = {
             title: XE.Lang.trans('xe::createChild'), // 하위 목록 생성
+            dynamic_fields: item.dfs,
             saveButton: true,
             type: 'add',
             parentId: $this.closest('.item-content').data('item').id
@@ -371,8 +372,9 @@ var Category = (function (XE, $, Tree) {
         dataType: 'json',
         data: item,
         success: function (data) {
-          $('button').prop('disabled', false)
-console.log(data);
+          location.reload();
+          /*$('button').prop('disabled', false)
+
           switch (item.type) {
             case 'add':
               var $container = (item.hasOwnProperty('parent_id')) ? $('#item_' + item.parent_id) : $('.__category_body > .item-container')
@@ -425,7 +427,7 @@ console.log(data);
               $item.find('> .item-content .btnEditCategory').trigger('click')
 
               break
-          }
+          }*/
         },
 
         complete: function () {
@@ -447,14 +449,13 @@ console.log(data);
       if (id) {
         data.id = id
       }
-
+// console.log(data);
       XE.ajax({
         url: _config.load,
         type: 'get',
         data: data,
         dataType: 'json',
         success: function (nodes) {
-
           if ($icon) {
             _this.setIconByStatus($icon, 'open')
           }
