@@ -30,7 +30,7 @@ use Xpressengine\UIObject\AbstractUIObject;
  * @license     http://www.gnu.org/licenses/lgpl-3.0-standalone.html LGPL
  * @link        https://xpressengine.io
  */
-class NewTitleUIObject extends AbstractUIObject
+class DocTitleUIObject extends AbstractUIObject
 {
     /**
      * @var bool
