@@ -27,6 +27,11 @@
           "class": "Overcode\\XePlugin\\DynamicFactory\\Components\\UIObjects\\TaxoSelect\\TaxoSelectUIObject",
           "name": "Taxonomy select UIO",
           "description": "Taxonomy Select UIObject"
+        },
+        "uiobject/df@doc_title": {
+          "class": "Overcode\\XePlugin\\DynamicFactory\\Components\\UIObjects\\DocTitle\\DocTitleUIObject",
+          "name": "Document Title UIO",
+          "description": "Document Title UIObject"
         }
       }
     }
