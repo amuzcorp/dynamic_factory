@@ -7,16 +7,13 @@ use Illuminate\Support\Facades\Schema;
 
 class Migrations
 {
-    // 현재 플러그인에서 사용 되는 SLUG 는 CPT_SLUG, CATEGORY_SLUG, CATEGORY_ITEM_SLUG, CPT_DOCUMENT_SLUG 이다.
+    // 현재 플러그인에서 사용 되는 SLUG 는 CPT_SLUG, CATEGORY_SLUG, CPT_DOCUMENT_SLUG 이다.
 
     // CPT 정보를 저장
     const CPT_TABLE_NAME = 'df_cpts';
 
     // xe 카테고리의 확장 정보를 저장
     const CATEGORY_EXTRA_TABLE_NAME = 'df_category_extra';
-
-    // xe 카테고리 ITEM 의 확장 정보를 저장
-    const CATEGORY_ITEM_EXTRA_TABLE_NAME = 'df_category_item_extra';
 
     // CPT 에서 사용하는 CATEGORY_ID 를 저장 n:n
     const CPT_TAXONOMY_TABLE_NAME = 'df_cpt_taxonomy';
@@ -31,7 +28,6 @@ class Migrations
     {
         if ($this->checkExistCptTable() === false) return false;
         if ($this->checkExistCategoryExtraTable() === false) return false;
-        if ($this->checkExistCategoryItemExtraTable() === false) return false;
         if ($this->checkExistCptTaxTable() === false) return false;
         if ($this->checkExistCptDocumentTaxTable() === false) return false;
         if ($this->checkExistCptDocumentSlugTable() === false) return false;
@@ -41,7 +37,6 @@ class Migrations
     {
         if ($this->checkExistCptTable() === false) $this->createCptTable();
         if ($this->checkExistCategoryExtraTable() === false) $this->createCategoryExtraTable();
-        if ($this->checkExistCategoryItemExtraTable() === false) $this->createCategoryItemExtraTable();
         if ($this->checkExistCptTaxTable() === false) $this->createCptTaxTable();
         if ($this->checkExistCptDocumentTaxTable() === false) $this->createCptDocumentTaxTable();
         if ($this->checkExistCptDocumentSlugTable() === false) $this->createCptDocumentSlugTable();
@@ -55,11 +50,6 @@ class Migrations
     protected function checkExistCategoryExtraTable()
     {
         return Schema::hasTable(self::CATEGORY_EXTRA_TABLE_NAME);
-    }
-
-    protected function checkExistCategoryItemExtraTable()
-    {
-        return Schema::hasTable(self::CATEGORY_ITEM_EXTRA_TABLE_NAME);
     }
 
     protected function checkExistCptTaxTable()
@@ -108,18 +98,6 @@ class Migrations
             $table->string('template', 50);
 
             $table->primary('category_id');
-        });
-    }
-
-    protected function createCategoryItemExtraTable()
-    {
-        Schema::create(self::CATEGORY_ITEM_EXTRA_TABLE_NAME, function (Blueprint $table) {
-            $table->engine = "InnoDB";
-
-            $table->integer('item_id');
-            $table->string('slug');
-
-            $table->primary('item_id');
         });
     }
 
