@@ -2,6 +2,7 @@
 namespace Overcode\XePlugin\DynamicFactory\Controllers;
 
 use App\Http\Sections\DynamicFieldSection;
+use Overcode\XePlugin\DynamicFactory\Handlers\CptValidatorHandler;
 use Overcode\XePlugin\DynamicFactory\Handlers\DynamicFactoryConfigHandler;
 use Overcode\XePlugin\DynamicFactory\Handlers\DynamicFactoryHandler;
 use Overcode\XePlugin\DynamicFactory\Handlers\DynamicFactoryTaxonomyHandler;
@@ -38,21 +39,24 @@ class DynamicFactorySettingController extends BaseController
 
     protected $urlHandler;
 
+    protected $cptValidatorHandler;
+
     public function __construct(
         DynamicFactoryService $dynamicFactoryService,
         DynamicFactoryHandler $dynamicFactoryHandler,
         DynamicFactoryTaxonomyHandler $dynamicFactoryTaxonomyHandler,
         DynamicFactoryConfigHandler $configHandler,
-        UrlHandler $urlHandler
+        UrlHandler $urlHandler,
+        CptValidatorHandler $cptValidatorHandler
     )
     {
         $this->dfService = $dynamicFactoryService;
         $this->dfHandler = $dynamicFactoryHandler;
         $this->taxonomyHandler = $dynamicFactoryTaxonomyHandler;
         $this->dynamicFieldConfigHandler = app('xe.dynamicField');
-//        $this->configHandler = app('overcode.df.configHandler');
         $this->configHandler = $configHandler;
         $this->urlHandler = $urlHandler;
+        $this->cptValidatorHandler = $cptValidatorHandler;
 
         $this->presenter = app('xe.presenter');
 
@@ -141,6 +145,10 @@ class DynamicFactorySettingController extends BaseController
     {
         // TODO 권한체크
 
+        $this->validate($request, $this->cptValidatorHandler->getRules());  // CPT 유효성 검사
+
+        // TODO 3rd Party Plugin 목록에서 cpt_id 중복 체크도 해야됨.
+
         $cpt = $this->dfService->storeCpt($request);
 
         return redirect()->route('dyFac.setting.index');
@@ -172,6 +180,8 @@ class DynamicFactorySettingController extends BaseController
     public function update(Request $request)
     {
         // TODO 권한체크
+
+        $this->validate($request, $this->cptValidatorHandler->getRules());  // CPT 유효성 검사
         $cpt = $this->dfService->updateCpt($request);
 
         return redirect()->route('dyFac.setting.edit', ['cpt_id' => $request->cpt_id]);
