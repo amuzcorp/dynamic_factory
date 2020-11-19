@@ -77,6 +77,6 @@ class NewTitleUIObject extends AbstractUIObject
             $args['scriptInit'] = true;
         }
 
-        return View::make('board::components/UIObjects/NewTitle/title', $args)->render();
+        return View::make('dynamic_factory::components/UIObjects/DocTitle/title', $args)->render();
     }
 }
