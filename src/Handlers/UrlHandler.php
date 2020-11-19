@@ -5,13 +5,13 @@ use Xpressengine\Config\ConfigEntity;
 
 class UrlHandler
 {
-    protected $cptId;
+    protected $instanceId;
 
     protected $config;
 
-    public function setCptId($cptId)
+    public function setInstanceId($instanceId)
     {
-        $this->cptId = $cptId;
+        $this->instanceId = $instanceId;
         return $this;
     }
 
@@ -19,6 +19,14 @@ class UrlHandler
     {
         $this->config = $config;
         return $this;
+    }
+
+    public function get($name = 'index', array $params = [], $instanceId = null)
+    {
+        if ($instanceId == null) {
+            $instanceId = $this->instanceId;
+        }
+        return instance_route($name, $params, $instanceId);
     }
 
     public function managerUrl($name, $params = [])
