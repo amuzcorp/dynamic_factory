@@ -104,13 +104,11 @@ class DynamicFactoryHandler
         $newCpt = new Cpt();
         $newCpt->fill([
             'site_key' => XeSite::getCurrentSiteKey(),
-            'cpt_id' => 'df' . $newCpt->getNextId(),
+            'cpt_id' => $inputs['cpt_id'],
             'cpt_name' => $inputs['cpt_name'],
             'menu_name' => $inputs['menu_name'],
-            'menu_order' => $inputs['menu_order'] ?? '500',
+            'menu_order' => $inputs['menu_order'],
             'menu_path' => $inputs['menu_path'] ?? '',
-            'slug' => $inputs['slug'],
-            'has_archive' => $inputs['has_archive'] ?? 0,
             'description' => $inputs['description'] ?? '',
             'labels' => $inputs['labels'] ?? ''
         ]);
@@ -123,14 +121,11 @@ class DynamicFactoryHandler
     public function update_cpt($inputs)
     {
         $cpt = Cpt::find($inputs['cpt_id']);
-
         $cpt->fill([
             'cpt_name' => $inputs['cpt_name'],
             'menu_name' => $inputs['menu_name'],
-            'menu_order' => $inputs['menu_order'] ?? '500',
+            'menu_order' => $inputs['menu_order'],
             'menu_path' => $inputs['menu_path'] ?? '',
-            'slug' => $inputs['slug'],
-            'has_archive' => $inputs['has_archive'] ?? 0,
             'description' => $inputs['description'] ?? '',
             'labels' => $inputs['labels'] ?? ''
         ]);

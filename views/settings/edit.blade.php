@@ -10,12 +10,17 @@
     <div class="col-sm-12">
         <form method="post" action="{{ route('dyFac.setting.update') }}">
             {!! csrf_field() !!}
-            <input type="hidden" name="cpt_id" value="{{ $cpt['cpt_id'] }}" />
             <div class="panel">
                 <div class="panel-heading">
                     <h4>이름 및 설명</h4>
                 </div>
                 <div class="panel-body">
+                    <div class="form-group row">
+                        <label class="col-sm-2 col-form-label">ID (필수)</label>
+                        <div class="col-sm-5">
+                            <input type="text" class="form-control" name="cpt_id" value="{{ $cpt['cpt_id'] }}" disabled="disabled">
+                        </div>
+                    </div>
                     <div class="form-group row">
                         <label class="col-sm-2 col-form-label">유형 이름 (필수)</label>
                         <div class="col-sm-5">
@@ -43,18 +48,6 @@
                                     <option value="{{ $menu['menu_path'] }}" @if($cpt['menu_path'] == $menu['menu_path']) selected="selected"@endif>{{ xe_trans($menu['title']) }}</option>
                                 @endforeach
                             </select>
-                        </div>
-                    </div>
-                    <div class="form-group row">
-                        <label class="col-sm-2 col-form-label">슬러그 (필수)</label>
-                        <div class="col-sm-5">
-                            <input type="text" class="form-control" name="slug" value="{{ $cpt['slug'] }}" @if($readonly) disabled="disabled" @endif>
-                        </div>
-                        <div class="col-sm-5">
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" value="1" id="has_archive" name="has_archive" @if($cpt['has_archive'])checked="checked"@endif  @if($readonly) disabled="disabled" @endif>
-                                <label class="form-check-label" for="has_archive">아카이브 슬러그 사용</label>
-                            </div>
                         </div>
                     </div>
                     <div class="form-group row">

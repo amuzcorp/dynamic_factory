@@ -11,6 +11,12 @@
                 </div>
                 <div class="panel-body">
                     <div class="form-group row">
+                        <label class="col-sm-2 col-form-label">ID (필수)</label>
+                        <div class="col-sm-5">
+                            <input type="text" class="form-control" name="cpt_id" maxlength="36">
+                        </div>
+                    </div>
+                    <div class="form-group row">
                         <label class="col-sm-2 col-form-label">유형 이름 (필수)</label>
                         <div class="col-sm-5">
                             <input type="text" class="form-control" name="cpt_name">
@@ -37,18 +43,6 @@
                                 <option value="{{ $menu['menu_path'] }}" @if($menu['menu_path'] === 'dynamic_factory.') selected="selected"@endif>{{ xe_trans($menu['title']) }}</option>
                                 @endforeach
                             </select>
-                        </div>
-                    </div>
-                    <div class="form-group row">
-                        <label class="col-sm-2 col-form-label">슬러그 (필수)</label>
-                        <div class="col-sm-5">
-                            <input type="text" class="form-control" name="slug">
-                        </div>
-                        <div class="col-sm-5">
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" value="1" id="has_archive" name="has_archive">
-                                <label class="form-check-label" for="has_archive">아카이브 슬러그 사용</label>
-                            </div>
                         </div>
                     </div>
                     <div class="form-group row">

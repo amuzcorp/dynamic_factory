@@ -79,13 +79,10 @@ class Migrations
             $table->string('menu_name');
             $table->integer('menu_order');
             $table->string('menu_path');
-            $table->string('slug');
-            $table->boolean('has_archive');
-            $table->string('description');
-//            $table->text('sections');
+            $table->string('description')->nullable();;
             $table->text('labels');
 
-            $table->unique('slug');
+            $table->unique('cpt_id');
         });
     }
     protected function createCategoryExtraTable()
