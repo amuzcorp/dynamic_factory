@@ -26,7 +26,7 @@
         "module/cpt@cpt": {
           "class": "Overcode\\XePlugin\\DynamicFactory\\Components\\Modules\\CptModule",
           "name": "CPT Document",
-          "description": "CPT Document 모듈"
+          "description": "사용자 정의 문서 모듈"
         },
         "module/cpt@cpt/skin/cpt@default": {
           "class": "Overcode\\XePlugin\\DynamicFactory\\Components\\Skins\\Cpt\\Common\\CommonSkin",

@@ -22,7 +22,7 @@ use Xpressengine\Routing\InstanceConfig;
 
 class CommonSkin extends GenericCptSkin
 {
-    protected static $path = 'cpt/components/Skins/Cpt/Common';
+    protected static $path = 'dynamic_factory/components/Skins/Cpt/Common';
     /**
      * @var array
      * @deprecated beta.24.

@@ -2,6 +2,9 @@
 
 namespace Overcode\XePlugin\DynamicFactory\Components\Modules;
 
+use Route;
+use XeSkin;
+use View;
 use Xpressengine\Menu\AbstractModule;
 
 class CptModule extends AbstractModule
@@ -32,7 +35,11 @@ class CptModule extends AbstractModule
      */
     public function createMenuForm()
     {
-        // TODO: Implement createMenuForm() method.
+        $skins = XeSkin::getList('module/cpt@cpt');
+
+        return View::make('dynamic_factory::components/Modules/views/create', [
+            'skins' => $skins
+        ])->render();
     }
 
     /**
