@@ -17,6 +17,7 @@ class CptModule extends AbstractModule
     public static function boot()
     {
         self::registerArchiveRoute();
+        self::registerSettingsRoute();
         self::registerInstanceRoute();
     }
 
@@ -39,6 +40,23 @@ class CptModule extends AbstractModule
         ], function () {
             Route::get('/{slug}', ['as' => 'cpts', 'ArchivesController@index']);
         });
+    }
+
+    /**
+     * Register Plugin Manage Route
+     *
+     * @return void
+     */
+    protected static function registerSettingsRoute()
+    {
+        Route::settings(self::getId(), function () {
+            // module
+            Route::get('config/{instanceId}', ['as' => 'settings.cpt.cpt.config', 'uses' => 'CptDocSettingController@editConfig']);
+            Route::post(
+                'config/update/{instanceId}',
+                ['as' => 'settings.cpt.cpt.config.update', 'uses' => 'CptDocSettingController@updateConfig']
+            );
+        }, ['namespace' => 'Overcode\XePlugin\DynamicFactory\Controllers']);
     }
 
     /**
@@ -146,6 +164,18 @@ class CptModule extends AbstractModule
     public function deleteMenu($instanceId)
     {
         // TODO: Implement deleteMenu() method.
+    }
+
+    /**
+     * Return URL about module's detail setting
+     * getInstanceSettingURI
+     *
+     * @param string $instanceId instance id
+     * @return mixed
+     */
+    public static function getInstanceSettingURI($instanceId)
+    {
+        return route('settings.cpt.cpt.config', $instanceId);
     }
 
     /**

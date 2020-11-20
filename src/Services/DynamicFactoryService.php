@@ -61,9 +61,9 @@ class DynamicFactoryService
         try {
             $cpt = $this->dfHandler->store_cpt($inputs);
 
-            $configName = $this->dfConfigHandler->getConfigName('df' . $cpt->cpt_id);
+            $configName = $this->dfConfigHandler->getConfigName($inputs['cpt_id']);
             $this->dfConfigHandler->addConfig([
-                'documentGroup' => 'documents_df' . $cpt->cpt_id,
+                'documentGroup' => 'documents_' . $inputs['cpt_id'],
                 'listColumns' => DynamicFactoryConfigHandler::DEFAULT_SELECTED_LIST_COLUMNS,
                 'sortListColumns' => DynamicFactoryConfigHandler::DEFAULT_LIST_COLUMNS,
                 'formColumns' => DynamicFactoryConfigHandler::DEFAULT_SELECTED_FORM_COLUMNS,
