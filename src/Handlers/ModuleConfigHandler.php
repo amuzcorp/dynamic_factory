@@ -11,7 +11,7 @@ class ModuleConfigHandler
      * config package name
      * 다른 모듈과 충돌을 피하기 위해 설정 이름을 모듈 이름으로 선언
      */
-    const CONFIG_NAME = 'module/board@board';
+    const CONFIG_NAME = 'module/cpt@cpt';
 
     /**
      * @var ConfigManager
