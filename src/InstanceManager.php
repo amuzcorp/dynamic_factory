@@ -36,7 +36,6 @@ class InstanceManager
 
     public function createCpt(array $params)
     {
-        throw new RequireCptIdException;
         if (empty($params['cpt_id']) === true) {
             throw new RequireCptIdException;
         }
