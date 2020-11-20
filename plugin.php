@@ -6,10 +6,12 @@ use Overcode\XePlugin\DynamicFactory\Handlers\DynamicFactoryConfigHandler;
 use Overcode\XePlugin\DynamicFactory\Handlers\DynamicFactoryDocumentHandler;
 use Overcode\XePlugin\DynamicFactory\Handlers\DynamicFactoryHandler;
 use Overcode\XePlugin\DynamicFactory\Handlers\DynamicFactoryTaxonomyHandler;
+use Overcode\XePlugin\DynamicFactory\Handlers\ModuleConfigHandler;
 use Overcode\XePlugin\DynamicFactory\Handlers\UrlHandler;
 use Overcode\XePlugin\DynamicFactory\Services\DynamicFactoryService;
 use Route;
 use XeDynamicField;
+use XeDB;
 use XeInterception;
 use Xpressengine\DynamicField\ConfigHandler;
 use Xpressengine\Plugin\AbstractPlugin;
@@ -74,6 +76,21 @@ class Plugin extends AbstractPlugin
             return new DynamicFactoryTaxonomyHandler();
         });
         $app->alias(DynamicFactoryTaxonomyHandler::class, 'overcode.df.taxonomyHandler');
+
+        $app->singleton(ModuleConfigHandler::class, function () {
+            return new ModuleConfigHandler(
+                app('xe.config')
+            );
+        });
+        $app->alias(ModuleConfigHandler::class, 'overcode.df.moduleConfigHandler');
+
+        $app->singleton(InstanceManager::class, function ($app) {
+            return new InstanceManager(
+                XeDB::connection(),
+                app('overcode.df.moduleConfigHandler')
+            );
+        });
+        $app->alias(InstanceManager::class, 'overcode.df.instance');
     }
 
     /**
@@ -88,7 +105,6 @@ class Plugin extends AbstractPlugin
         $this->CptCategorySettingFromPlugin();
         $this->CptDynamicFieldSettingFromPlugin();
 
-        $this->route();
         $this->registerSettingsMenus();
         $this->registerSettingsRoute();
         $this->registerCategoryRoute();
@@ -178,15 +194,6 @@ class Plugin extends AbstractPlugin
         }
 
         if($this->cpts_from_plugin) {
-            /*foreach ($this->cpts_from_plugin as $val) {
-                \XeRegister::push('settings/menu', $val->menu_path . $val->cpt_id, [
-                    'title' => $val->menu_name,
-                    'description' => $val->description,
-                    'display' => true,
-                    'ordering' => $val->menu_order
-                ]);
-            }*/
-
             foreach ($this->cpts_from_plugin as $val) {
                 \XeRegister::push('settings/menu', $val['menu_path'] . $val['cpt_id'], [
                     'title' => $val['menu_name'],
@@ -246,13 +253,6 @@ class Plugin extends AbstractPlugin
 
         if($this->cpts_from_plugin) {
             Route::settings(static::getId(), function () {
-                /*foreach ($this->cpts_from_plugin as $val) {
-                    Route::get('/'.$val->cpt_id. '/{type?}', [
-                        'as' => 'dyFac.setting.'.$val->cpt_id,
-                        'uses' => 'DynamicFactorySettingController@cptDocument',
-                        'settings_menu' => $val->menu_path . $val->cpt_id
-                    ]);
-                }*/
                 foreach ($this->cpts_from_plugin as $val) {
                     Route::get('/'.$val['cpt_id']. '/{type?}', [
                         'as' => 'dyFac.setting.'.$val['cpt_id'],
@@ -297,21 +297,6 @@ class Plugin extends AbstractPlugin
                 ]);
             });
         });
-    }
-
-    protected function route()
-    {
-        // implement code
-
-        Route::fixed(
-            $this->getId(),
-            function () {
-                Route::get('/', [
-                    'as' => 'dynamic_factory::index','uses' => 'Overcode\XePlugin\DynamicFactory\Controllers\Controller@index'
-                ]);
-            }
-        );
-
     }
 
     protected function reserveSlugUrl()

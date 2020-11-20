@@ -11,24 +11,15 @@
         <div id="collapseMenuType" class="panel-collapse">
             <div class="panel-body">
                 <div class="form-group">
-                    <p><span class="glyphicon glyphicon-chevron-down" aria-hidden="true"></span> For web master's<br>{{xe_trans('board::msgCannotChangeThisSetting')}}</p>
 
-                    <label>Table Division </label>
-                    <select name="division" class="form-control">
-                        <option value="true">{{xe_trans('xe::use')}}</option>
-                        <option value="false">{{xe_trans('xe::disuse')}}</option>
-                    </select>
-
-                </div>
-                <div class="form-group">
-
-                    <label>Revision</label>
-                    <select name="revision" class="form-control">
-                        <option value="true">{{xe_trans('xe::use')}}</option>
-                        <option value="false">{{xe_trans('xe::disuse')}}</option>
+                    <label>사용할 사용자 정의 문서</label>
+                    <select name="cpt_id" class="form-control">
+                        <option value="">선택</option>
+                    @foreach($cpts as $cpt)
+                        <option value="{{ $cpt->cpt_id }}">{{ $cpt->cpt_name }}</option>
+                    @endforeach
                     </select>
                 </div>
-
             </div>
         </div>
     </div>

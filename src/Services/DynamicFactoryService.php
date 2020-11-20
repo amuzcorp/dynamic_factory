@@ -110,6 +110,18 @@ class DynamicFactoryService
         return $cpt;
     }
 
+    public function getItemsAll()
+    {
+        $cpts = $this->getItems();
+        $cpts_from_plugin = $this->getItemsFromPlugin();
+
+        foreach ($cpts_from_plugin as $cpt) {
+            $cpts->push($cpt);
+        }
+
+        return $cpts;
+    }
+
     public function getItem($cpt_id)
     {
         $cpt = $this->dfHandler->getItem($cpt_id);

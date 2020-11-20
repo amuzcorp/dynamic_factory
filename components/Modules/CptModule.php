@@ -17,6 +17,7 @@ class CptModule extends AbstractModule
     public static function boot()
     {
         self::registerArchiveRoute();
+        self::registerInstanceRoute();
     }
 
     /**
@@ -25,6 +26,27 @@ class CptModule extends AbstractModule
      * @return void
      */
     protected static function registerArchiveRoute()
+    {
+        // set routing
+        config(['xe.routing' => array_merge(
+            config('xe.routing'),
+            ['cpt_archives' => 'cpts']
+        )]);
+
+        Route::group([
+            'prefix' => 'cpts',
+            'namespace' => 'Overcode\XePlugin\DynamicFactory\Controllers'
+        ], function () {
+            Route::get('/{slug}', ['as' => 'cpts', 'ArchivesController@index']);
+        });
+    }
+
+    /**
+     * Register Plugin Instance Route
+     *
+     * @return void
+     */
+    protected static function registerInstanceRoute()
     {
 
     }
@@ -37,8 +59,12 @@ class CptModule extends AbstractModule
     {
         $skins = XeSkin::getList('module/cpt@cpt');
 
+        $dfService = app('overcode.df.service');
+        $cpts = $dfService->getItemsAll();
+
         return View::make('dynamic_factory::components/Modules/views/create', [
-            'skins' => $skins
+            'skins' => $skins,
+            'cpts' => $cpts
         ])->render();
     }
 
@@ -55,7 +81,11 @@ class CptModule extends AbstractModule
      */
     public function storeMenu($instanceId, $menuTypeParams, $itemParams)
     {
-        // TODO: Implement storeMenu() method.
+
+        $input = $menuTypeParams;
+        $input['instanceId'] = $instanceId;
+
+        app('overcode.df.instance')->createCpt($input);
     }
 
     /**
@@ -67,7 +97,15 @@ class CptModule extends AbstractModule
      */
     public function editMenuForm($instanceId)
     {
-        // TODO: Implement editMenuForm() method.
+        $skins = XeSkin::getList(self::getId());
+
+        $dfService = app('overcode.df.service');
+        $cpts = $dfService->getItemsAll();
+
+        return View::make('dynamic_factory::components/Modules/views/edit', [
+            'skins' => $skins,
+            'cpts' => $cpts
+        ])->render();
     }
 
     /**
