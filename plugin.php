@@ -380,4 +380,15 @@ class Plugin extends AbstractPlugin
 
         return true;
     }
+
+    /**
+     * 플러그인을 설치해제한다. 플러그인 디렉토리가 XpressEngine에서 삭제되기 전에 실행될 코드를 여기에 추가한다.
+     *
+     * @return void
+     */
+    public function uninstall()
+    {
+        $migration = new Migrations();
+        $migration->dropTables();
+    }
 }

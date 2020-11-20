@@ -137,4 +137,13 @@ class Migrations
         });
     }
 
+    public function dropTables()
+    {
+        Schema::drop(self::CPT_TABLE_NAME);
+        Schema::drop(self::CATEGORY_EXTRA_TABLE_NAME);
+        Schema::drop(self::CPT_TAXONOMY_TABLE_NAME);
+        Schema::drop(self::CPT_DOCUMENT_TAXONOMY_TABLE_NAME);
+        Schema::drop(self::CPT_DOCUMENT_SLUG_TABLE_NAME);
+    }
+
 }
