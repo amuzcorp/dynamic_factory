@@ -18,11 +18,33 @@ class ModuleConfigHandler
      */
     protected $configManager;
 
+    /**
+     * @var array
+     */
+    protected $defaultConfig = [];
+
     public function __construct(
         ConfigManager $configManager
     )
     {
         $this->configManager = $configManager;
+    }
+
+    /**
+     * 기본 설정 반환. 설정이 없을 경우 등록 후 반환
+     *
+     * @return ConfigEntity
+     */
+    public function getDefault()
+    {
+        $parent = $this->configManager->get(static::CONFIG_NAME);
+
+        if ($parent == null) {
+            $default = $this->defaultConfig;
+            $parent = $this->configManager->add(static::CONFIG_NAME, $default);
+        }
+
+        return $parent;
     }
 
     /**

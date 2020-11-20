@@ -331,6 +331,9 @@ class Plugin extends AbstractPlugin
         /** @var DynamicFactoryConfigHandler $configHandler */
         $configHandler = app('overcode.df.configHandler');
         $configHandler->storeDfConfig();
+
+        $moduleConfigHandler = app('overcode.df.moduleConfigHandler');
+        $moduleConfigHandler->getDefault();
     }
 
     /**
