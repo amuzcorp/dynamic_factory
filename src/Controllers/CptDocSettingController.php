@@ -27,8 +27,6 @@ class CptDocSettingController extends Controller
         $this->presenter = app('xe.presenter');
 
         $this->presenter->setSettingsSkinTargetId(CptModule::getId());
-
-        dd($this->presenter->getSkinHandler());
     }
 
     public function editConfig(CaptchaManager $captcha, $instanceId)
