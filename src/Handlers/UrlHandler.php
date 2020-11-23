@@ -1,6 +1,7 @@
 <?php
 namespace Overcode\XePlugin\DynamicFactory\Handlers;
 
+use Overcode\XePlugin\DynamicFactory\Models\CptDocument;
 use Xpressengine\Config\ConfigEntity;
 
 class UrlHandler
@@ -27,6 +28,16 @@ class UrlHandler
             $instanceId = $this->instanceId;
         }
         return instance_route($name, $params, $instanceId);
+    }
+
+    public function getShow(CptDocument $document, $params =[], ConfigEntity $config = null)
+    {
+        if ($config === null) {
+            $config = $this->config;
+        }
+//        dd($params);
+
+        return $this->get('show', $params);
     }
 
     public function managerUrl($name, $params = [])

@@ -2,6 +2,7 @@
 
 namespace Overcode\XePlugin\DynamicFactory\Components\Modules;
 
+use Overcode\XePlugin\DynamicFactory\Models\DfSlug;
 use Route;
 use XeSkin;
 use View;
@@ -67,7 +68,19 @@ class CptModule extends AbstractModule
      */
     protected static function registerInstanceRoute()
     {
+        Route::instance(self::getId(), function () {
+            Route::get('/', ['as' => 'index', 'uses' => 'CptDocModuleController@index']);
+            Route::get('/show/{id}', ['as' => 'show', 'uses' => 'CptDocModuleController@showByItemId']);
 
+            Route::get('/hasSlug', ['as' => 'hasSlug', 'uses' => 'CptDocModuleController@hasSlug']);
+            Route::get('/{slug}', ['as' => 'slug', 'uses' => 'CptDocModuleController@slug']);
+        }, ['namespace' => 'Overcode\XePlugin\DynamicFactory\Controllers']);
+
+        DfSlug::setReserved([
+            'index', 'create', 'edit', 'destroy', 'show', 'identify', 'revision', 'store', 'preview', 'temporary',
+            'trash', 'certify', 'update', 'vote', 'manageMenus', 'comment', 'file', 'suggestion', 'slug', 'hasSlug',
+            'favorite'
+        ]);
     }
 
     /**
