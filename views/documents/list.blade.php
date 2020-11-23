@@ -21,7 +21,7 @@
                 @if ($cptDocs->count() > 0)
                     @foreach($cptDocs as $doc)
                     <tr>
-                        <td>{{ $doc->title }}</td>
+                        <td><a href="{{ route('dyFac.setting.'.$cpt->cpt_id, ['type' => 'edit', 'doc_id' => $doc->id]) }}">{{ $doc->title }}</a></td>
                         <td>
                             @if ($doc->user !== null)
                                 {{ $doc->user->getDisplayName() }}

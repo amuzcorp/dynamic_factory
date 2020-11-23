@@ -79,4 +79,10 @@ class CptDocument extends Document implements SeoUsable
     {
         return $this->hasOne(DfSlug::class, 'target_id');
     }
+
+    public function getSlug()
+    {
+        $slug = $this->dfSlug;
+        return $slug === null ? '' : $slug->slug;
+    }
 }

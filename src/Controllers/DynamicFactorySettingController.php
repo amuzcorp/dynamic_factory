@@ -10,6 +10,7 @@ use Overcode\XePlugin\DynamicFactory\Handlers\DynamicFactoryTaxonomyHandler;
 use Overcode\XePlugin\DynamicFactory\Handlers\UrlHandler;
 use Overcode\XePlugin\DynamicFactory\Models\CategoryExtra;
 use Overcode\XePlugin\DynamicFactory\Models\Cpt;
+use Overcode\XePlugin\DynamicFactory\Models\CptDocument;
 use Overcode\XePlugin\DynamicFactory\Models\CptTaxonomy;
 use Overcode\XePlugin\DynamicFactory\Models\DfSlug;
 use Overcode\XePlugin\DynamicFactory\Plugin;
@@ -395,7 +396,26 @@ class DynamicFactorySettingController extends BaseController
 
     public function documentEdit(Cpt $cpt, Request $request)
     {
+        $taxonomies = $this->taxonomyHandler->getTaxonomies($cpt->cpt_id);
 
+        $dynamicFields = $this->dynamicFieldConfigHandler->gets('documents_' . $cpt->cpt_id);
+
+        $dynamicFieldsById = [];
+        foreach ($dynamicFields as $dyField) {
+            $dynamicFieldsById[$dyField->getConfig()->get('id')] = $dyField->getConfig();
+        }
+        $cptConfig = $this->dfService->getCptConfig($cpt->cpt_id);
+
+        $item = CptDocument::division($cpt->cpt_id)->find($request->doc_id);
+
+        return $this->presenter->make('dynamic_factory::views.documents.edit',[
+            'cpt' => $cpt,
+            'taxonomies' => $taxonomies,
+            'dynamicFields' => $dynamicFields,
+            'cptConfig' => $cptConfig,
+            'dynamicFieldsById' => $dynamicFieldsById,
+            'item' => $item
+        ]);
     }
 
     public function documentDelete(Cpt $cpt, Request $request)
@@ -409,6 +429,11 @@ class DynamicFactorySettingController extends BaseController
         $document = $this->dfService->storeCptDocument($request);
 
         return redirect()->route('dyFac.setting.'.$request->cpt_id, ['type' => 'list']);
+    }
+
+    public function updateCptDocument(Request $request)
+    {
+        return '';
     }
 
     public function getCptDocuments($request, $cpt)
