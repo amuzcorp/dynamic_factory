@@ -56,6 +56,7 @@ class CptModule extends AbstractModule
                 'config/update/{instanceId}',
                 ['as' => 'settings.cpt.cpt.config.update', 'uses' => 'CptDocSettingController@updateConfig']
             );
+            Route::get('skin/edit/{instanceId}', ['as' => 'settings.cpt.cpt.skin', 'uses' => 'CptDocSettingController@editSkin']);
         }, ['namespace' => 'Overcode\XePlugin\DynamicFactory\Controllers']);
     }
 
@@ -121,6 +122,8 @@ class CptModule extends AbstractModule
         $cpts = $dfService->getItemsAll();
 
         return View::make('dynamic_factory::components/Modules/views/edit', [
+            'instanceId' => $instanceId,
+            'config' => app('overcode.df.moduleConfigHandler')->get($instanceId),
             'skins' => $skins,
             'cpts' => $cpts
         ])->render();
@@ -139,7 +142,7 @@ class CptModule extends AbstractModule
      */
     public function updateMenu($instanceId, $menuTypeParams, $itemParams)
     {
-        // TODO: Implement updateMenu() method.
+        app('overcode.df.instance')->updateConfig($menuTypeParams);
     }
 
     /**
@@ -175,7 +178,7 @@ class CptModule extends AbstractModule
      */
     public static function getInstanceSettingURI($instanceId)
     {
-        return route('settings.cpt.cpt.config', $instanceId);
+        return route('settings.cpt.cpt.skin', $instanceId);
     }
 
     /**

@@ -3,6 +3,7 @@
 namespace Overcode\XePlugin\DynamicFactory;
 
 use Overcode\XePlugin\DynamicFactory\Exceptions\AlreadyExistsInstanceException;
+use Overcode\XePlugin\DynamicFactory\Exceptions\InvalidConfigException;
 use Overcode\XePlugin\DynamicFactory\Exceptions\RequireCptIdException;
 use Overcode\XePlugin\DynamicFactory\Handlers\ModuleConfigHandler;
 use Xpressengine\Database\VirtualConnection;
@@ -48,6 +49,29 @@ class InstanceManager
         $this->conn->beginTransaction();
 
         $config = $this->configHandler->add($params);
+
+        $this->conn->commit();
+
+        return $config;
+    }
+
+    public function updateConfig(array $params)
+    {
+        if (empty($params['cpt_id']) === true) {
+            throw new RequireCptIdException;
+        }
+
+        $config = $this->configHandler->get($params['instanceId']);
+        if ($config === null) {
+            throw new InvalidConfigException;
+        }
+        foreach ($params as $key => $val) {
+            $config->set($key, $val);
+        }
+
+        $this->conn->beginTransaction();
+
+        $config = $this->configHandler->modify($config);
 
         $this->conn->commit();
 

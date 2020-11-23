@@ -31,6 +31,6 @@ class UrlHandler
 
     public function managerUrl($name, $params = [])
     {
-        return route('dyFac.setting.'. $name, $params);
+        return route('settings.cpt.cpt.'. $name, $params);
     }
 }
