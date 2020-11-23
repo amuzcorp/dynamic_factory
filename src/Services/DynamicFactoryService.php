@@ -8,12 +8,14 @@ use Overcode\XePlugin\DynamicFactory\Interfaces\Orderable;
 use Overcode\XePlugin\DynamicFactory\Interfaces\Searchable;
 use Overcode\XePlugin\DynamicFactory\Models\Cpt;
 use Overcode\XePlugin\DynamicFactory\Models\CptDocument;
+use Overcode\XePlugin\DynamicFactory\Models\DfSlug;
 use Overcode\XePlugin\DynamicFactory\Plugin;
 use XeDB;
 use XeSite;
 use Overcode\XePlugin\DynamicFactory\Handlers\DynamicFactoryHandler;
 use Xpressengine\Category\Models\CategoryItem;
 use Xpressengine\Config\ConfigEntity;
+use Xpressengine\Document\Models\Document;
 use Xpressengine\Http\Request;
 
 class DynamicFactoryService
@@ -180,8 +182,11 @@ class DynamicFactoryService
                 $documentConfigHandler->createInstance($cpt_id, ['instanceId' => $cpt_id, 'group' => Plugin::getId() . '_' . $cpt_id, 'siteKey' => XeSite::getCurrentSiteKey()]);
             }
             $document = $this->dfDocumentHandler->store($inputs);
+
             $this->dfTaxonomyHandler->storeTaxonomy($document, $inputs);
 
+            $cptDocument = CptDocument::find($document->id);
+            $this->saveSlug($cptDocument, $inputs);
         }catch (\Exception $e) {
             XeDB::rollback();
 
@@ -221,5 +226,23 @@ class DynamicFactoryService
     public function getCategoryExtras()
     {
         return $this->dfTaxonomyHandler->getCategoryExtras();
+    }
+
+    protected function saveSlug(CptDocument $cptDocument, array $args)
+    {
+        $slug = $cptDocument->dfSlug;
+        if ($slug === null) {
+            $args['slug'] = DfSlug::make($args['slug'], $cptDocument->id);
+            $slug = new DfSlug([
+                'slug' => $args['slug'],
+                'title' => $args['title'],
+                'instance_id' => $args['cpt_id']
+            ]);
+        } else {
+            $slug->slug = $args['slug'];
+            $slug->title = $cptDocument->title;
+        }
+
+        $cptDocument->dfSlug()->save($slug);
     }
 }

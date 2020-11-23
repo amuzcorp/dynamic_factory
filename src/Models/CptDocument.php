@@ -74,4 +74,9 @@ class CptDocument extends Document implements SeoUsable
     {
         return compile($this->instance_id, $this->content, $this->format === static::FORMAT_HTML);
     }
+
+    public function dfSlug()
+    {
+        return $this->hasOne(DfSlug::class, 'target_id');
+    }
 }

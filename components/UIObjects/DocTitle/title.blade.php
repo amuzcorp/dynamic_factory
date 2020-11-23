@@ -54,16 +54,17 @@
 
             function hasSlug($container, callback) {
                 var id = $container.find('[name="title"]').data('id'),
-                    slug = $container.find('.__xe_slug_edit input').val();
-
+                    slug = $container.find('.__xe_slug_edit input').val(),
+                    cpt_id = '{{ $cpt_id }}';
                 XE.ajax({
-                    url: '{{ app('xe.board.url')->get('hasSlug') }}',
+                    url: '{{ route('dyFac.setting.hasSlug', ['cpt_id' => $cpt_id]) }}',
                     data: {id: id, slug: slug},
                     type: 'get',
                     dataType: 'json',
                     success: function(res) {
+                        console.log(res);
                         $container.find('.__xe_slug_edit input').val(res.slug);
-                        $container.find('.current-slug').text('{{instance_route('slug', ['slug' => ''])}}/' + res.slug);
+                        $container.find('.current-slug').text('/' + res.slug);
 
                         callback();
                     }
@@ -74,18 +75,21 @@
 @endif
 
 <div class="__xe_titleWithSlug">
-    <input type="text" name="{{ $titleDomName }}" data-valid-name="{{ xe_trans('board::title') }}" class="__xe_title {{$titleClassName}} xe-list-board-body--header-title-input" value="{{ $title }}" placeholder="{{ xe_trans('board::enterTitle') }}" data-id="{{ $id }}" data-slug="{{ $slug }}"/>
+    <div class="form-group">
+        <label>제목</label>
+        <input type="text" name="{{ $titleDomName }}" data-valid-name="{{ xe_trans('board::title') }}" class="__xe_title {{$titleClassName}} xe-list-board-body--header-title-input form-control" value="{{ $title }}" placeholder="{{ xe_trans('board::enterTitle') }}" data-id="{{ $id }}" data-slug="{{ $slug }}"/>
 
-    <div class="__xe_slug_edit" style="display:none;">
-        <i class="xi-link"></i>
-        <span class="edit-slug">{{instance_route('slug', ['slug' => ''])}}/<input type="text" name="{{ $slugDomName }}" value="{{ $slug }}"/></span>
-        <span><button type="button" class="xe-btn xe-btn-link xe-btn-xs ok">Ok</button></span>
-        <span><button type="button" class="xe-btn xe-btn-link xe-btn-xs cancel">Cancel</button></span>
-    </div>
+        <div class="__xe_slug_edit" style="display:none;">
+            <i class="xi-link"></i>
+            <span class="edit-slug"><input type="text" name="{{ $slugDomName }}" value="{{ $slug }}"/></span>
+            <span><button type="button" class="xe-btn xe-btn-link xe-btn-xs ok">Ok</button></span>
+            <span><button type="button" class="xe-btn xe-btn-link xe-btn-xs cancel">Cancel</button></span>
+        </div>
 
-    <div class="__xe_slug_show" style="display:none;">
-        <i class="xi-link"></i>
-        <span class="current-slug">{{instance_route('slug', ['slug' => ''])}}/{{ $slug }}</span>
-        <span><button type="button" class="xe-btn xe-btn-link xe-btn-xs edit">Edit</button></span>
+        <div class="__xe_slug_show" style="display:none;">
+            Slug <i class="xi-link"></i>
+            <span class="current-slug">{{ $slug }}</span>
+            <span><button type="button" class="xe-btn xe-btn-link xe-btn-xs edit">Edit</button></span>
+        </div>
     </div>
 </div>

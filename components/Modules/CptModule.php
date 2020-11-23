@@ -72,7 +72,6 @@ class CptModule extends AbstractModule
             Route::get('/', ['as' => 'index', 'uses' => 'CptDocModuleController@index']);
             Route::get('/show/{id}', ['as' => 'show', 'uses' => 'CptDocModuleController@showByItemId']);
 
-            Route::get('/hasSlug', ['as' => 'hasSlug', 'uses' => 'CptDocModuleController@hasSlug']);
             Route::get('/{slug}', ['as' => 'slug', 'uses' => 'CptDocModuleController@slug']);
         }, ['namespace' => 'Overcode\XePlugin\DynamicFactory\Controllers']);
 

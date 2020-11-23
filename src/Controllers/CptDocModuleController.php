@@ -3,6 +3,7 @@
 namespace Overcode\XePlugin\DynamicFactory\Controllers;
 
 use Overcode\XePlugin\DynamicFactory\Components\Modules\CptModule;
+use Overcode\XePlugin\DynamicFactory\Models\DfSlug;
 use Overcode\XePlugin\DynamicFactory\Services\CptDocService;
 use XeFrontend;
 use XePresenter;
@@ -67,5 +68,21 @@ class CptDocModuleController extends Controller
         $title = strip_tags(html_entity_decode($title));
 
         return $title;
+    }
+
+    /**
+     * 문자열을 넘겨 slug 반환
+     *
+     * @param Request $request request
+     * @return mixed
+     */
+    public function hasSlug(Request $request)
+    {
+        $slugText = DfSlug::convert('', $request->get('slug'));
+        $slug = DfSlug::make($slugText, $request->get('id'));
+
+        return XePresenter::makeApi([
+            'slug' => $slug
+        ]);
     }
 }

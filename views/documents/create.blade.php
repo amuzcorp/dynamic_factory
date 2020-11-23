@@ -14,18 +14,18 @@
                 <div class="panel-body">
                 @foreach($cptConfig['formColumns'] as $columnName)
                     @if($columnName === 'title')
-                    <div class="form-group">
+                    {{--<div class="form-group">
                         <label for="">제목</label>
                         <input type="text" class="form-control" id="title" name="title" placeholder="{{ sprintf($cpt->labels['here_title'], $cpt->cpt_name) }}">
-                    </div>
-                    {{--<div class="xe-list-board-body--header-item xe-list-board-body--header-title xf-col-md-12">
+                    </div>--}}
+                    <div class="xe-list-board-body--header-item xe-list-board-body--header-title xf-col-md-12">
                         {!! uio('uiobject/df@doc_title', [
                             'title' => Request::old('title'),
                             'slug' => Request::old('slug'),
                             'titleClassName' => 'bd_input',
-                            'config' => $cptConfig
+                            'cpt_id' => $cpt->cpt_id
                         ]) !!}
-                    </div>--}}
+                    </div>
                     @elseif($columnName === 'content')
                     <div class="form-group">
                         <label for="xeContentEditor">내용</label>
@@ -83,3 +83,4 @@
         </div>
     </div>
 </form>
+{{ XeFrontend::js('assets/vendor/jqueryui/jquery-ui.min.js')->load() }}

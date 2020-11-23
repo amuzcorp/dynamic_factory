@@ -2,6 +2,7 @@
 namespace Overcode\XePlugin\DynamicFactory\Controllers;
 
 use App\Http\Sections\DynamicFieldSection;
+use Overcode\XePlugin\DynamicFactory\Exceptions\NotFoundDocumentException;
 use Overcode\XePlugin\DynamicFactory\Handlers\CptValidatorHandler;
 use Overcode\XePlugin\DynamicFactory\Handlers\DynamicFactoryConfigHandler;
 use Overcode\XePlugin\DynamicFactory\Handlers\DynamicFactoryHandler;
@@ -10,6 +11,7 @@ use Overcode\XePlugin\DynamicFactory\Handlers\UrlHandler;
 use Overcode\XePlugin\DynamicFactory\Models\CategoryExtra;
 use Overcode\XePlugin\DynamicFactory\Models\Cpt;
 use Overcode\XePlugin\DynamicFactory\Models\CptTaxonomy;
+use Overcode\XePlugin\DynamicFactory\Models\DfSlug;
 use Overcode\XePlugin\DynamicFactory\Plugin;
 use Overcode\XePlugin\DynamicFactory\Services\DynamicFactoryService;
 use App\Http\Sections\EditorSection;
@@ -445,5 +447,21 @@ class DynamicFactorySettingController extends BaseController
         }
 
         return $this->presenter->makeApi([ 'return_value' => $return_value]);
+    }
+
+    /**
+     * 문자열을 넘겨 slug 반환
+     *
+     * @param Request $request request
+     * @return mixed
+     */
+    public function hasSlug(Request $request)
+    {
+        $slugText = DfSlug::convert('', $request->get('slug'));
+        $slug = DfSlug::make($slugText, $request->get('id'));
+
+        return XePresenter::makeApi([
+            'slug' => $slug,
+        ]);
     }
 }
