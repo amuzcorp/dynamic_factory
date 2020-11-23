@@ -75,7 +75,7 @@
 <div id="dynamic_field_hidden" style="display:none;">
 @foreach($category_items as $item)
     @foreach((array)$item->dfs as $df)
-        <div id="cate_df_{{ $item->id }}">{!! $df !!}</div>
+        <div class="cate_df_{{ $item->id }}">{!! $df !!}</div>
     @endforeach
 @endforeach
 </div>

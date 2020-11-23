@@ -167,10 +167,9 @@ class CustomCategoryController extends CategoryController
                 $key = $id . '_' . $column->name;
 
                 if (isset($request->{$key}) == true) {
-                    $insertParam[$column->name] = $request->{$key};
+                    $insertParam[$column->name] = is_array($request->{$key}) ? json_encode($request->{$key}) : $request->{$key};
                 }
             }
-
             $tableName = $fieldType->getTableName();
 
             $selectParam = ['field_id'=>$id, 'target_id'=>$request->get('id'), 'group'=>$group];

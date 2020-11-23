@@ -260,7 +260,13 @@ console.log(obj);
       template += '<div class="lang-editor-box" data-name="description" data-autocomplete="false" data-multiline="true" ' + descriptionKeyProp + '></div>'
       template += '</div>'
       // 다이나믹 필드를 추가한다.
-      template += _this.getDynamicField(obj.id);
+      //template += _this.getDynamicField(obj.id);
+      //return $('.cate_df_' + item_id).html();
+      if($('.cate_df_' + obj.id)) {
+        $('.cate_df_' + obj.id).each(function() {
+          template += $(this).html();
+        });
+      }
 
       template += '</div>'
       template += '</form>'
@@ -372,6 +378,7 @@ console.log(obj);
         dataType: 'json',
         data: item,
         success: function (data) {
+          // console.log(data);
           location.reload();
           /*$('button').prop('disabled', false)
 
@@ -604,12 +611,6 @@ console.log(obj);
       }
 
       return params
-    },
-    /**
-     * 미리 로드한 DynamicField 를 Item 에 삽입한다.
-     */
-    getDynamicField: function (item_id) {
-      return $('#cate_df_' + item_id).html();
     }
   }
 })(window.XE, window.jQuery, window.Tree)
