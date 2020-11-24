@@ -38,7 +38,7 @@
                         @else
                             @if(isset($dynamicFieldsById[$columnName]) && $dynamicFieldsById[$columnName]->get('use') == true)
                                 <div class="__xe_{{$columnName}} __xe_section">
-                                    {!! df_create($cptConfig->get('documentGroup'), $columnName, Request::all()) !!}
+                                    {!! df_edit($cptConfig->get('documentGroup'), $columnName, $item->getAttributes()) !!}
                                 </div>
                                 {{--
                                 @foreach ($dynamicFields as $dynamicField)
@@ -72,6 +72,7 @@
                                             'label' => xe_trans($taxonomy->name),
                                             'template' => $taxonomy->extra->template,
                                             'items' => app('overcode.df.taxonomyHandler')->getCategoryItemsTree($taxonomy->id),
+                                            'value' => isset($category_items[$taxonomy->id]) ? $category_items[$taxonomy->id] : ''
                                         ]) !!}
                                     </div>
                                 </div>

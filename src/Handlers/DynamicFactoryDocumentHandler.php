@@ -12,9 +12,21 @@ class DynamicFactoryDocumentHandler extends DocumentHandler
         $cpt_id = $attributes['cpt_id'];
 
         $attributes['instance_id'] = $cpt_id;
-//        $attributes['type'] = Plugin::getId();
         $attributes['type'] = $cpt_id;
 
         return parent::add($attributes);
+    }
+
+    public function update($doc, $inputs)
+    {
+        $attributes = $doc->getAttributes();
+
+        foreach ($inputs as $name => $value) {
+            if (array_key_exists($name, $attributes)) {
+                $doc->{$name} = $value;
+            }
+        }
+
+        return parent::put($doc);
     }
 }

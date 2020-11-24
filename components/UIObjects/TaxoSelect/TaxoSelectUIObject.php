@@ -67,13 +67,15 @@ class TaxoSelectUIObject extends AbstractUIObject
             $args['default'] = '';
         }
 
+
         if (!isset($args['value']) || $args['value'] === '') {
             $args['value'] = '';
             $args['text'] = '';
         } else {
-            $selectedItem = self::getSelectedItem($args['items'], $args['value']);
+            $selectedItem = self::getSelectedItem($args['items'], $args['value'], $args['template']);
+            $args['selectedItem'] = $selectedItem;
             if ($selectedItem) {
-                $args['text'] = $selectedItem['text'];
+                $args['text'] = isset($selectedItem['text']) ? $selectedItem['text'] : '';
             } else {
                 $args['value'] = '';
                 $args['text'] = '';
@@ -87,7 +89,7 @@ class TaxoSelectUIObject extends AbstractUIObject
             $args['scriptInit'] = true;
         }
 
-        $blade = 'taxoSelect';
+        $blade = 'taxoSelect';  // blade file name
 
         if($args['template'] === 'multi_select') $blade = 'taxoMultiSelect';
         else if($args['template'] === 'check_list') $blade = 'taxoCheckList';
@@ -96,20 +98,56 @@ class TaxoSelectUIObject extends AbstractUIObject
         return View::make('dynamic_factory::components/UIObjects/TaxoSelect/'. $blade, $args)->render();
     }
 
-    private static function getSelectedItem ($items, $selectedValue)
+    /**
+     * @param $items
+     * @param array|$selectedValue
+     * @param $template
+     * @return array|bool
+     */
+    private static function getSelectedItem ($items, $selectedValue, $template)
     {
-        foreach($items as $item) {
-            if ($item['value'] == $selectedValue) {
-                return [
-                    'value' => $item['value'],
-                    'text' => $item['text']
-                ];
+        if($template === 'multi_select' || $template === 'check_list') {
+            // 멀티 선택일때
+            $selectItems = [];
+
+            foreach ($items as $item) {
+                if (in_array($item['value'], $selectedValue)) {
+                    // category item id 를 key 로 사용한다.
+                    $selectItems[$item['value']] = [
+                        'value' => $item['value'],
+                        'text' => $item['text']
+                    ];
+                }
+
+                if (self::hasChildren($item)) {
+                    $selectedItem = self::getSelectedItem(self::getChildren($item), $selectedValue, $template);
+                    if ($selectedItem) {
+                        $selectItems = array_merge($selectItems, $selectedItem);
+                    }
+                }
             }
 
-            if (self::hasChildren($item)) {
-                $selectedItem = self::getSelectedItem(self::getChildren($item), $selectedValue);
-                if ($selectedItem) {
-                    return $selectedItem;
+            return $selectItems;
+
+        } else {
+            // 단일 선택일때
+            if(is_array($selectedValue)) {
+                $selectedValue = $selectedValue[0];
+            }
+
+            foreach ($items as $item) {
+                if ($item['value'] == $selectedValue) {
+                    return [
+                        'value' => $item['value'],
+                        'text' => $item['text']
+                    ];
+                }
+
+                if (self::hasChildren($item)) {
+                    $selectedItem = self::getSelectedItem(self::getChildren($item), $selectedValue, $template);
+                    if ($selectedItem) {
+                        return $selectedItem;
+                    }
                 }
             }
         }

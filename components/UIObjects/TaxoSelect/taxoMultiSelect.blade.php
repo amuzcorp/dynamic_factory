@@ -3,5 +3,5 @@
 @endphp
 
 <select class="form-control" name="{{ $name }}[]" multiple>
-    {!! TaxoSelectUIObject::renderMultiList($items, $value) !!}
+    {!! TaxoSelectUIObject::renderMultiList($items, isset($selectedItem) ? $selectedItem : '') !!}
 </select>

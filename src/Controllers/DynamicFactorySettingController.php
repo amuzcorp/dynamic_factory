@@ -408,13 +408,16 @@ class DynamicFactorySettingController extends BaseController
 
         $item = CptDocument::division($cpt->cpt_id)->find($request->doc_id);
 
+        $category_items = $this->dfService->getSelectCategoryItems($cpt->cpt_id, $item->id);
+
         return $this->presenter->make('dynamic_factory::views.documents.edit',[
             'cpt' => $cpt,
             'taxonomies' => $taxonomies,
             'dynamicFields' => $dynamicFields,
             'cptConfig' => $cptConfig,
             'dynamicFieldsById' => $dynamicFieldsById,
-            'item' => $item
+            'item' => $item,
+            'category_items' => $category_items
         ]);
     }
 
@@ -433,7 +436,11 @@ class DynamicFactorySettingController extends BaseController
 
     public function updateCptDocument(Request $request)
     {
-        return '';
+        //$cptId =$request->get('cpt_id');
+
+        $this->dfService->updateCptDocument($request);
+
+        return redirect()->route('dyFac.setting.'.$request->cpt_id, ['type' => 'edit', 'doc_id' => $request->doc_id]);
     }
 
     public function getCptDocuments($request, $cpt)

@@ -85,4 +85,9 @@ class CptDocument extends Document implements SeoUsable
         $slug = $this->dfSlug;
         return $slug === null ? '' : $slug->slug;
     }
+
+    public function taxonomy()
+    {
+        return $this->hasMany(DfTaxonomy::class, 'target_id', 'id');
+    }
 }

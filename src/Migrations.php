@@ -113,7 +113,9 @@ class Migrations
         Schema::create(self::CPT_DOCUMENT_TAXONOMY_TABLE_NAME, function (Blueprint $table) {
             $table->engine = "InnoDB";
 
-            $table->string('target_id');
+            $table->increments('id');
+
+            $table->string('target_id', 36);
             $table->integer('category_id');
             $table->text('item_ids');
         });

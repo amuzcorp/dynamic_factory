@@ -226,7 +226,6 @@ class DynamicFactoryTaxonomyHandler
     public function storeTaxonomy($document, $inputs)
     {
         $taxonomies = $this->getTaxonomies($inputs['cpt_id']);
-
         foreach ($taxonomies as $taxonomy) {
             $taxonomyAttributeName = $this->getTaxonomyItemAttributeName($taxonomy->id);
             if (isset($inputs[$taxonomyAttributeName]) === false) {
@@ -238,19 +237,73 @@ class DynamicFactoryTaxonomyHandler
                 continue;
             }
 
-            $taxonomyItem = CategoryItem::find($taxonomyItemId);
+            $taxonomyItem = CategoryItem::find($taxonomyItemId)->first();
             if ($taxonomyItem === null) {
                 continue;
             }
 
+            if(!is_array($taxonomyItemId)){
+                $taxonomyItemId = (array)$taxonomyItemId;
+            }
             $newDfTaxonomy = new DfTaxonomy();
             $newDfTaxonomy->fill([
                 'target_id' => $document->id,
-                'category_id' => $taxonomyItem[0]->category_id,
+                'category_id' => $taxonomyItem->category_id,
                 'item_ids' => $taxonomyItemId
             ]);
 
             $newDfTaxonomy->save();
+        }
+    }
+
+    public function updateTaxonomy($document, $inputs)
+    {
+        $taxonomies = $this->getTaxonomies($inputs['cpt_id']);
+        $i = 0;
+        foreach ($taxonomies as $taxonomy) {
+            $taxonomyAttributeName = $this->getTaxonomyItemAttributeName($taxonomy->id);
+            if (isset($inputs[$taxonomyAttributeName]) === false) {
+                continue;
+            }
+
+            $dfTaxonomy = $document->taxonomy()->where('category_id', $taxonomy->id)->get()->first();
+
+            $taxonomyItemId = $inputs[$taxonomyAttributeName];
+            if ($taxonomyItemId === null || $taxonomyItemId === '') {
+                if ($dfTaxonomy !== null) {
+                    $dfTaxonomy->delete();
+                    continue;
+                }
+            }
+
+            $taxonomyItem = CategoryItem::find($taxonomyItemId)->first();
+            if ($taxonomyItem === null) {
+                continue;
+            }
+
+            if ($dfTaxonomy !== null) {
+                if(!is_array($taxonomyItemId)) {
+                    $taxonomyItemId = [
+                        $taxonomyItemId
+                    ];
+                }
+
+                if ($dfTaxonomy['item_ids'] != $taxonomyItemId) {
+                    $dfTaxonomy['item_ids'] = $taxonomyItemId;
+                }
+
+                $dfTaxonomy->save();
+            } else {
+                $newDfTaxonomy = new DfTaxonomy();
+                $newDfTaxonomy->fill([
+                    'target_id' => $document->id,
+                    'category_id' => $taxonomyItem->category_id,
+                    'item_ids' => $taxonomyItemId
+                ]);
+
+                $newDfTaxonomy->save();
+            }
+            $i++;
         }
     }
 
@@ -372,5 +425,21 @@ class DynamicFactoryTaxonomyHandler
     public function df($group, $columnName)
     {
         return \XeDynamicField::get($group, $columnName);
+    }
+
+    public function getSelectCategoryItems($cpt_id, $target_id)
+    {
+        $cptTaxs = CptTaxonomy::get()->where('cpt_id', $cpt_id);
+
+        $items = [];
+
+        foreach($cptTaxs as $cptTax) {
+            $docTaxs = DfTaxonomy::get()->where('category_id', $cptTax->category_id)->where('target_id', $target_id);
+            foreach ($docTaxs as $docTax) {
+                $items[$cptTax->category_id] = $docTax->item_ids;
+            }
+        }
+
+        return $items;
     }
 }

@@ -197,6 +197,30 @@ class DynamicFactoryService
         return $document;
     }
 
+    public function updateCptDocument(Request $request)
+    {
+        $inputs = $request->originExcept('_token');
+
+        XeDB::beginTransaction();
+        try {
+            $cpt_id = $request->cpt_id;
+
+            $doc = CptDocument::division($cpt_id)->find($request->get('doc_id'));
+
+            $this->dfDocumentHandler->update($doc, $inputs);
+
+            $this->dfTaxonomyHandler->updateTaxonomy($doc, $inputs);
+
+            $this->saveSlug($doc, $inputs);
+
+        }catch (\Exception $e) {
+            XeDB::rollback();
+
+            throw $e;
+        }
+        XeDB::commit();
+    }
+
     public function getItemsWhereQuery(array $attributes)
     {
         $instance_id = $attributes['cpt_id'];
@@ -244,5 +268,10 @@ class DynamicFactoryService
         }
 
         $cptDocument->dfSlug()->save($slug);
+    }
+
+    public function getSelectCategoryItems($cpt_id, $target_id)
+    {
+        return $this->dfTaxonomyHandler->getSelectCategoryItems($cpt_id, $target_id);
     }
 }
