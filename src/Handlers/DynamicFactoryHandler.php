@@ -35,7 +35,6 @@ class DynamicFactoryHandler
         return $this->defaultLabels;
     }
 
-
     public function setReserved($slug)
     {
         if (is_array($slug) === true) {

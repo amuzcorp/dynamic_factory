@@ -85,6 +85,12 @@ class DynamicFactoryConfigHandler
         return $this->configManager->get($configName);
     }
 
+    public function getConfig($cpt_id)
+    {
+        $configName = $this->getConfigName($cpt_id);
+        return $this->get($configName);
+    }
+
     public function getDynamicFields(ConfigEntity $config)
     {
         $configs = $this->dynamicField->gets($config->get('documentGroup'));

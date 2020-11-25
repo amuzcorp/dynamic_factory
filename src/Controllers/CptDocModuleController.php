@@ -3,8 +3,10 @@
 namespace Overcode\XePlugin\DynamicFactory\Controllers;
 
 use Overcode\XePlugin\DynamicFactory\Components\Modules\CptModule;
+use Overcode\XePlugin\DynamicFactory\Exceptions\NotFoundDocumentException;
 use Overcode\XePlugin\DynamicFactory\Models\DfSlug;
 use Overcode\XePlugin\DynamicFactory\Services\CptDocService;
+use Auth;
 use XeFrontend;
 use XePresenter;
 use App\Http\Controllers\Controller;
@@ -57,6 +59,32 @@ class CptDocModuleController extends Controller
         ]);
     }
 
+    public function show(
+        CptDocService $service,
+        Request $request,
+        $menuUrl,
+        $id
+    )
+    {
+        $user = Auth::user();
+
+        $item = $service->getItem($id, $user, $this->config);
+
+        $dyFacConfig = app('overcode.df.configHandler')->getConfig($this->config->get('cpt_id'));
+        $fieldTypes = $service->getFieldTypes($dyFacConfig);
+
+        $dynamicFieldsById = [];
+        foreach ($fieldTypes as $fieldType) {
+            $dynamicFieldsById[$fieldType->get('id')] = $fieldType;
+        }
+
+        return XePresenter::make('show', [
+            'item' => $item,
+            'fieldTypes' => $fieldTypes,
+            'dynamicFieldsById' => $dynamicFieldsById
+        ]);
+    }
+
     private function getSiteTitle()
     {
         $siteTitle = \XeFrontend::output('title');
@@ -84,5 +112,20 @@ class CptDocModuleController extends Controller
         return XePresenter::makeApi([
             'slug' => $slug
         ]);
+    }
+
+    public function slug(CptDocService $service, Request $request, $menuUrl, $strSlug)
+    {
+//        dd($menuUrl, $strSlug, $this->instanceId);
+
+        $cpt_id = $this->config->get('cpt_id');
+
+        $slug = DfSlug::where('slug', $strSlug)->where('instance_id', $cpt_id)->first();
+
+        if ($slug === null) {
+            throw new NotFoundDocumentException;
+        }
+
+        return $this->show($service, $request, $menuUrl, $slug->target_id);
     }
 }

@@ -26,12 +26,12 @@
         @foreach($paginate as $item)
             <tr>
                 <td class="title column-title xe-hidden-xs">
-                    <a href="{{--$urlHandler->getShow($item, Request::all())--}}" id="title_{{$item->id}}" class="title_text">{!! $item->title !!}</a>
+                    <a href="{{ $urlHandler->getShow($item, Request::all()) }}" id="title_{{$item->id}}" class="title_text">{!! $item->title !!}</a>
                 </td>
 
                 {{--모바일 사이즈 게시물 list--}}
                 <td class="xe-visible-xs title column-title">
-                    <a href="#" id="title_{{$item->id}}" class="title_text">{!! $item->title !!}</a>
+                    <a href="{{ $urlHandler->getShow($item, Request::all()) }}" id="title_{{$item->id}}" class="title_text">{!! $item->title !!}</a>
                 </td>
             </tr>
         @endforeach
@@ -41,6 +41,12 @@
 </div>
 
 <div class="board_footer">
-    페이지네이션
+    <!-- PAGINATAION PC-->
+    {!! $paginate->render('dynamic_factory::components.Skins.Cpt.Common.views.default-pagination') !!}
+    <!-- /PAGINATION PC-->
+
+    <!-- PAGINATAION Mobile -->
+    {!! $paginate->render('dynamic_factory::components.Skins.Cpt.Common.views.simple-pagination') !!}
+    <!-- /PAGINATION Mobile -->
 </div>
 <div class="bd_dimmed"></div>

@@ -32,12 +32,9 @@ class UrlHandler
 
     public function getShow(CptDocument $document, $params =[], ConfigEntity $config = null)
     {
-        if ($config === null) {
-            $config = $this->config;
-        }
-//        dd($params);
+        $slug = $document->getSlug();
 
-        return $this->get('show', $params);
+        return $this->get('slug', [$slug], $this->instanceId);
     }
 
     public function managerUrl($name, $params = [])

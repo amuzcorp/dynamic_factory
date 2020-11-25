@@ -20,6 +20,16 @@ class CptDocument extends Document implements SeoUsable
         return $title;
     }
 
+    /**
+     * get compiled content
+     *
+     * @return string
+     */
+    public function getContent()
+    {
+        return compile($this->instance_id, $this->content, $this->format === static::FORMAT_HTML);
+    }
+
     public function getDescription()
     {
         return str_replace(
