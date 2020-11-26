@@ -5,7 +5,13 @@
         <thead class="xe-hidden-xs">
         <!-- LIST HEADER -->
         <tr>
-            <th scope="col" class="title column-th-title"><span>{{ xe_trans('board::title') }}</span></th>
+        @foreach($dfConfig['listColumns'] as $columnName)
+            @if($columnName === 'title')
+            <th scope="col" class="title column-th-title"><span>제목</span></th>
+            @else
+            <th scope="col" class="column-th-{{$columnName}}"><span>{{ xe_trans($column_labels[$columnName]) }}</span></th>
+            @endif
+        @endforeach
         </tr>
         <!-- /LIST HEADER -->
         </thead>
@@ -25,10 +31,32 @@
         <!-- LIST -->
         @foreach($paginate as $item)
             <tr>
-                <td class="title column-title xe-hidden-xs">
-                    <a href="{{ $urlHandler->getShow($item, Request::all()) }}" id="title_{{$item->id}}" class="title_text">{!! $item->title !!}</a>
-                </td>
-
+            @foreach($dfConfig['listColumns'] as $columnName)
+                @if ($columnName == 'title')
+                    <td class="title column-{{$columnName}} xe-hidden-xs">
+                        <a href="{{ $urlHandler->getShow($item, Request::all()) }}" id="title_{{$item->id}}" class="title_text">{!! $item->title !!}</a>
+                    </td>
+                @elseif ($columnName == 'writer')
+                    <td class="author xe-hidden-xs">
+                        @if ($item->hasAuthor() && $config->get('anonymity') === false)
+                            <a href="#"
+                               data-toggle="xe-page-toggle-menu"
+                               data-url="{{ route('toggleMenuPage') }}"
+                               data-data='{!! json_encode(['id'=>$item->getUserId(), 'type'=>'user']) !!}'>{!! $item->writer !!}</a>
+                        @else
+                            <a>{!! $item->writer !!}</a>
+                        @endif
+                    </td>
+                @elseif ($columnName == 'read_count')
+                    <td class="read_num xe-hidden-xs">{{ $item->{$columnName} }}</td>
+                @elseif (in_array($columnName, ['created_at', 'updated_at', 'deleted_at']))
+                    <td class="time xe-hidden-xs column-{{$columnName}}" title="{{ $item->{$columnName} }}" @if($item->{$columnName}->getTimestamp() > strtotime('-1 month')) data-xe-timeago="{{ $item->{$columnName} }}" @endif >{{ $item->{$columnName}->toDateString() }}</td>
+                @elseif (($fieldType = XeDynamicField::get('documents_'.$dfConfig->get('cpt_id'), $columnName)) != null)
+                    <td class="xe-hidden-xs column-{{$columnName}}">{!! $fieldType->getSkin()->output($columnName, $item->getAttributes()) !!}</td>
+                @else
+                    <td class="xe-hidden-xs column-{{$columnName}}">{!! $item->{$columnName} !!}</td>
+                @endif
+            @endforeach
                 {{--모바일 사이즈 게시물 list--}}
                 <td class="xe-visible-xs title column-title">
                     <a href="{{ $urlHandler->getShow($item, Request::all()) }}" id="title_{{$item->id}}" class="title_text">{!! $item->title !!}</a>

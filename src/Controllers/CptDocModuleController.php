@@ -52,10 +52,15 @@ class CptDocModuleController extends Controller
     {
         \XeFrontend::title($this->getSiteTitle());
 
+        $dfConfig = app('overcode.df.configHandler')->getConfig($this->config->get('cpt_id'));
+        $column_labels = app('overcode.df.configHandler')->getColumnLabels($dfConfig);
+
         $paginate = $service->getItems($request, $this->config);
 
         return XePresenter::makeAll('index', [
-            'paginate' => $paginate
+            'paginate' => $paginate,
+            'dfConfig' => $dfConfig,
+            'column_labels' => $column_labels
         ]);
     }
 

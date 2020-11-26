@@ -167,15 +167,15 @@ class DynamicFactoryConfigHandler
     // 컬럼의 LABEL 을 구한다
     public function getColumnLabels(ConfigEntity $config)
     {
-        $columnLables = self::COLUMN_LABELS;
+        $columnLabels = self::COLUMN_LABELS;
 
         $dynamicFields = $this->getDynamicFields($config);
 
         foreach ($dynamicFields as $val) {
-            $columnLables[$val->get('id')] = $val->get('label');
+            $columnLabels[$val->get('id')] = $val->get('label');
         }
 
-        return $columnLables;
+        return $columnLabels;
     }
 
     public function getCategoryConfig($cpt_id)

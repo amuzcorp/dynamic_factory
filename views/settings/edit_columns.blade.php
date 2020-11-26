@@ -85,6 +85,7 @@
                                                             <span class="item-subtext">{{ xe_trans($columnLabels[$columnName]) }}</span>
                                                         </td>
                                                         <td>
+                                                            @if($columnName === 'title' || $columnName === 'content')
                                                             <div class="xe-btn-toggle pull-right">
                                                                 <label>
                                                                     <span class="sr-only">toggle</span>
@@ -92,6 +93,9 @@
                                                                     <span class="toggle"></span>
                                                                 </label>
                                                             </div>
+                                                            @else
+                                                                <input type="hidden" name="formColumns[]" value="{{ $columnName }}" />
+                                                            @endif
                                                         </td>
                                                     </tr>
                                                 @endforeach

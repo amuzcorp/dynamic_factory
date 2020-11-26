@@ -366,10 +366,15 @@ class DynamicFactorySettingController extends BaseController
     {
         $cptDocs = $this->getCptDocuments($request, $cpt);
 
+        $config = $this->configHandler->getConfig($cpt->cpt_id);
+        $column_labels = $this->configHandler->getColumnLabels($config);
+
         return $this->presenter->make('dynamic_factory::views.documents.list',[
             'cpt' => $cpt,
             'current_route_name' => $request->current_route_name,
-            'cptDocs' => $cptDocs
+            'cptDocs' => $cptDocs,
+            'config' => $config,
+            'column_labels' => $column_labels
         ]);
     }
 

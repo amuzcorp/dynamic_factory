@@ -6,6 +6,7 @@ use Xpressengine\Document\Models\Document;
 use Xpressengine\Seo\SeoUsable;
 use Xpressengine\User\Models\Guest;
 use Xpressengine\User\Models\UnknownUser;
+use Xpressengine\User\Models\User;
 
 class CptDocument extends Document implements SeoUsable
 {
@@ -99,5 +100,25 @@ class CptDocument extends Document implements SeoUsable
     public function taxonomy()
     {
         return $this->hasMany(DfTaxonomy::class, 'target_id', 'id');
+    }
+
+    /**
+     * get users
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     */
+    public function user()
+    {
+        return $this->hasOne(User::class, 'id', 'user_id');
+    }
+
+    /**
+     * has user
+     *
+     * @return bool
+     */
+    public function hasAuthor()
+    {
+        return $this->user !== null;
     }
 }
