@@ -15,7 +15,7 @@
                     <select name="cpt_id" class="form-control">
                         <option value="">선택</option>
                     @foreach($cpts as $cpt)
-                        <option value="{{ $cpt->cpt_id }}" @if($config->get('cpt_id') == true) selected="selected"@endif>{{ $cpt->cpt_name }}</option>
+                        <option value="{{ $cpt->cpt_id }}">{{ $cpt->cpt_name }}</option>
                     @endforeach
                     </select>
                 </div>
