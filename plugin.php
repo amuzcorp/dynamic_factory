@@ -1,7 +1,6 @@
 <?php
 namespace Overcode\XePlugin\DynamicFactory;
 
-use Overcode\XePlugin\DynamicFactory\Handlers\CategoryDynamicFieldHandler;
 use Overcode\XePlugin\DynamicFactory\Handlers\DynamicFactoryConfigHandler;
 use Overcode\XePlugin\DynamicFactory\Handlers\DynamicFactoryDocumentHandler;
 use Overcode\XePlugin\DynamicFactory\Handlers\DynamicFactoryHandler;
@@ -10,6 +9,7 @@ use Overcode\XePlugin\DynamicFactory\Handlers\ModuleConfigHandler;
 use Overcode\XePlugin\DynamicFactory\Handlers\UrlHandler;
 use Overcode\XePlugin\DynamicFactory\Services\DynamicFactoryService;
 use Route;
+use XeCounter;
 use XeDynamicField;
 use XeDB;
 use XeInterception;
@@ -30,11 +30,16 @@ class Plugin extends AbstractPlugin
         $app->singleton(DynamicFactoryDocumentHandler::class, function() {
             $proxyHandler = XeInterception::proxy(DynamicFactoryDocumentHandler::class);
 
+            $readCounter = XeCounter::make(app('request'), 'read');
+            $readCounter->setGuest();
+
+            $voteCounter = XeCounter::make(app('request'), 'vote', ['assent', 'dissent']);
+
             return new $proxyHandler(
-                app('xe.db')->connection(),
-                app('xe.document.config'),
-                app('xe.document.instance'),
-                app('request')
+                app('xe.document'),
+                app('xe.storage'),
+                $readCounter,
+                $voteCounter
             );
         });
         $app->alias(DynamicFactoryDocumentHandler::class, 'overcode.df.documentHandler');

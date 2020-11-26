@@ -4,9 +4,18 @@
         <h1><a href="#">{!! $item->title !!}</a></h1>
 
         <div class="more_info">
-            <span>
-                <a class="mb_autohr">{{ $item->writer }}</a>
-            </span>
+            @if ($item->hasAuthor())
+                <span class="xe-dropdown">
+                    <a href="{{ sprintf('/@%s', $item->getUserId()) }}" class="mb_autohr"
+                       data-toggle="xe-page-toggle-menu"
+                       data-url="{{ route('toggleMenuPage') }}"
+                       data-data='{!! json_encode(['id'=>$item->getUserId(), 'type'=>'user']) !!}'>{{ $item->writer }}</a>
+               </span>
+            @else
+                <span>
+                    <a class="mb_autohr">{{ $item->writer }}</a>
+                </span>
+            @endif
 
             <span class="mb_time" title="{{$item->created_at}}"><i class="xi-time"></i> <span data-xe-timeago="{{$item->created_at}}">{{$item->created_at}}</span></span>
             <span class="mb_readnum"><i class="xi-eye"></i> {{$item->read_count}}</span>
@@ -17,15 +26,13 @@
             {!! compile($item->instance_id, $item->content, $item->format === Overcode\XePlugin\DynamicFactory\Models\CptDocument::FORMAT_HTML) !!}
         </div>
     </div>
+    <br/>
     @foreach ($fieldTypes as $dynamicFieldConfig)
-{{--        @if (in_array($dynamicFieldConfig->get('id'), $skinConfig['formColumns']) === false && ($fieldType = XeDynamicField::getByConfig($dynamicFieldConfig)) != null && $dynamicFieldConfig->get('use') == true)--}}
+        @if (($fieldType = XeDynamicField::getByConfig($dynamicFieldConfig)) != null && $dynamicFieldConfig->get('use') == true)
             <div class="__xe_ __xe_section">
-                @php
-                    $fieldType = XeDynamicField::getByConfig($dynamicFieldConfig)
-                @endphp
                 {!! $fieldType->getSkin()->show($item->getAttributes()) !!}
             </div>
-{{--        @endif--}}
+        @endif
     @endforeach
     <div class="read_footer">
         <div class="bd_function">

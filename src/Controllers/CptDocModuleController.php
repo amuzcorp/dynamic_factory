@@ -4,6 +4,8 @@ namespace Overcode\XePlugin\DynamicFactory\Controllers;
 
 use Overcode\XePlugin\DynamicFactory\Components\Modules\CptModule;
 use Overcode\XePlugin\DynamicFactory\Exceptions\NotFoundDocumentException;
+use Overcode\XePlugin\DynamicFactory\Handlers\DynamicFactoryDocumentHandler;
+use Overcode\XePlugin\DynamicFactory\Models\CptDocument;
 use Overcode\XePlugin\DynamicFactory\Models\DfSlug;
 use Overcode\XePlugin\DynamicFactory\Services\CptDocService;
 use Auth;
@@ -23,11 +25,14 @@ class CptDocModuleController extends Controller
 
     public $configHandler;
 
+    public $dfDocHandler;
+
     public $config;
 
     public function __construct(
         ModuleConfigHandler $configHandler,
-        UrlHandler $urlHandler
+        UrlHandler $urlHandler,
+        DynamicFactoryDocumentHandler $dfDocHandler
     )
     {
         $instanceConfig = InstanceConfig::instance();
@@ -35,6 +40,7 @@ class CptDocModuleController extends Controller
 
         $this->configHandler = $configHandler;
         $this->urlHandler = $urlHandler;
+        $this->dfDocHandler = $dfDocHandler;
         $this->config = $configHandler->get($this->instanceId);
         if ($this->config !== null) {
             $urlHandler->setInstanceId($this->config->get('instanceId'));
@@ -74,6 +80,11 @@ class CptDocModuleController extends Controller
         $user = Auth::user();
 
         $item = $service->getItem($id, $user, $this->config);
+
+        // 글 조회수 증가
+        if ($item->display == CptDocument::DISPLAY_VISIBLE) {
+            $this->dfDocHandler->incrementReadCount($item, Auth::user());
+        }
 
         $dyFacConfig = app('overcode.df.configHandler')->getConfig($this->config->get('cpt_id'));
         $fieldTypes = $service->getFieldTypes($dyFacConfig);

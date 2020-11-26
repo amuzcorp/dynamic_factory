@@ -12,7 +12,27 @@ class CptDocument extends Document implements SeoUsable
 {
     use SoftDeletes;
 
+    /**
+     * Canonical url
+     *
+     * @var string
+     */
     protected $canonical;
+
+    /**
+     * get user id
+     *
+     * @return string
+     */
+    public function getUserId()
+    {
+        $userId = $this->getAttribute('user_id');
+        if ($this->getAttribute('user_type') === self::USER_TYPE_ANONYMITY) {
+            $userId = '';
+        }
+
+        return $userId;
+    }
 
     public function getTitle()
     {
