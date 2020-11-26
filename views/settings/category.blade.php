@@ -63,6 +63,7 @@ $(document).ready(function() {
                 data: {id: category_id}
             }).done(function (json) {
                 console.log(json);
+                location.reload();
             })
         }
     });
