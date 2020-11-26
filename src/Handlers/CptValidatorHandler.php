@@ -20,4 +20,14 @@ class CptValidatorHandler
             'menu_order' => 'required|numeric',
         ];
     }
+
+    public function getUpdateRules()
+    {
+        return [
+            'cpt_id' => 'required|max:36|regex:/^[a-zA-Z]+([a-zA-Z0-9_]+)?[a-zA-Z0-9]+$/',
+            'cpt_name' => 'required',
+            'menu_name' => 'required',
+            'menu_order' => 'required|numeric',
+        ];
+    }
 }

@@ -184,7 +184,7 @@ class DynamicFactorySettingController extends BaseController
     {
         // TODO 권한체크
 
-        $this->validate($request, $this->cptValidatorHandler->getRules());  // CPT 유효성 검사
+        $this->validate($request, $this->cptValidatorHandler->getUpdateRules());  // CPT 유효성 검사
         $cpt = $this->dfService->updateCpt($request);
 
         return redirect()->route('dyFac.setting.edit', ['cpt_id' => $request->cpt_id]);

@@ -10,6 +10,7 @@
     <div class="col-sm-12">
         <form method="post" action="{{ route('dyFac.setting.update') }}">
             {!! csrf_field() !!}
+            <input type="hidden" name="cpt_id" value="{{ $cpt['cpt_id'] }}" readonly />
             <div class="panel">
                 <div class="panel-heading">
                     <h4>이름 및 설명</h4>
@@ -18,7 +19,7 @@
                     <div class="form-group row">
                         <label class="col-sm-2 col-form-label">ID (필수)</label>
                         <div class="col-sm-5">
-                            <input type="text" class="form-control" name="cpt_id" value="{{ $cpt['cpt_id'] }}" disabled="disabled">
+                            <input type="text" class="form-control" value="{{ $cpt['cpt_id'] }}" disabled="disabled">
                         </div>
                     </div>
                     <div class="form-group row">
