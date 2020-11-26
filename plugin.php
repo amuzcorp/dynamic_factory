@@ -168,7 +168,7 @@ class Plugin extends AbstractPlugin
     protected function registerSettingsMenus()
     {
         \XeRegister::push('settings/menu', 'setting.dynamic_factory', [
-            'title' => 'Dynamic Factory',
+            'title' => '사용자 정의 문서',
             'description' => '확장 필드와 카테고리를 조합한 사용자 정의 문서 생성 및 관리를 할 수 있습니다.',
             'display' => true,
             'ordering' => 100
