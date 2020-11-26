@@ -2,85 +2,83 @@
     use Overcode\XePlugin\DynamicFactory\Handlers\DynamicFactoryHandler;
 @endphp
 @section('page_title')
-    <div class="clearfix">
-        <h2 class="pull-left">사용자 정의 유형 관리</h2>
-        <a href="{{ route('dyFac.setting.create') }}" class="xu-button xu-button--primary pull-right">새 유형 추가</a>
-    </div>
+    <h2>사용자 정의 문서 관리</h2>
 @endsection
 <div class="row">
     <div class="col-sm-12">
-        <div class="panel">
-            <div class="panel-body">
-                <h4>다이나믹 팩토리에서 생성한 사용자 정의 문서</h4>
-                <table class="table table-bordered">
-                    <thead>
-                    <tr>
-                        <th>글 유형</th>
-                        <th>확장 필드</th>
-                        <th>카테고리</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    @foreach($cpts as $cpt)
-                    <tr>
-                        <td>
-                            <a href="{{ route('dyFac.setting.edit', ['cpt_id' => $cpt->cpt_id]) }}">{{ $cpt->cpt_name }}</a>
-                        </td>
-                        <td>
-                            <ul class="list-group">
-                            @foreach(DynamicFactoryHandler::getDynamicFields($cpt->cpt_id) as $dyFi)
-                                <li class="list-group-item">{{ $dyFi['label'] }} ({{ $dyFi['typeName'] }})</li>
-                            @endforeach
-                            </ul>
-                            <a href="{{ route('dyFac.setting.create_extra', ['cpt_id' => $cpt->cpt_id]) }}" class="btn btn-sm btn-warning">확장 필드 관리</a>
-                        </td>
-                        <td>
-                            <ul class="list-group">
-                            @foreach($cpt->categories as $cate)
-                                <li class="list-group-item"><a href="{{ route('dyFac.setting.create_taxonomy',[ 'tax_id' => $cate->id]) }}">{{ xe_trans($cate->name) }}</a></li>
-                            @endforeach
-                            </ul>
-                            <a href="{{ route('dyFac.setting.create_taxonomy') }}" class="btn btn-sm btn-warning">카테고리 추가</a>
-                        </td>
-                    </tr>
-                    @endforeach
-                    </tbody>
-                </table>
-                <h4>다른 플러그인에서 생성한 사용자 정의 문서</h4>
-                <table class="table table-bordered">
-                    <thead>
-                    <tr>
-                        <th>글 유형</th>
-                        <th>확장 필드</th>
-                        <th>카테고리</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    @foreach($cpts_fp as $cpt)
-                        <tr>
-                            <td>
-                                <a href="{{ route('dyFac.setting.edit', ['cpt_id' => $cpt->cpt_id]) }}">{{ $cpt->cpt_name }}</a>
-                            </td>
-                            <td>
-                                <ul class="list-group">
-                                    @foreach(DynamicFactoryHandler::getDynamicFields($cpt->cpt_id) as $dyFi)
-                                        <li class="list-group-item">{{ $dyFi['label'] }} ({{ $dyFi['typeName'] }})</li>
-                                    @endforeach
-                                </ul>
-                                <a href="{{ route('dyFac.setting.create_extra', ['cpt_id' => $cpt->cpt_id]) }}" class="btn btn-sm btn-warning">확장 필드 관리</a>
-                            </td>
-                            <td>
-                                <ul class="list-group">
+        <div class="panel-group">
+            <div class="panel">
+                <div class="panel-heading">
+                    <div class="pull-left"><h4>생성된 사용자 정의 문서</h4></div>
+                    <div class="pull-right text-align--right">
+                        <div class="search-btn-group">
+                            <a href="{{ route('dyFac.setting.create') }}" class="xe-btn xe-btn-primary __xe_make_plugin"><i class="xi-file-text-o"></i> 신규 생성</a>
+                            <a href="{{ route('dyFac.setting.create_taxonomy') }}" class="xe-btn"><i class="xi-list-square"></i> 카테고리 생성</a>
+                        </div>
+                    </div>
+                </div>
+
+                <ul class="list-group list-plugin">
+                @foreach($cpts as $cpt)
+                    <li class="list-group-item">
+                        <div class="left-group">
+                            <span class="plugin-title">{{ $cpt->cpt_name }}</span>
+                            <dl>
+                                <dt class="sr-only">ID</dt>
+                                <dd title="ID">{{ $cpt->cpt_id }}</dd>
+                                <dt class="sr-only">Category</dt>
+                                <dd title="Category">
+                                @foreach($cpt->categories as $cate)
+                                    <a href="{{ route('dyFac.setting.create_taxonomy',[ 'tax_id' => $cate->id]) }}">
+                                        <span class="label label-info">{{ xe_trans($cate->name) }}</span>
+                                    </a>
+                                @endforeach
+                                </dd>
+                            </dl>
+                            <p class="ellipsis">{{ $cpt->description }}</p>
+                        </div>
+
+                        <div class="btn-right form-inline">
+                            <a href="{{ route('dyFac.setting.edit', ['cpt_id' => $cpt->cpt_id]) }}" class="xe-btn xe-btn-positive-outline">설정</a>
+                            <a href="javascript:alert('해당 기능은 준비중입니다.')" class="xe-btn xe-btn-danger-outline __xe_remove_plugin">삭제</a>
+                        </div>
+                    </li>
+                @endforeach
+                @if(count($cpts) === 0)
+                <li class="list-group-item off" style="padding:25px 20px;">생성된 문서가 없습니다.</li>
+                @endif
+                </ul>
+            </div>
+
+            <div class="panel">
+                <div class="panel-heading">
+                    <div class="pull-left"><h4>다른 플러그인에서 생성된 사용자 정의 문서</h4></div>
+                </div>
+                <ul class="list-group list-plugin">
+                @foreach($cpts_fp as $cpt)
+                    <li class="list-group-item">
+                        <div class="left-group">
+                            <span class="plugin-title">{{ $cpt->cpt_name }}</span>
+                            <dl>
+                                <dt class="sr-only">ID</dt>
+                                <dd title="ID">{{ $cpt->cpt_id }}</dd>
+                                <dt class="sr-only">Category</dt>
+                                <dd title="Category">
                                     @foreach($cpt->categories as $cate)
-                                        <li class="list-group-item"><a href="{{ route('dyFac.setting.create_taxonomy',[ 'tax_id' => $cate->id]) }}">{{ xe_trans($cate->name) }}</a></li>
+                                        <a href="{{ route('dyFac.setting.create_taxonomy',[ 'tax_id' => $cate->id]) }}">
+                                            <span class="label label-info">{{ xe_trans($cate->name) }}</span>
+                                        </a>
                                     @endforeach
-                                </ul>
-                                <a href="{{ route('dyFac.setting.create_taxonomy') }}" class="btn btn-sm btn-warning">카테고리 추가</a>
-                            </td>
-                        </tr>
-                    @endforeach
-                    </tbody>
-                </table>
+                                </dd>
+                            </dl>
+                            <p class="ellipsis">{{ $cpt->description }}</p>
+                        </div>
+                    </li>
+                @endforeach
+                @if(count($cpts_fp) === 0)
+                    <li class="list-group-item off" style="padding:25px 20px;">생성된 문서가 없습니다.</li>
+                @endif
+                </ul>
             </div>
         </div>
     </div>

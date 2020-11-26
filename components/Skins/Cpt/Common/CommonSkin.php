@@ -35,13 +35,6 @@ class CommonSkin extends GenericCptSkin
         $this->setPaginationPresenter();
         $this->setTerms();
 
-        // 스킨 view(blade)파일이나 js 에서 사용할 다국어 정의
-        XeFrontend::translation([
-            'board::selectPost',
-            'board::selectBoard',
-            'board::msgDeleteConfirm',
-        ]);
-
         // set skin path
         $this->data['_skinPath'] = static::$path;
         $this->data['isManager'] = $this->isManager();
