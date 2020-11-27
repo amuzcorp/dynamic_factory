@@ -1,6 +1,9 @@
 @section('page_title')
     <h2>카테고리 목록</h2>
+@stop
 
+@section('page_description')
+    <small>사용자 정의 문서와 연동하여 사용하는 카테고리 관리 페이지 입니다.</small>
 @endsection
 <div class="row">
     <div class="col-sm-12">
