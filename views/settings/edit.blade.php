@@ -64,7 +64,7 @@
                 <div class="panel accordion" id="accordion_ex">
                     <div class="panel-heading clearfix" id="headingOne" data-toggle="collapse" data-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
                         <div class="pull-left"><h4>레이블</h4></div>
-                        <div class="pull-right"><h4><i class="xi-angle-down"></i></h4></div>
+                        <div class="pull-right"><h4><i id="angle_icon" class="xi-angle-down"></i></h4></div>
                     </div>
                     <div id="collapseOne" class="collapse" style="overflow: hidden;">
                         <div class="panel-body">
@@ -144,3 +144,12 @@
         </form>
     </div>
 </div>
+<script type="text/javascript">
+$(document).ready(function() {
+    $('#collapseOne').on('show.bs.collapse', function () {
+        $('#angle_icon').removeClass('xi-angle-down').addClass('xi-angle-up');
+    }).on('hide.bs.collapse', function () {
+        $('#angle_icon').removeClass('xi-angle-up').addClass('xi-angle-down');
+    });
+});
+</script>
