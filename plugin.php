@@ -8,6 +8,7 @@ use Overcode\XePlugin\DynamicFactory\Handlers\DynamicFactoryTaxonomyHandler;
 use Overcode\XePlugin\DynamicFactory\Handlers\ModuleConfigHandler;
 use Overcode\XePlugin\DynamicFactory\Handlers\UrlHandler;
 use Overcode\XePlugin\DynamicFactory\Services\DynamicFactoryService;
+use Overcode\XePlugin\DynamicFactory\InstanceManager;
 use Route;
 use XeCounter;
 use XeDynamicField;

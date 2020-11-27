@@ -154,6 +154,7 @@ class CptModule extends AbstractModule
      */
     public function updateMenu($instanceId, $menuTypeParams, $itemParams)
     {
+        $menuTypeParams['instanceId'] = $instanceId;
         app('overcode.df.instance')->updateConfig($menuTypeParams);
     }
 

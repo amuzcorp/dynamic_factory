@@ -88,4 +88,15 @@ class ModuleConfigHandler
         return $this->configManager->add($this->name($params['instanceId']), $params);
     }
 
+    /**
+     * modify config
+     *
+     * @param ConfigEntity $config config entity
+     * @return ConfigEntity
+     */
+    public function modify(ConfigEntity $config)
+    {
+        return $this->configManager->modify($config);
+    }
+
 }
