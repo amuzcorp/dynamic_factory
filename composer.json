@@ -1,6 +1,6 @@
 {
   "name": "xpressengine-plugin/dynamic_factory",
-  "description": "This Package is Xpressengine Plugin - DynamicFactory plugin.",
+  "description": "사용자 정의 문서를 이용해서 다양한 유형을 만들어 보세요!",
   "keywords": [
     "xpressengine",
     "plugin"

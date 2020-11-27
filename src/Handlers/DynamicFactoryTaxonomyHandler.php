@@ -351,16 +351,37 @@ class DynamicFactoryTaxonomyHandler
         return true;
     }
 
-    /**
-     * category_id 로 item 리스트를 만들고 item 리스트에 확장 변수 fieldTypes 를 붙여서 반환
-     */
-    public function getCategoryItemFieldTypes($category_id)
+    public function getTaxFieldGroup($category_id)
     {
         $categoryExtra = $this->getCategoryExtra($category_id);
-
         $slug = $categoryExtra->slug;
-
         $group = 'tax_' . $slug;
+
+        return $group;
+    }
+
+    public function getCategoryFieldTypes($category_id)
+    {
+        $group = $this->getTaxFieldGroup($category_id);
+
+        $dynamicFieldHandler = app('xe.dynamicField');
+        $dynamicFields = $dynamicFieldHandler->gets($group);
+
+        $fieldTypes = []; // 카테고리에 선언된 확장변수 타입들
+        foreach ($dynamicFields as $key => $val) {
+            $fieldType = df($group, $key);
+            $fieldTypes[] = $fieldType;
+        }
+
+        return $fieldTypes;
+    }
+
+    /**
+     * category_id 로 item 리스트를 만들고 확장 변수 view 에 필요한 변수들을 붙여서 반환
+     */
+    public function getCategoryItemAttributes($category_id)
+    {
+        $group = $this->getTaxFieldGroup($category_id);
 
         $categoryItems = XeCategory::cates()->find($category_id)->items;
 
@@ -368,12 +389,30 @@ class DynamicFactoryTaxonomyHandler
         $dynamicFields = $dynamicFieldHandler->gets($group);
 
         foreach ($categoryItems as $item) {
-            $fieldTypes = [];
-            foreach ($dynamicFields as $dfKey => $dfVal) {
-                $fieldType = df($group, $dfKey);
-                $fieldTypes[] = $fieldType;
+            $dfs = [];
+
+            foreach ($dynamicFields as $key => $val) {
+                $fieldType = df($group, $key);
+                $tableName = $fieldType->getTableName();
+
+                foreach ($fieldType->getColumns() as $column) {
+                    $name = $key . '_' . $column->name;
+
+                    $param = [
+                        'field_id' => $key,
+                        'target_id' => $item->id,
+                        'group' => $group
+                    ];
+
+                    // target_id 로 해당 Dynamic Field Table 에서 get 한다.
+                    $die = \XeDB::table($tableName)->where($param)->first();
+                    if($die === null) {
+                        $item->{$name} = null;
+                    }else {
+                        $item->{$name} = $die->{$column->name};
+                    }
+                }
             }
-            $item->fieldTypes = $fieldTypes;
         }
 
         return $categoryItems;
