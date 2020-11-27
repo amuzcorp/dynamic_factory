@@ -351,6 +351,37 @@ class DynamicFactoryTaxonomyHandler
         return true;
     }
 
+    /**
+     * category_id 로 item 리스트를 만들고 item 리스트에 확장 변수 fieldTypes 를 붙여서 반환
+     */
+    public function getCategoryItemFieldTypes($category_id)
+    {
+        $categoryExtra = $this->getCategoryExtra($category_id);
+
+        $slug = $categoryExtra->slug;
+
+        $group = 'tax_' . $slug;
+
+        $categoryItems = XeCategory::cates()->find($category_id)->items;
+
+        $dynamicFieldHandler = app('xe.dynamicField');
+        $dynamicFields = $dynamicFieldHandler->gets($group);
+
+        foreach ($categoryItems as $item) {
+            $fieldTypes = [];
+            foreach ($dynamicFields as $dfKey => $dfVal) {
+                $fieldType = df($group, $dfKey);
+                $fieldTypes[] = $fieldType;
+            }
+            $item->fieldTypes = $fieldTypes;
+        }
+
+        return $categoryItems;
+    }
+
+    /**
+     * category_id 로 item 리스트를 만들고 확장 변수 입력폼을 붙여서 반환
+     */
     public function getCategoryDynamicField($category_id)
     {
         $categoryExtra = $this->getCategoryExtra($category_id);
