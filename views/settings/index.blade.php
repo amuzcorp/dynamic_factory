@@ -73,6 +73,10 @@
                             </dl>
                             <p class="ellipsis">{{ $cpt->description }}</p>
                         </div>
+
+                        <div class="btn-right form-inline">
+                            <a href="{{ route('dyFac.setting.edit', ['cpt_id' => $cpt->cpt_id]) }}" class="xe-btn xe-btn-positive-outline">설정</a>
+                        </div>
                     </li>
                 @endforeach
                 @if(count($cpts_fp) === 0)

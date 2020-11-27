@@ -1,5 +1,5 @@
 @section('page_title')
-    @if(!$category->id)<h2>새로운 카테고리 추가</h2>@endif
+    @if(!$category->id)<h2>카테고리 생성</h2>@endif
     @if($category->id)<h2>{{ xe_trans($category->name)}} - 카테고리 수정</h2>@endif
 @endsection
 
@@ -19,8 +19,8 @@
                 {!! csrf_field() !!}
                 <input type="hidden" name="category_id" value="{{ $category->id }}">
                 <div class="panel">
-                    <div class="panel-footer">
-                        <h4>이름 및 슬러그</h4>
+                    <div class="panel-heading">
+                        <div class="pull-left"><h4>기본 정보</h4></div>
                     </div>
                     <div class="panel-body">
                         <div class="form-group row">
@@ -47,8 +47,8 @@
                             </div>
                         </div>
                     </div>
-                    <div class="panel-footer">
-                        <h4>이 분류와 함께 사용할 유형</h4>
+                    <div class="panel-heading" style="border-top: 1px solid #E5E5E5">
+                        <div class="pull-left"><h4>이 분류와 함께 사용할 유형</h4></div>
                     </div>
                     <div class="panel-body">
                         @foreach($cpts as $cpt)

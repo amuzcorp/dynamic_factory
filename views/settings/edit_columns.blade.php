@@ -1,5 +1,5 @@
 @section('page_title')
-    <h2>[{{ $cpt['cpt_name'] }}] 출력 순서</h2>
+    <h2>{{ $cpt['cpt_name'] }} - 출력 순서</h2>
 @endsection
 
 @include('dynamic_factory::views.settings.tab')
