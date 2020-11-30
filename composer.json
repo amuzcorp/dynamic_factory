@@ -1,64 +1,69 @@
 {
-  "name": "xpressengine-plugin/dynamic_factory",
-  "description": "사용자 정의 문서를 이용해서 다양한 유형을 만들어 보세요!",
-  "keywords": [
-    "xpressengine",
-    "plugin"
-  ],
-  "license": "LGPL-3.0-or-later",
-  "version": "1.0.0",
-  "type": "xpressengine-plugin",
-  "support": {
-    "email": "overcode@amuz.co.kr"
-  },
-  "authors": [
-    {
-      "name": "OVERCODE",
-      "email": "overcode@amuz.co.kr",
-      "homepage": "http://amuz.co.kr",
-      "role": "Developer"
-    }
-  ],
-  "extra": {
-    "xpressengine": {
-      "title": "다이나믹 팩토리",
-      "component": {
-        "module/cpt@cpt": {
-          "class": "Overcode\\XePlugin\\DynamicFactory\\Components\\Modules\\CptModule",
-          "name": "CPT Document",
-          "description": "사용자 정의 문서 모듈"
-        },
-        "module/cpt@cpt/skin/cpt@default": {
-          "class": "Overcode\\XePlugin\\DynamicFactory\\Components\\Skins\\Cpt\\Common\\CommonSkin",
-          "name": "CPT 기본 스킨",
-          "description": "CPT 기본 스킨"
-        },
-        "module/cpt@cpt/settingsSkin/cpt@default": {
-          "class": "Overcode\\XePlugin\\DynamicFactory\\Components\\Skins\\Cpt\\Settings\\Common\\CommonSettingsSkin",
-          "name": "CPT 상세설정 기본 스킨",
-          "description": "CPT 상세설정 기본 스킨",
-          "screenshot" : []
-        },
-        "uiobject/df@taxo_select": {
-          "class": "Overcode\\XePlugin\\DynamicFactory\\Components\\UIObjects\\TaxoSelect\\TaxoSelectUIObject",
-          "name": "Taxonomy select UIO",
-          "description": "Taxonomy Select UIObject"
-        },
-        "uiobject/df@doc_title": {
-          "class": "Overcode\\XePlugin\\DynamicFactory\\Components\\UIObjects\\DocTitle\\DocTitleUIObject",
-          "name": "Document Title UIO",
-          "description": "Document Title UIObject"
+    "name": "xpressengine-plugin/dynamic_factory",
+    "description": "사용자 정의 문서를 이용해서 다양한 유형을 만들어 보세요!",
+    "keywords": [
+        "xpressengine",
+        "plugin"
+    ],
+    "license": "LGPL-3.0-or-later",
+    "version": "1.0.0",
+    "type": "xpressengine-plugin",
+    "support": {
+        "email": "overcode@amuz.co.kr"
+    },
+    "authors": [
+        {
+            "name": "OVERCODE",
+            "email": "overcode@amuz.co.kr",
+            "homepage": "http://amuz.co.kr",
+            "role": "Developer"
         }
-      }
+    ],
+    "extra": {
+        "xpressengine": {
+            "title": "다이나믹 팩토리",
+            "component": {
+                "module/cpt@cpt": {
+                    "class": "Overcode\\XePlugin\\DynamicFactory\\Components\\Modules\\CptModule",
+                    "name": "CPT Document",
+                    "description": "사용자 정의 문서 모듈"
+                },
+                "module/cpt@cpt/skin/cpt@default": {
+                    "class": "Overcode\\XePlugin\\DynamicFactory\\Components\\Skins\\Cpt\\Common\\CommonSkin",
+                    "name": "CPT 기본 스킨",
+                    "description": "CPT 기본 스킨"
+                },
+                "module/cpt@cpt/settingsSkin/cpt@default": {
+                    "class": "Overcode\\XePlugin\\DynamicFactory\\Components\\Skins\\Cpt\\Settings\\Common\\CommonSettingsSkin",
+                    "name": "CPT 상세설정 기본 스킨",
+                    "description": "CPT 상세설정 기본 스킨",
+                    "screenshot": []
+                },
+                "uiobject/df@taxo_select": {
+                    "class": "Overcode\\XePlugin\\DynamicFactory\\Components\\UIObjects\\TaxoSelect\\TaxoSelectUIObject",
+                    "name": "Taxonomy select UIO",
+                    "description": "Taxonomy Select UIObject"
+                },
+                "uiobject/df@doc_title": {
+                    "class": "Overcode\\XePlugin\\DynamicFactory\\Components\\UIObjects\\DocTitle\\DocTitleUIObject",
+                    "name": "Document Title UIO",
+                    "description": "Document Title UIObject"
+                },
+                "fieldType/dynamic_factory@RelateCpt": {
+                    "name": "RelateCpt fieldType",
+                    "description": "The fieldType supported by Dynamic_factory plugin.",
+                    "class": "Overcode\\XePlugin\\DynamicFactory\\Components\\DynamicFields\\RelateCpt\\RelateCptField"
+                }
+            }
+        }
+    },
+    "require": {
+        "xpressengine/xpressengine": "~3.0.12"
+    },
+    "autoload": {
+        "psr-4": {
+            "Overcode\\XePlugin\\DynamicFactory\\": "src/",
+            "Overcode\\XePlugin\\DynamicFactory\\Components\\": "components/"
+        }
     }
-  },
-  "require": {
-    "xpressengine/xpressengine": "~3.0.12"
-  },
-  "autoload": {
-    "psr-4": {
-      "Overcode\\XePlugin\\DynamicFactory\\": "src/",
-      "Overcode\\XePlugin\\DynamicFactory\\Components\\": "components/"
-    }
-  }
 }
