@@ -51,7 +51,7 @@ class RelateCptField extends AbstractType
      */
     public function getSettingsRules()
     {
-        return ['cpt_ids' => 'required'];
+        return ['cpt_ids' => 'required', 'author' => 'required'];
     }
 
     /**
