@@ -53,6 +53,11 @@
                     "name": "RelateCpt fieldType",
                     "description": "The fieldType supported by Dynamic_factory plugin.",
                     "class": "Overcode\\XePlugin\\DynamicFactory\\Components\\DynamicFields\\RelateCpt\\RelateCptField"
+                },
+                "fieldType/dynamic_factory@RelateCpt/fieldSkin/dynamic_factory@AmuzDefault": {
+                    "name": "AmuzDefault fieldSkin",
+                    "description": "The fieldSkin supported by Dynamic_factory plugin.",
+                    "class": "Overcode\\XePlugin\\DynamicFactory\\Components\\DynamicFields\\RelateCpt\\Skins\\AmuzDefault\\AmuzDefaultSkin"
                 }
             }
         }

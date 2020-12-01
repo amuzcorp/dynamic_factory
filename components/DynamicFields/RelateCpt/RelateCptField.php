@@ -19,7 +19,7 @@ class RelateCptField extends AbstractType
      */
     public function name()
     {
-        return 'RelateCpt fieldType';
+        return 'RelateCpt - 관련 사용자 문서';
     }
 
     /**
@@ -29,7 +29,7 @@ class RelateCptField extends AbstractType
      */
     public function description()
     {
-        return 'The fieldType supported by Dynamic_factory plugin.';
+        return '관련 사용자 문서들을 입력 할 수 있습니다.';
     }
 
     /**
@@ -40,7 +40,7 @@ class RelateCptField extends AbstractType
     public function getColumns()
     {
         return [
-            'column'=>new ColumnEntity('column', ColumnDataType::STRING)
+            'relate' => new ColumnEntity('relate', ColumnDataType::TEXT)
         ];
     }
 
