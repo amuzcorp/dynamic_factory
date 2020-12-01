@@ -51,7 +51,7 @@ class RelateCptField extends AbstractType
      */
     public function getSettingsRules()
     {
-        return [];
+        return ['cpt_ids' => 'required'];
     }
 
     /**
@@ -63,6 +63,12 @@ class RelateCptField extends AbstractType
      */
     public function getSettingsView(ConfigEntity $config = null)
     {
-        return view('dynamic_factory::components/DynamicFields/RelateCpt/views/setting');
+        $dfService = app('overcode.df.service');
+        $cpts = $dfService->getItemsAll();
+
+        return view('dynamic_factory::components/DynamicFields/RelateCpt/views/setting',[
+            'config' => $config,
+            'cpts' => $cpts
+        ]);
     }
 }
