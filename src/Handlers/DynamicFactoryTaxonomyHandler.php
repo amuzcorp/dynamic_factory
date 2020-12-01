@@ -65,11 +65,13 @@ class DynamicFactoryTaxonomyHandler
             $cateExtra->template = $inputs['template'];
             $cateExtra->save();
 
-            foreach ($inputs['cpts'] as $val) {
-                $cptTaxonomy = new CptTaxonomy();
-                $cptTaxonomy->cpt_id = $val;
-                $cptTaxonomy->category_id = $taxonomyItem->id;
-                $cptTaxonomy->save();
+            if(isset($inputs['cpts'])) {
+                foreach ($inputs['cpts'] as $val) {
+                    $cptTaxonomy = new CptTaxonomy();
+                    $cptTaxonomy->cpt_id = $val;
+                    $cptTaxonomy->category_id = $taxonomyItem->id;
+                    $cptTaxonomy->save();
+                }
             }
         } catch (\Exception $e) {
             \XeDB::rollback();
