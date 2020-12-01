@@ -1,6 +1,7 @@
 <?php
 namespace Overcode\XePlugin\DynamicFactory\Services;
 
+use Illuminate\Support\Collection;
 use Overcode\XePlugin\DynamicFactory\Exceptions\NotFoundDocumentException;
 use Overcode\XePlugin\DynamicFactory\Models\CptDocument;
 use Xpressengine\Config\ConfigEntity;
@@ -33,5 +34,29 @@ class CptDocService
     {
         $configHandler = app('overcode.df.configHandler');
         return (array)$configHandler->getDynamicFields($config);
+    }
+
+    /**
+     * 확장 필드 관련 CPT 목록 불러오기
+     *
+     * @param array $cpt_ids
+     * @param UserInterface|null $user
+     * @param string $author
+     * @return Collection
+     */
+    public function getItemsByCptIds(array $cpt_ids, UserInterface $user = null, $author = 'any')
+    {
+        $result_items = new Collection();
+
+        foreach($cpt_ids as $cpt_id) {
+            $query = CptDocument::division($cpt_id)->where('instance_id', $cpt_id);
+            if($author === 'author') {
+                $query = $query->where('user_id', $user->getId());
+            }
+            $items = $query->get();
+            $result_items = $result_items->merge($items);
+        }
+
+        return $result_items;
     }
 }

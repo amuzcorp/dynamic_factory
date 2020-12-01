@@ -7,6 +7,7 @@ use Overcode\XePlugin\DynamicFactory\Handlers\DynamicFactoryHandler;
 use Overcode\XePlugin\DynamicFactory\Handlers\DynamicFactoryTaxonomyHandler;
 use Overcode\XePlugin\DynamicFactory\Handlers\ModuleConfigHandler;
 use Overcode\XePlugin\DynamicFactory\Handlers\UrlHandler;
+use Overcode\XePlugin\DynamicFactory\Services\CptDocService;
 use Overcode\XePlugin\DynamicFactory\Services\DynamicFactoryService;
 use Overcode\XePlugin\DynamicFactory\InstanceManager;
 use Route;
@@ -59,6 +60,11 @@ class Plugin extends AbstractPlugin
             );
         });
         $app->alias(DynamicFactoryService::class, 'overcode.df.service');
+
+        $app->singleton(CptDocService::class , function() {
+            return new CptDocService();
+        });
+        $app->alias(CptDocService::class, 'overcode.doc.service');
 
         $app->singleton(DynamicFactoryHandler::class, function () {
             return new DynamicFactoryHandler();
