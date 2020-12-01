@@ -1,7 +1,7 @@
 {{ XeFrontend::css('plugins/dynamic_factory/assets/multiSelect2/multiSelect2.css')->load() }}
 {{ XeFrontend::js('plugins/dynamic_factory/assets/multiSelect2/multiSelect2.min.js')->appendTo('head')->load() }}
 <div>
-    <label>관련 문서 선택</label>
+    <label>{{xe_trans($config->get('label'))}}</label>
     <div class="autocomplete-select"></div>
 </div>
 <script>
@@ -18,7 +18,7 @@
 
     ];
 
-    var placeholder = "여기에서 관련 문서를 검색 및 선택하세요.";
+    var placeholder = "{{ $config->get('description') ? $config->get('description') : '여기에서 관련 문서를 검색 및 선택하세요.' }}";
 
     var autocomplete = new MultiSelect2(".autocomplete-select", {
         options: options,
