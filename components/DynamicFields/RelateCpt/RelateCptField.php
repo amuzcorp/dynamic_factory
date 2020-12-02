@@ -174,4 +174,34 @@ class RelateCptField extends AbstractType
             sprintf('dynamicField.%s.%s.after_update', $config->get('group'), $config->get('id'))
         );
     }
+
+    /**
+     * 생성된 Dynamic Field revision 테이블에 데이터 입력
+     *
+     * @param array $args parameters
+     * @return void
+     */
+    public function insertRevision(array $args)
+    {
+        if (isset($args['id']) === false) {
+            throw new Exceptions\RequiredDynamicFieldException;
+        }
+
+        $insertParam = [];
+        $insertParam['target_id'] = $args['id'];
+        $insertParam['group'] = $this->config->get('group');
+        $insertParam['field_id'] = $this->config->get('id');
+        $insertParam['revision_id'] = $args['revision_id'];
+        $insertParam['revision_no'] = $args['revision_no'];
+
+        foreach ($this->getColumns() as $column) {
+            $key = $this->config->get('id') . '_' . $column->name;
+
+            if (isset($args[$key])) {
+                $insertParam[$column->name] = json_encode($args[$key]); // 배열의 형태이기 때문에 json 으로 저장
+            }
+        }
+
+        $this->handler->connection()->table($this->getRevisionTableName())->insert($insertParam);
+    }
 }

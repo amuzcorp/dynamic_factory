@@ -115,7 +115,7 @@ class AmuzDefaultSkin extends AbstractSkin
 
         $items = []; // CptDocument 가 들어감
         foreach($cpt_ids as $cpt_id) {
-            foreach ($ids as $id) {
+            foreach ((array)$ids as $id) {
                 $item = CptDocument::division($cpt_id)->find($id);
                 if ($item !== null) {
                     $items[] = $item;
