@@ -46,8 +46,6 @@ class AmuzDefaultSkin extends AbstractSkin
      */
     public function create(array $args)
     {
-        $viewFactory = $this->handler->getViewFactory();
-
         list($data, $key) = $this->filter($args);
 
         $cpt_ids = $this->config->get('cpt_ids');
@@ -56,12 +54,47 @@ class AmuzDefaultSkin extends AbstractSkin
 
         $items = $cptDocService->getItemsByCptIds($cpt_ids, Auth::user(), $this->config->get('author'));
 
+        $viewFactory = $this->handler->getViewFactory();
         return $viewFactory->make($this->getViewPath('create'), [
             'items' => $items,
             'args' => $args,
             'config' => $this->config,
             'data' => array_merge($data, $this->mergeData),
             'key' => $key,
+        ])->render();
+    }
+
+    /**
+     * 수정 form 에 추가될 html 코드 반환
+     * return html tag string
+     *
+     * @param array $args arguments
+     * @return \Illuminate\View\View
+     */
+    public function edit(array $args)
+    {
+        list($data, $key) = $this->filter($args);
+
+        $cpt_ids = $this->config->get('cpt_ids');
+
+        $cptDocService = app('overcode.doc.service');
+
+        $items = $cptDocService->getItemsByCptIds($cpt_ids, Auth::user(), $this->config->get('author'));
+
+        $values = [];
+
+        if(isset($args[$key['ids']])){
+            $values = json_decode($args[$key['ids']]);
+        }
+
+        $viewFactory = $this->handler->getViewFactory();
+        return $viewFactory->make($this->getViewPath('edit'), [
+            'items' => $items,
+            'args' => $args,
+            'config' => $this->config,
+            'data' => array_merge($data, $this->mergeData),
+            'key' => $key,
+            'values' => $values
         ])->render();
     }
 }

@@ -40,7 +40,7 @@ class RelateCptField extends AbstractType
     public function getColumns()
     {
         return [
-            'relate' => new ColumnEntity('relate', ColumnDataType::TEXT)
+            'ids' => new ColumnEntity('ids', ColumnDataType::TEXT)
         ];
     }
 
@@ -70,5 +70,108 @@ class RelateCptField extends AbstractType
             'config' => $config,
             'cpts' => $cpts
         ]);
+    }
+
+    /**
+     * 생성된 Dynamic Field 테이블에 데이터 입력
+     *
+     * @param array $args parameters
+     * @return void
+     */
+    public function insert(array $args)
+    {
+        $config = $this->config;
+
+        if (isset($args[$config->get('joinColumnName')]) === false) {
+            throw new Exceptions\RequiredJoinColumnException;
+        }
+
+        $insertParam = [];
+        $insertParam['field_id'] = $config->get('id');
+        $insertParam['target_id'] = $args[$config->get('joinColumnName')];
+        $insertParam['group'] = $config->get('group');
+
+        foreach ($this->getColumns() as $column) {
+            $key = $config->get('id') . '_' . $column->name;
+
+            if (isset($args[$key]) == true) {
+                $insertParam[$column->name] = json_encode($args[$key]); // 배열의 형태이기 때문에 json 으로 저장
+            }
+        }
+
+        // event fire
+        $this->handler->getRegisterHandler()->fireEvent(
+            sprintf('dynamicField.%s.%s.before_insert', $config->get('group'), $config->get('id'))
+        );
+
+        if (count($insertParam) > 1) {
+            $this->handler->connection()->table($this->getTableName())->insert($insertParam);
+        }
+
+        // event fire
+        $this->handler->getRegisterHandler()->fireEvent(
+            sprintf('dynamicField.%s.%s.after_insert', $config->get('group'), $config->get('id'))
+        );
+    }
+
+    /**
+     * 생성된 Dynamic Field 테이블에 데이터 수정
+     *
+     * @param array $args   parameters
+     * @param array $wheres Illuminate\Database\Query\Builder's wheres attribute
+     * @return void
+     */
+    public function update(array $args, array $wheres)
+    {
+        $config = $this->config;
+        $type = $this->handler->getRegisterHandler()->getType($this->handler, $config->get('typeId'));
+
+        $where = $this->getWhere($wheres, $config);
+
+        if (isset($where['target_id']) === false) {
+            return null;
+        }
+
+        foreach ($args as $index => $arg) {
+            if ($arg == null) {
+                $args[$index] = '';
+            }
+        }
+
+        $updateParam = [];
+        foreach ($this->getColumns() as $column) {
+            $key = $config->get('id') . '_' . $column->name;
+
+            if (isset($args[$key])) {
+                $updateParam[$column->name] = json_encode($args[$key]); // 배열의 형태이기 때문에 json 으로 저장
+            }
+        }
+
+        // event fire
+        $this->handler->getRegisterHandler()->fireEvent(
+            sprintf('dynamicField.%s.%s.before_update', $config->get('group'), $config->get('id'))
+        );
+
+        if (count($updateParam) > 0) {
+            if ($this->handler->connection()->table($type->getTableName())
+                    ->where($where)->first() != null
+            ) {
+                $this->handler->connection()->table($type->getTableName())
+                    ->where($where)->update($updateParam);
+            } else {
+                $insertParam = $updateParam;
+                $insertParam['target_id'] = $where['target_id'];
+                $insertParam['field_id'] = $config->get('id');
+                $insertParam['group'] = $config->get('group');
+
+                $this->handler->connection()->table($type->getTableName())
+                    ->insert($insertParam);
+            }
+        }
+
+        // event fire
+        $this->handler->getRegisterHandler()->fireEvent(
+            sprintf('dynamicField.%s.%s.after_update', $config->get('group'), $config->get('id'))
+        );
     }
 }
