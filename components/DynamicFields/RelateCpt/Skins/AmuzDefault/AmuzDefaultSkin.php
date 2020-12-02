@@ -1,6 +1,7 @@
 <?php
 namespace Overcode\XePlugin\DynamicFactory\Components\DynamicFields\RelateCpt\Skins\AmuzDefault;
 
+use Overcode\XePlugin\DynamicFactory\Models\CptDocument;
 use Xpressengine\DynamicField\AbstractSkin;
 use Auth;
 
@@ -95,6 +96,40 @@ class AmuzDefaultSkin extends AbstractSkin
             'data' => array_merge($data, $this->mergeData),
             'key' => $key,
             'values' => $values
+        ])->render();
+    }
+
+    /**
+     * 조회할 때 사용 될 html 코드 반환
+     * return html tag string
+     *
+     * @param array $args arguments
+     * @return \Illuminate\View\View
+     */
+    public function show(array $args)
+    {
+        list($data, $key) = $this->filter($args);
+
+        $cpt_ids = $this->config->get('cpt_ids');
+        $ids = json_decode($data['ids']);
+
+        $items = []; // CptDocument 가 들어감
+        foreach($cpt_ids as $cpt_id) {
+            foreach ($ids as $id) {
+                $item = CptDocument::division($cpt_id)->find($id);
+                if ($item !== null) {
+                    $items[] = $item;
+                }
+            }
+        }
+
+        $viewFactory = $this->handler->getViewFactory();
+        return $viewFactory->make($this->getViewPath('show'), [
+            'args' => $args,
+            'config' => $this->config,
+            'data' => array_merge($data, $this->mergeData),
+            'key' => $key,
+            'items' => $items
         ])->render();
     }
 }

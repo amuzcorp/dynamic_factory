@@ -141,4 +141,25 @@ class CptDocument extends Document implements SeoUsable
     {
         return $this->user !== null;
     }
+
+    /**
+     * 문서 정보만으로 인스턴스 route 를 생성한다.
+     * 하나의 CPT 에서 여러개의 인스턴스를 만들어도 처음의 1개만 반환된다.
+     *
+     * @return string|null
+     */
+    public function getCptSlug($instanceId = null)
+    {
+        $configManager = app('xe.config');
+        $config = $configManager->get('module/cpt@cpt');
+        $children = $configManager->children($config);
+        foreach($children as $child){
+            if($child->get('cpt_id') === $this->instance_id) {
+                $instanceId = ($instanceId !== null) ? $instanceId : $child->get('instanceId');
+                return instance_route('slug', [$this->dfSlug->slug], $instanceId);
+            }
+        }
+
+        return null;
+    }
 }
