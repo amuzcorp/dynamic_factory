@@ -11,11 +11,15 @@ use Overcode\XePlugin\DynamicFactory\Services\CptDocService;
 use Overcode\XePlugin\DynamicFactory\Services\DynamicFactoryService;
 use Overcode\XePlugin\DynamicFactory\InstanceManager;
 use Route;
+use XeConfig;
 use XeCounter;
 use XeDynamicField;
 use XeDB;
 use XeInterception;
+use Xpressengine\Config\ConfigEntity;
+use Xpressengine\DynamicField\ColumnEntity;
 use Xpressengine\DynamicField\ConfigHandler;
+use Xpressengine\DynamicField\DynamicFieldHandler;
 use Xpressengine\Plugin\AbstractPlugin;
 
 class Plugin extends AbstractPlugin
@@ -120,6 +124,8 @@ class Plugin extends AbstractPlugin
         $this->registerSettingsMenus();
         $this->registerSettingsRoute();
         $this->registerCategoryRoute();
+
+        $this->interceptDynamicField();
     }
 
     protected function registerSitesPermissions()
@@ -320,6 +326,29 @@ class Plugin extends AbstractPlugin
     {
 
     }
+
+    protected function interceptDynamicField()
+    {
+        intercept(
+            DynamicFieldHandler::class . '@create',
+            'dynamic_factory::createDynamicField',
+            function ($func, ConfigEntity $config, ColumnEntity $column = null) {
+                $func($config, $column);
+
+                // remove prefix name of group
+                $cptId = str_replace('documents_', '', $config->get('group'));
+
+                /** @var Overcode\XePlugin\DynamicFactory\Handlers\DynamicFactoryConfigHandler $configHandler */
+                $configHandler = app('overcode.df.configHandler');
+                $cptConfig = $configHandler->getConfig($cptId);
+                if ($cptConfig !== null) {
+                    $cptConfig->set('formColumns', $configHandler->getSortFormColumns($cptConfig));
+                    XeConfig::modify($cptConfig);
+                }
+            }
+        );
+    }
+
 
     /**
      * 플러그인이 활성화될 때 실행할 코드를 여기에 작성한다.
