@@ -5,16 +5,17 @@
         <input type="hidden" name="{{ $key['ids'] }}[]" value="{{ $value }}" />
     @endforeach
 </div>
+
 <div>
     <label>{{xe_trans($config->get('label'))}}</label>
     <div class="autocomplete-select"></div>
 </div>
 <script>
     var options = [
-        @foreach($items as $item)
+        @foreach($users as $user)
         {
-            label: "{{ $item->getTitle() }}",
-            value: "{{ $item->id }}"
+            label: "{{ $user->display_name }}({{ $user->login_id }})",
+            value: "{{ $user->id }}"
         },
         @endforeach
     ];
@@ -51,6 +52,7 @@
                 console.log(value);
             },
         });
+
         @if(count($values) == 0)
         $('.multi-select__label').text(placeholder);
         @endif

@@ -20,8 +20,6 @@
     var placeholder = "{{ $config->get('description') ? $config->get('description') : '여기에서 관련 문서를 검색 및 선택하세요.' }}";
 
     $(document).ready(function() {
-        $('.multi-select__label').text(placeholder);
-
         var autocomplete = new MultiSelect2(".autocomplete-select", {
             options: options,
             value: values,
@@ -47,5 +45,7 @@
                 console.log(value);
             },
         });
+
+        $('.multi-select__label').text(placeholder);
     });
 </script>
