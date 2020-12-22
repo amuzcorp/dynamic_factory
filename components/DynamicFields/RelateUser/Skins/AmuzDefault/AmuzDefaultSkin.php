@@ -79,6 +79,9 @@ class AmuzDefaultSkin extends AbstractSkin
         if(isset($args[$key['ids']])){
             $values = json_decode($args[$key['ids']]);
         }
+        if($values === null){
+            $values = [];
+        }
 
         $viewFactory = $this->handler->getViewFactory();
         return $viewFactory->make($this->getViewPath('edit'), [
