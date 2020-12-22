@@ -29,6 +29,8 @@ class CptDocModuleController extends Controller
 
     public $config;
 
+    protected $taxonomyHandler;
+
     public function __construct(
         ModuleConfigHandler $configHandler,
         UrlHandler $urlHandler,
@@ -46,6 +48,7 @@ class CptDocModuleController extends Controller
             $urlHandler->setInstanceId($this->config->get('instanceId'));
             $urlHandler->setConfig($this->config);
         }
+        $this->taxonomyHandler = app('overcode.df.taxonomyHandler');
 
         XePresenter::setSkinTargetId(CptModule::getId());
         XePresenter::share('configHandler', $configHandler);
@@ -58,15 +61,27 @@ class CptDocModuleController extends Controller
     {
         \XeFrontend::title($this->getSiteTitle());
 
-        $dfConfig = app('overcode.df.configHandler')->getConfig($this->config->get('cpt_id'));
+        $cpt_id = $this->config->get('cpt_id');
+
+        $dfConfig = app('overcode.df.configHandler')->getConfig($cpt_id);
         $column_labels = app('overcode.df.configHandler')->getColumnLabels($dfConfig);
+
+        $taxonomies = $this->taxonomyHandler->getTaxonomies($cpt_id);
+        $categories = [];
+
+        foreach($taxonomies as $taxonomy) {
+            $categories[$taxonomy->id]['group'] = $this->taxonomyHandler->getTaxFieldGroup($taxonomy->id);
+            $categories[$taxonomy->id]['items'] = $this->taxonomyHandler->getCategoryItemAttributes($taxonomy->id);
+        }
 
         $paginate = $service->getItems($request, $this->config);
 
         return XePresenter::makeAll('index', [
             'paginate' => $paginate,
             'dfConfig' => $dfConfig,
-            'column_labels' => $column_labels
+            'column_labels' => $column_labels,
+            'taxonomies' => $taxonomies,
+            'categories' => $categories
         ]);
     }
 
