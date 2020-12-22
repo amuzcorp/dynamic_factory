@@ -213,10 +213,14 @@ class Plugin extends AbstractPlugin
 
         if($this->cpts_from_plugin) {
             foreach ($this->cpts_from_plugin as $val) {
+                $display = true;
+                if(isset($val['display'])) {
+                    $display = $val['display'];
+                }
                 \XeRegister::push('settings/menu', $val['menu_path'] . $val['cpt_id'], [
                     'title' => $val['menu_name'],
                     'description' => $val['description'],
-                    'display' => true,
+                    'display' => $display,
                     'ordering' => $val['menu_order']
                 ]);
             }
