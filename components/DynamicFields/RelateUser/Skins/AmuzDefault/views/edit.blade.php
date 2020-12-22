@@ -1,6 +1,7 @@
 {{ XeFrontend::css('plugins/dynamic_factory/assets/multiSelect2/multiSelect2.css')->load() }}
 {{ XeFrontend::js('plugins/dynamic_factory/assets/multiSelect2/multiSelect2.min.js')->appendTo('head')->load() }}
-<div id="relate_hidden_data">
+
+<div id="hidden_data_{{ $key['ids'] }}">
     @foreach($values as $value)
         <input type="hidden" name="{{ $key['ids'] }}[]" value="{{ $value }}" />
     @endforeach
@@ -8,10 +9,10 @@
 
 <div>
     <label>{{xe_trans($config->get('label'))}}</label>
-    <div class="autocomplete-select"></div>
+    <div id="autocomplete_{{ $key['ids'] }}"></div>
 </div>
 <script>
-    var options = [
+    var options_{{ $key['ids'] }} = [
         @foreach($users as $user)
         {
             label: "{{ $user->display_name }}({{ $user->login_id }})",
@@ -20,25 +21,25 @@
         @endforeach
     ];
 
-    var values = [
+    var values_{{ $key['ids'] }} = [
         @foreach($values as $value) "{{ $value }}", @endforeach
     ];
 
-    var placeholder = "{{ $config->get('description') ? $config->get('description') : '여기에서 관련 문서를 검색 및 선택하세요.' }}";
+    var placeholder_{{ $key['ids'] }} = "{{ $config->get('placeholder') ? xe_trans($config->get('placeholder')) : '여기에서 관련 사용자를 검색 및 선택하세요.' }}";
 
     $(document).ready(function() {
-        var autocomplete = new MultiSelect2(".autocomplete-select", {
-            options: options,
-            value: values,
+        new MultiSelect2("#autocomplete_{{ $key['ids'] }}", {
+            options: options_{{ $key['ids'] }},
+            value: values_{{ $key['ids'] }},
             multiple: true,
             autocomplete: true,
             icon: "xi-close",
             onChange: value => {
-                var hidden_div = document.getElementById("relate_hidden_data");
+                var hidden_div = document.getElementById("hidden_data_{{ $key['ids'] }}");
                 hidden_div.innerHTML = "";
 
                 if(value.length === 0) {
-                    $('.multi-select__label').text(placeholder);
+                    $('#autocomplete_{{ $key['ids'] }} .multi-select__label').text(placeholder_{{ $key['ids'] }});
                 }else{
                     for(var i = 0; i < value.length ; i++) {
                         var inputTag = document.createElement("input");
@@ -49,12 +50,12 @@
                         hidden_div.appendChild(inputTag);
                     }
                 }
-                console.log(value);
+                //console.log(value);
             },
         });
 
         @if(count($values) == 0)
-        $('.multi-select__label').text(placeholder);
+        $('#autocomplete_{{ $key['ids'] }} .multi-select__label').text(placeholder_{{ $key['ids'] }});
         @endif
     });
 </script>
