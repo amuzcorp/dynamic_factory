@@ -28,15 +28,15 @@
 
     var placeholder_{{ $key['ids'] }} = "{{ $config->get('placeholder') ? xe_trans($config->get('placeholder')) : '여기에서 관련 문서를 검색 및 선택하세요.' }}";
 
-    var hidden_div = document.getElementById("hidden_data_{{ $key['ids'] }}");
+    var hidden_div_{{ $key['ids'] }} = document.getElementById("hidden_data_{{ $key['ids'] }}");
 
-    var addInputTag = function(value) {
+    var addInputTag_{{ $key['ids'] }} = function(value) {
         var inputTag = document.createElement("input");
         inputTag.setAttribute("type", "hidden");
         inputTag.setAttribute("name", "{{ $key['ids'] }}[]");
         inputTag.setAttribute("value", value);
 
-        hidden_div.appendChild(inputTag);
+        hidden_div_{{ $key['ids'] }}.appendChild(inputTag);
     };
 
     $(document).ready(function() {
@@ -47,15 +47,15 @@
             autocomplete: true,
             icon: "xi-close",
             onChange: value => {
-                hidden_div.innerHTML = "";
+                hidden_div_{{ $key['ids'] }}.innerHTML = "";
 
                 if(value.length === 0) {
                     $('#autocomplete_{{ $key['ids'] }} .multi-select__label').text(placeholder_{{ $key['ids'] }});
-                    addInputTag("");
+                    addInputTag_{{ $key['ids'] }}("");
                 }else{
                     for(var i = 0; i < value.length ; i++) {
                         if(value[i]) {
-                            addInputTag(value[i]);
+                            addInputTag_{{ $key['ids'] }}(value[i]);
                         }
                     }
                 }
