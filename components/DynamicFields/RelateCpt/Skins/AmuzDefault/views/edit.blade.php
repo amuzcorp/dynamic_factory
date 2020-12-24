@@ -21,10 +21,23 @@
     ];
 
     var values_{{ $key['ids'] }} = [
-        @foreach($values as $value) "{{ $value }}", @endforeach
+        @foreach($values as $value)
+            @if(!empty($value)) "{{ $value }}", @endif
+        @endforeach
     ];
 
     var placeholder_{{ $key['ids'] }} = "{{ $config->get('placeholder') ? xe_trans($config->get('placeholder')) : '여기에서 관련 문서를 검색 및 선택하세요.' }}";
+
+    var hidden_div = document.getElementById("hidden_data_{{ $key['ids'] }}");
+
+    var addInputTag = function(value) {
+        var inputTag = document.createElement("input");
+        inputTag.setAttribute("type", "hidden");
+        inputTag.setAttribute("name", "{{ $key['ids'] }}[]");
+        inputTag.setAttribute("value", value);
+
+        hidden_div.appendChild(inputTag);
+    };
 
     $(document).ready(function() {
         new MultiSelect2("#autocomplete_{{ $key['ids'] }}", {
@@ -34,19 +47,16 @@
             autocomplete: true,
             icon: "xi-close",
             onChange: value => {
-                var hidden_div = document.getElementById("hidden_data_{{ $key['ids'] }}");
                 hidden_div.innerHTML = "";
 
                 if(value.length === 0) {
                     $('#autocomplete_{{ $key['ids'] }} .multi-select__label').text(placeholder_{{ $key['ids'] }});
+                    addInputTag("");
                 }else{
                     for(var i = 0; i < value.length ; i++) {
-                        var inputTag = document.createElement("input");
-                        inputTag.setAttribute("type", "hidden");
-                        inputTag.setAttribute("name", "{{ $key['ids'] }}[]");
-                        inputTag.setAttribute("value", value[i]);
-
-                        hidden_div.appendChild(inputTag);
+                        if(value[i]) {
+                            addInputTag(value[i]);
+                        }
                     }
                 }
                 //console.log(value);
