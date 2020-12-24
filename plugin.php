@@ -66,7 +66,9 @@ class Plugin extends AbstractPlugin
         $app->alias(DynamicFactoryService::class, 'overcode.df.service');
 
         $app->singleton(CptDocService::class , function() {
-            return new CptDocService();
+            return new CptDocService(
+                app('overcode.df.documentHandler')
+            );
         });
         $app->alias(CptDocService::class, 'overcode.doc.service');
 

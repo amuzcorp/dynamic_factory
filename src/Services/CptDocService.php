@@ -3,6 +3,7 @@ namespace Overcode\XePlugin\DynamicFactory\Services;
 
 use Illuminate\Support\Collection;
 use Overcode\XePlugin\DynamicFactory\Exceptions\NotFoundDocumentException;
+use Overcode\XePlugin\DynamicFactory\Handlers\DynamicFactoryDocumentHandler;
 use Overcode\XePlugin\DynamicFactory\Models\CptDocument;
 use Xpressengine\Config\ConfigEntity;
 use Xpressengine\Http\Request;
@@ -10,12 +11,22 @@ use Xpressengine\User\UserInterface;
 
 class CptDocService
 {
+    protected $handler;
+
+    public function __construct(DynamicFactoryDocumentHandler $documentHandler)
+    {
+        $this->handler = $documentHandler;
+    }
+
     public function getItems(Request $request, ConfigEntity $config, $id = null)
     {
         $model = CptDocument::division($config->get('cpt_id'));
         $query = $model->where('instance_id', $config->get('cpt_id'));
 
+        $this->handler->makeWhere($query, $request, $config);
+
         $paginate = $query->paginate(10)->appends($request->except('page'));
+
         return $paginate;
     }
 
