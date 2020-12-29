@@ -8,10 +8,7 @@ use Xpressengine\Category\Models\CategoryItem;
 use Xpressengine\Config\ConfigEntity;
 use Xpressengine\Counter\Counter;
 use Xpressengine\Database\Eloquent\Builder;
-use Xpressengine\Database\VirtualConnectionInterface as VirtualConnection;
-use Xpressengine\Document\ConfigHandler;
 use Xpressengine\Document\DocumentHandler;
-use Xpressengine\Document\InstanceManager;
 use Xpressengine\Storage\Storage;
 use Xpressengine\User\UserInterface;
 
@@ -107,6 +104,36 @@ class DynamicFactoryDocumentHandler
 
         if ($request->get('user_id') !== null && $request->get('user_id') !== '') {
             $query = $query->where('user_id', $request->get('user_id'));
+        }
+
+        $category_items = [];
+
+        $data = $request->except('_token');
+        foreach($data as $id => $value){
+            if(strpos($id, 'taxo_', 0) === 0) {
+                foreach($value as $val) {
+                    if(isset($val)) {
+                        $category_items[] = $val;
+                    }
+                }
+            }
+        }
+
+        if(count($category_items) > 0) {
+            $query->leftJoin(
+                'df_taxonomy',
+                sprintf('%s.%s', $query->getQuery()->from, 'id'),
+                '=',
+                sprintf('%s.%s', 'df_taxonomy', 'target_id')
+            );
+        }
+
+        foreach($category_items as $item_id) {
+            $categoryItem = CategoryItem::find($data);
+            if ($categoryItem !== null) {
+                $query = $query->where('df_taxonomy.item_ids', 'like', '%"'. $item_id .'"%');
+            }
+
         }
 
         if ($request->get('category_item_id') !== null && $request->get('category_item_id') !== '') {
