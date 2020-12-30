@@ -74,6 +74,15 @@
                         </tbody>
                     </table>
                 </div>
+                @if ($cptDocs->count() > 0)
+                    <div class="panel-footer">
+                        <div class="text-center" style="padding: 24px 0;">
+                            <nav>
+                                {!! $cptDocs->render() !!}
+                            </nav>
+                        </div>
+                    </div>
+                @endif
             </div>
         </div>
     </div>
