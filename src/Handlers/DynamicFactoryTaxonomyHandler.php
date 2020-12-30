@@ -271,7 +271,7 @@ class DynamicFactoryTaxonomyHandler
             $dfTaxonomy = $document->taxonomy()->where('category_id', $taxonomy->id)->get()->first();
 
             $taxonomyItemId = $inputs[$taxonomyAttributeName];
-            if ($taxonomyItemId === null || $taxonomyItemId === '') {
+            if ($taxonomyItemId === null || $taxonomyItemId === '' || (!empty($taxonomyItemId) && $taxonomyItemId[0] === '')) {
                 if ($dfTaxonomy !== null) {
                     $dfTaxonomy->delete();
                     continue;

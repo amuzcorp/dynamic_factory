@@ -91,9 +91,12 @@ class TaxoSelectUIObject extends AbstractUIObject
 
         $blade = 'taxoSelect';  // blade file name
 
-        if($args['template'] === 'multi_select') $blade = 'taxoMultiSelect';
-        else if($args['template'] === 'check_list') $blade = 'taxoCheckList';
-        else if($args['template'] === 'hierarchy') $blade = 'taxoHierarchy';
+        // 멀티 select 일때
+        if($args['template'] === 'multi_select') {
+            $blade = 'taxoMultiSelect';
+
+
+        }
 
         return View::make('dynamic_factory::components/UIObjects/TaxoSelect/'. $blade, $args)->render();
     }
@@ -106,7 +109,7 @@ class TaxoSelectUIObject extends AbstractUIObject
      */
     private static function getSelectedItem ($items, $selectedValue, $template)
     {
-        if($template === 'multi_select' || $template === 'check_list') {
+        if($template === 'multi_select') {
             // 멀티 선택일때
             $selectItems = [];
 
