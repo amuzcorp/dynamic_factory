@@ -39,10 +39,8 @@
                             <label class="col-sm-2 col-form-label">템플릿</label>
                             <div class="col-sm-10">
                                 <select class="form-control" name="template">
-                                    <option value="select" @if($cpt_cate_extra->template === 'select') selected="selected" @endif>Select</option>
+                                    <option value="select" @if($cpt_cate_extra->template === 'select') selected="selected" @endif>Single Select</option>
                                     <option value="multi_select" @if($cpt_cate_extra->template === 'multi_select') selected="selected" @endif>Multi Select</option>
-{{--                                    <option value="hierarchy" @if($cpt_cate_extra->template === 'hierarchy') selected="selected" @endif>Hierarchy</option>--}}
-                                    <option value="check_list" @if($cpt_cate_extra->template === 'check_list') selected="selected" @endif>Check List</option>
                                 </select>
                             </div>
                         </div>
