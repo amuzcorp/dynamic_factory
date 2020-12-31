@@ -5,8 +5,9 @@ use Overcode\XePlugin\DynamicFactory\Handlers\DynamicFactoryConfigHandler;
 use Overcode\XePlugin\DynamicFactory\Handlers\DynamicFactoryDocumentHandler;
 use Overcode\XePlugin\DynamicFactory\Handlers\DynamicFactoryHandler;
 use Overcode\XePlugin\DynamicFactory\Handlers\DynamicFactoryTaxonomyHandler;
-use Overcode\XePlugin\DynamicFactory\Handlers\ModuleConfigHandler;
-use Overcode\XePlugin\DynamicFactory\Handlers\UrlHandler;
+use Overcode\XePlugin\DynamicFactory\Handlers\CptModuleConfigHandler;
+use Overcode\XePlugin\DynamicFactory\Handlers\CptUrlHandler;
+use Overcode\XePlugin\DynamicFactory\Handlers\TaxoModuleConfigHandler;
 use Overcode\XePlugin\DynamicFactory\Services\CptDocService;
 use Overcode\XePlugin\DynamicFactory\Services\DynamicFactoryService;
 use Overcode\XePlugin\DynamicFactory\InstanceManager;
@@ -33,6 +34,8 @@ class Plugin extends AbstractPlugin
     public function register()
     {
         $app = app();
+
+        // DynamicFactoryDocumentHandler
         $app->singleton(DynamicFactoryDocumentHandler::class, function() {
             $proxyHandler = XeInterception::proxy(DynamicFactoryDocumentHandler::class);
 
@@ -50,6 +53,7 @@ class Plugin extends AbstractPlugin
         });
         $app->alias(DynamicFactoryDocumentHandler::class, 'overcode.df.documentHandler');
 
+        // DynamicFactoryService
         $app->singleton(DynamicFactoryService::class, function () {
             $dynamicFactoryHandler = app('overcode.df.handler');
             $dynamicFactoryConfigHandler = app('overcode.df.configHandler');
@@ -65,6 +69,7 @@ class Plugin extends AbstractPlugin
         });
         $app->alias(DynamicFactoryService::class, 'overcode.df.service');
 
+        //CptDocService
         $app->singleton(CptDocService::class , function() {
             return new CptDocService(
                 app('overcode.df.documentHandler')
@@ -72,11 +77,13 @@ class Plugin extends AbstractPlugin
         });
         $app->alias(CptDocService::class, 'overcode.doc.service');
 
+        // DynamicFactoryHandler
         $app->singleton(DynamicFactoryHandler::class, function () {
             return new DynamicFactoryHandler();
         });
         $app->alias(DynamicFactoryHandler::class, 'overcode.df.handler');
 
+        // DynamicFactoryConfigHandler
         $app->singleton(DynamicFactoryConfigHandler::class, function () {
             return new DynamicFactoryConfigHandler(
                 app('xe.config'),
@@ -85,27 +92,40 @@ class Plugin extends AbstractPlugin
         });
         $app->alias(DynamicFactoryConfigHandler::class, 'overcode.df.configHandler');
 
-        $app->singleton(UrlHandler::class, function ($app) {
-            return new UrlHandler();
+        // CptUrlHandler
+        $app->singleton(CptUrlHandler::class, function ($app) {
+            return new CptUrlHandler();
         });
-        $app->alias(UrlHandler::class, 'overcode.df.url');
+        $app->alias(CptUrlHandler::class, 'overcode.df.url');
 
+        // DynamicFactoryTaxonomyHandler
         $app->singleton(DynamicFactoryTaxonomyHandler::class, function() {
             return new DynamicFactoryTaxonomyHandler();
         });
         $app->alias(DynamicFactoryTaxonomyHandler::class, 'overcode.df.taxonomyHandler');
 
-        $app->singleton(ModuleConfigHandler::class, function () {
-            return new ModuleConfigHandler(
+        // CptModuleConfigHandler
+        $app->singleton(CptModuleConfigHandler::class, function () {
+            return new CptModuleConfigHandler(
                 app('xe.config')
             );
         });
-        $app->alias(ModuleConfigHandler::class, 'overcode.df.moduleConfigHandler');
+        $app->alias(CptModuleConfigHandler::class, 'overcode.df.cptModuleConfigHandler');
 
+        // TaxoModuleConfigHandler
+        $app->singleton(TaxoModuleConfigHandler::class, function () {
+            return new TaxoModuleConfigHandler(
+                app('xe.config')
+            );
+        });
+        $app->alias(TaxoModuleConfigHandler::class, 'overcode.df.taxoModuleConfigHandler');
+
+        // InstanceManager
         $app->singleton(InstanceManager::class, function ($app) {
             return new InstanceManager(
                 XeDB::connection(),
-                app('overcode.df.moduleConfigHandler')
+                app('overcode.df.cptModuleConfigHandler'),
+                app('overcode.df.taxoModuleConfigHandler')
             );
         });
         $app->alias(InstanceManager::class, 'overcode.df.instance');
@@ -384,8 +404,8 @@ class Plugin extends AbstractPlugin
         $configHandler = app('overcode.df.configHandler');
         $configHandler->storeDfConfig();
 
-        $moduleConfigHandler = app('overcode.df.moduleConfigHandler');
-        $moduleConfigHandler->getDefault();
+        $cptModuleConfigHandler = app('overcode.df.cptModuleConfigHandler');
+        $cptModuleConfigHandler->getDefault();
     }
 
     /**

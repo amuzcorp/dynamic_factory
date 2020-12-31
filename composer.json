@@ -33,6 +33,11 @@
                     "name": "CPT 기본 스킨",
                     "description": "CPT 기본 스킨"
                 },
+                "module/taxo@taxo": {
+                  "class": "Overcode\\XePlugin\\DynamicFactory\\Components\\Modules\\Taxonomy\\TaxonomyModule",
+                  "name": "Taxonomy Archive",
+                  "description": "텍소노미 아카이브"
+                },
                 "module/cpt@cpt/settingsSkin/cpt@default": {
                     "class": "Overcode\\XePlugin\\DynamicFactory\\Components\\Skins\\Cpt\\Settings\\Common\\CommonSettingsSkin",
                     "name": "CPT 상세설정 기본 스킨",

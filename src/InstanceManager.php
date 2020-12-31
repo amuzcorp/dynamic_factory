@@ -5,7 +5,8 @@ namespace Overcode\XePlugin\DynamicFactory;
 use Overcode\XePlugin\DynamicFactory\Exceptions\AlreadyExistsInstanceException;
 use Overcode\XePlugin\DynamicFactory\Exceptions\InvalidConfigException;
 use Overcode\XePlugin\DynamicFactory\Exceptions\RequireCptIdException;
-use Overcode\XePlugin\DynamicFactory\Handlers\ModuleConfigHandler;
+use Overcode\XePlugin\DynamicFactory\Handlers\CptModuleConfigHandler;
+use Overcode\XePlugin\DynamicFactory\Handlers\TaxoModuleConfigHandler;
 use Xpressengine\Database\VirtualConnection;
 
 /**
@@ -22,17 +23,24 @@ class InstanceManager
     protected $conn;
 
     /**
-     * @var ConfigHandler
+     * @var CptModuleConfigHandler
      */
-    protected $configHandler;
+    protected $cptConfigHandler;
+
+    /**
+     * @var TaxoModuleConfigHandler
+     */
+    protected $taxoConfigHandler;
 
     public function __construct(
         VirtualConnection $conn,
-        ModuleConfigHandler $configHandler
+        CptModuleConfigHandler $cptConfigHandler,
+        TaxoModuleConfigHandler $taxoConfigHandler
     )
     {
         $this->conn = $conn;
-        $this->configHandler = $configHandler;
+        $this->cptConfigHandler = $cptConfigHandler;
+        $this->taxoConfigHandler = $taxoConfigHandler;
     }
 
     public function createCpt(array $params)
@@ -41,27 +49,27 @@ class InstanceManager
             throw new RequireCptIdException;
         }
 
-        $config = $this->configHandler->get($params['instanceId']);
+        $config = $this->cptConfigHandler->get($params['instanceId']);
         if ($config !== null) {
             throw new AlreadyExistsInstanceException;
         }
 
         $this->conn->beginTransaction();
 
-        $config = $this->configHandler->add($params);
+        $config = $this->cptConfigHandler->add($params);
 
         $this->conn->commit();
 
         return $config;
     }
 
-    public function updateConfig(array $params)
+    public function updateCptConfig(array $params)
     {
         if (empty($params['cpt_id']) === true) {
             throw new RequireCptIdException;
         }
 
-        $config = $this->configHandler->get($params['instanceId']);
+        $config = $this->cptConfigHandler->get($params['instanceId']);
         if ($config === null) {
             throw new InvalidConfigException;
         }
@@ -71,7 +79,7 @@ class InstanceManager
 
         $this->conn->beginTransaction();
 
-        $config = $this->configHandler->modify($config);
+        $config = $this->cptConfigHandler->modify($config);
 
         $this->conn->commit();
 

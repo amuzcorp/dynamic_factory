@@ -12,16 +12,16 @@ use Auth;
 use XeFrontend;
 use XePresenter;
 use App\Http\Controllers\Controller;
-use Overcode\XePlugin\DynamicFactory\Handlers\ModuleConfigHandler;
-use Overcode\XePlugin\DynamicFactory\Handlers\UrlHandler;
+use Overcode\XePlugin\DynamicFactory\Handlers\CptModuleConfigHandler;
+use Overcode\XePlugin\DynamicFactory\Handlers\CptUrlHandler;
 use Xpressengine\Http\Request;
 use Xpressengine\Routing\InstanceConfig;
 
-class CptDocModuleController extends Controller
+class CptModuleController extends Controller
 {
     protected $instanceId;
 
-    public $urlHandler;
+    public $cptUrlHandler;
 
     public $configHandler;
 
@@ -32,8 +32,8 @@ class CptDocModuleController extends Controller
     protected $taxonomyHandler;
 
     public function __construct(
-        ModuleConfigHandler $configHandler,
-        UrlHandler $urlHandler,
+        CptModuleConfigHandler $configHandler,
+        CptUrlHandler $cptUrlHandler,
         DynamicFactoryDocumentHandler $dfDocHandler
     )
     {
@@ -41,18 +41,18 @@ class CptDocModuleController extends Controller
         $this->instanceId = $instanceConfig->getInstanceId();
 
         $this->configHandler = $configHandler;
-        $this->urlHandler = $urlHandler;
+        $this->cptUrlHandler = $cptUrlHandler;
         $this->dfDocHandler = $dfDocHandler;
         $this->config = $configHandler->get($this->instanceId);
         if ($this->config !== null) {
-            $urlHandler->setInstanceId($this->config->get('instanceId'));
-            $urlHandler->setConfig($this->config);
+            $cptUrlHandler->setInstanceId($this->config->get('instanceId'));
+            $cptUrlHandler->setConfig($this->config);
         }
         $this->taxonomyHandler = app('overcode.df.taxonomyHandler');
 
         XePresenter::setSkinTargetId(CptModule::getId());
         XePresenter::share('configHandler', $configHandler);
-        XePresenter::share('urlHandler', $urlHandler);
+        XePresenter::share('cptUrlHandler', $cptUrlHandler);
         XePresenter::share('instanceId', $this->instanceId);
         XePresenter::share('config', $this->config);
     }

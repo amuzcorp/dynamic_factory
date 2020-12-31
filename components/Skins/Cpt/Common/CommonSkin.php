@@ -101,7 +101,7 @@ class CommonSkin extends GenericCptSkin
     protected function setPaginationPresenter()
     {
         if (isset($this->data['paginate'])) {
-            $this->data['paginate']->setPath($this->data['urlHandler']->get('index'));
+            $this->data['paginate']->setPath($this->data['cptUrlHandler']->get('index'));
         }
     }
 

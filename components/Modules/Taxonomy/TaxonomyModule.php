@@ -1,14 +1,13 @@
 <?php
 
-namespace Overcode\XePlugin\DynamicFactory\Components\Modules\Cpt;
+namespace Overcode\XePlugin\DynamicFactory\Components\Modules\Taxonomy;
 
-use Overcode\XePlugin\DynamicFactory\Models\DfSlug;
 use Route;
 use XeSkin;
 use View;
 use Xpressengine\Menu\AbstractModule;
 
-class CptModule extends AbstractModule
+class TaxonomyModule extends AbstractModule
 {
     /**
      * boot
@@ -30,12 +29,12 @@ class CptModule extends AbstractModule
     {
         Route::settings(self::getId(), function () {
             // module
-            Route::get('config/{instanceId}', ['as' => 'settings.cpt.cpt.config', 'uses' => 'CptModuleSettingController@editConfig']);
+            Route::get('config/{instanceId}', ['as' => 'settings.taxo.taxo.config', 'uses' => 'TaxoModuleSettingController@editConfig']);
             Route::post(
                 'config/update/{instanceId}',
-                ['as' => 'settings.cpt.cpt.config.update', 'uses' => 'CptModuleSettingController@updateConfig']
+                ['as' => 'settings.taxo.taxo.config.update', 'uses' => 'TaxoModuleSettingController@updateConfig']
             );
-            Route::get('skin/edit/{instanceId}', ['as' => 'settings.cpt.cpt.skin', 'uses' => 'CptModuleSettingController@editSkin']);
+            Route::get('skin/edit/{instanceId}', ['as' => 'settings.taxo.taxo.skin', 'uses' => 'TaxoModuleSettingController@editSkin']);
         }, ['namespace' => 'Overcode\XePlugin\DynamicFactory\Controllers']);
     }
 
@@ -47,17 +46,17 @@ class CptModule extends AbstractModule
     protected static function registerInstanceRoute()
     {
         Route::instance(self::getId(), function () {
-            Route::get('/', ['as' => 'index', 'uses' => 'CptModuleController@index']);
-            Route::get('/show/{id}', ['as' => 'show', 'uses' => 'CptModuleController@showByItemId']);
+            Route::get('/', ['as' => 'index', 'uses' => 'TaxoModuleController@index']);
+            Route::get('/show/{id}', ['as' => 'show', 'uses' => 'TaxoModuleController@showByItemId']);
 
-            Route::get('/{slug}', ['as' => 'slug', 'uses' => 'CptModuleController@slug']);
+            Route::get('/{slug}', ['as' => 'slug', 'uses' => 'TaxoModuleController@slug']);
         }, ['namespace' => 'Overcode\XePlugin\DynamicFactory\Controllers']);
 
-        DfSlug::setReserved([
+        /*DfSlug::setReserved([
             'index', 'create', 'edit', 'destroy', 'show', 'identify', 'revision', 'store', 'preview', 'temporary',
             'trash', 'certify', 'update', 'vote', 'manageMenus', 'comment', 'file', 'suggestion', 'slug', 'hasSlug',
             'favorite'
-        ]);
+        ]);*/
     }
 
     /**
@@ -68,12 +67,13 @@ class CptModule extends AbstractModule
     {
         $skins = XeSkin::getList('module/cpt@cpt');
 
-        $dfService = app('overcode.df.service');
-        $cpts = $dfService->getItemsAll();
+        // 카테고리 리스트
+        $taxonomyHandler = app('overcode.df.taxonomyHandler');
+        $categoryExtras = $taxonomyHandler->getCategoryExtras();
 
-        return View::make('dynamic_factory::components/Modules/Cpt/views/create', [
+        return View::make('dynamic_factory::components/Modules/Taxonomy/views/create', [
             'skins' => $skins,
-            'cpts' => $cpts
+            'categoryExtras' => $categoryExtras
         ])->render();
     }
 
@@ -90,11 +90,7 @@ class CptModule extends AbstractModule
      */
     public function storeMenu($instanceId, $menuTypeParams, $itemParams)
     {
-
-        $input = $menuTypeParams;
-        $input['instanceId'] = $instanceId;
-
-        app('overcode.df.instance')->createCpt($input);
+        // TODO: Implement storeMenu() method.
     }
 
     /**
@@ -106,17 +102,7 @@ class CptModule extends AbstractModule
      */
     public function editMenuForm($instanceId)
     {
-        $skins = XeSkin::getList(self::getId());
-
-        $dfService = app('overcode.df.service');
-        $cpts = $dfService->getItemsAll();
-
-        return View::make('dynamic_factory::components/Modules/Cpt/views/edit', [
-            'instanceId' => $instanceId,
-            'config' => app('overcode.df.cptModuleConfigHandler')->get($instanceId),
-            'skins' => $skins,
-            'cpts' => $cpts
-        ])->render();
+        // TODO: Implement editMenuForm() method.
     }
 
     /**
@@ -132,8 +118,7 @@ class CptModule extends AbstractModule
      */
     public function updateMenu($instanceId, $menuTypeParams, $itemParams)
     {
-        $menuTypeParams['instanceId'] = $instanceId;
-        app('overcode.df.instance')->updateCptConfig($menuTypeParams);
+        // TODO: Implement updateMenu() method.
     }
 
     /**
@@ -169,8 +154,7 @@ class CptModule extends AbstractModule
      */
     public static function getInstanceSettingURI($instanceId)
     {
-//        return route('settings.cpt.cpt.config', $instanceId);
-        return route('settings.cpt.cpt.skin', $instanceId);
+        return route('settings.taxo.taxo.skin', $instanceId);
     }
 
     /**

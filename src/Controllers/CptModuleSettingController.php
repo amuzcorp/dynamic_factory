@@ -5,18 +5,18 @@ namespace Overcode\XePlugin\DynamicFactory\Controllers;
 use App\Http\Controllers\Controller;
 use App\Http\Sections\SkinSection;
 use Overcode\XePlugin\DynamicFactory\Components\Modules\Cpt\CptModule;
-use Overcode\XePlugin\DynamicFactory\Handlers\ModuleConfigHandler;
-use Overcode\XePlugin\DynamicFactory\Handlers\UrlHandler;
+use Overcode\XePlugin\DynamicFactory\Handlers\CptModuleConfigHandler;
+use Overcode\XePlugin\DynamicFactory\Handlers\CptUrlHandler;
 use Xpressengine\Captcha\CaptchaManager;
 
-class CptDocSettingController extends Controller
+class CptModuleSettingController extends Controller
 {
     /**
-     * @var ModuleConfigHandler
+     * @var CptModuleConfigHandler
      */
     protected $configHandler;
 
-    protected $urlHandler;
+    protected $cptUrlHandler;
 
     /**
      * @var \Xpressengine\Presenter\Presenter
@@ -24,16 +24,16 @@ class CptDocSettingController extends Controller
     protected $presenter;
 
     public function __construct(
-        ModuleConfigHandler $configHandler,
-        UrlHandler $urlHandler
+        CptModuleConfigHandler $configHandler,
+        CptUrlHandler $cptUrlHandler
     )
     {
         $this->configHandler = $configHandler;
-        $this->urlHandler = $urlHandler;
+        $this->cptUrlHandler = $cptUrlHandler;
 
         $this->presenter = app('xe.presenter');
         $this->presenter->setSettingsSkinTargetId(CptModule::getId());
-        $this->presenter->share('urlHandler', $this->urlHandler);
+        $this->presenter->share('cptUrlHandler', $this->cptUrlHandler);
     }
 
     public function editConfig(CaptchaManager $captcha, $instanceId)

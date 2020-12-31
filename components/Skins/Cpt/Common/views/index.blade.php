@@ -34,7 +34,7 @@
             @foreach($dfConfig['listColumns'] as $columnName)
                 @if ($columnName == 'title')
                     <td class="title column-{{$columnName}} xe-hidden-xs">
-                        <a href="{{ $urlHandler->getShow($item, Request::all()) }}" id="title_{{$item->id}}" class="title_text">{!! $item->title !!}</a>
+                        <a href="{{ $cptUrlHandler->getShow($item, Request::all()) }}" id="title_{{$item->id}}" class="title_text">{!! $item->title !!}</a>
                     </td>
                 @elseif ($columnName == 'writer')
                     <td class="author xe-hidden-xs">
@@ -59,7 +59,7 @@
             @endforeach
                 {{--모바일 사이즈 게시물 list--}}
                 <td class="xe-visible-xs title column-title">
-                    <a href="{{ $urlHandler->getShow($item, Request::all()) }}" id="title_{{$item->id}}" class="title_text">{!! $item->title !!}</a>
+                    <a href="{{ $cptUrlHandler->getShow($item, Request::all()) }}" id="title_{{$item->id}}" class="title_text">{!! $item->title !!}</a>
                 </td>
             </tr>
         @endforeach

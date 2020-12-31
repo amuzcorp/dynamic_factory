@@ -1,10 +1,11 @@
 <?php
+
 namespace Overcode\XePlugin\DynamicFactory\Handlers;
 
 use Overcode\XePlugin\DynamicFactory\Models\CptDocument;
 use Xpressengine\Config\ConfigEntity;
 
-class UrlHandler
+class TaxoUrlHandler
 {
     protected $instanceId;
 
@@ -39,6 +40,6 @@ class UrlHandler
 
     public function managerUrl($name, $params = [])
     {
-        return route('settings.cpt.cpt.'. $name, $params);
+        return route('settings.taxo.taxo.'. $name, $params);
     }
 }

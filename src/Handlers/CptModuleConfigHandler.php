@@ -5,7 +5,7 @@ namespace Overcode\XePlugin\DynamicFactory\Handlers;
 use Xpressengine\Config\ConfigEntity;
 use Xpressengine\Config\ConfigManager;
 
-class ModuleConfigHandler
+class CptModuleConfigHandler
 {
     /**
      * config package name

@@ -7,7 +7,7 @@ use Overcode\XePlugin\DynamicFactory\Handlers\CptValidatorHandler;
 use Overcode\XePlugin\DynamicFactory\Handlers\DynamicFactoryConfigHandler;
 use Overcode\XePlugin\DynamicFactory\Handlers\DynamicFactoryHandler;
 use Overcode\XePlugin\DynamicFactory\Handlers\DynamicFactoryTaxonomyHandler;
-use Overcode\XePlugin\DynamicFactory\Handlers\UrlHandler;
+use Overcode\XePlugin\DynamicFactory\Handlers\CptUrlHandler;
 use Overcode\XePlugin\DynamicFactory\Models\CategoryExtra;
 use Overcode\XePlugin\DynamicFactory\Models\Cpt;
 use Overcode\XePlugin\DynamicFactory\Models\CptDocument;
@@ -40,7 +40,7 @@ class DynamicFactorySettingController extends BaseController
 
     protected $presenter;
 
-    protected $urlHandler;
+    protected $cptUrlHandler;
 
     protected $cptValidatorHandler;
 
@@ -49,7 +49,7 @@ class DynamicFactorySettingController extends BaseController
         DynamicFactoryHandler $dynamicFactoryHandler,
         DynamicFactoryTaxonomyHandler $dynamicFactoryTaxonomyHandler,
         DynamicFactoryConfigHandler $configHandler,
-        UrlHandler $urlHandler,
+        CptUrlHandler $cptUrlHandler,
         CptValidatorHandler $cptValidatorHandler
     )
     {
@@ -58,12 +58,12 @@ class DynamicFactorySettingController extends BaseController
         $this->taxonomyHandler = $dynamicFactoryTaxonomyHandler;
         $this->dynamicFieldConfigHandler = app('xe.dynamicField');
         $this->configHandler = $configHandler;
-        $this->urlHandler = $urlHandler;
+        $this->cptUrlHandler = $cptUrlHandler;
         $this->cptValidatorHandler = $cptValidatorHandler;
 
         $this->presenter = app('xe.presenter');
 
-        $this->presenter->share('urlHandler', $this->urlHandler);
+        $this->presenter->share('cptUrlHandler', $this->cptUrlHandler);
     }
 
     /**

@@ -37,7 +37,7 @@
     <div class="read_footer">
         <div class="bd_function">
             <div class="bd_function_r">
-                <a href="{{ $urlHandler->get('index', array_merge(Request::all())) }}" class="bd_ico bd_list"><i class="xi-list"></i><span class="xe-sr-only">리스트</span></a>
+                <a href="{{ $cptUrlHandler->get('index', array_merge(Request::all())) }}" class="bd_ico bd_list"><i class="xi-list"></i><span class="xe-sr-only">리스트</span></a>
             </div>
         </div>
     </div>
