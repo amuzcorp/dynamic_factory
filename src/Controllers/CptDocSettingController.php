@@ -40,7 +40,7 @@ class CptDocSettingController extends Controller
     {
         $config = $this->configHandler->get($instanceId);
 
-        return $this->presenter->make('module.skin', [
+        return $this->presenter->make('module.config', [
             'instanceId' => $instanceId,
             'config' => $config
         ]);

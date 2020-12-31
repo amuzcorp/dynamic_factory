@@ -17,30 +17,8 @@ class CptModule extends AbstractModule
      */
     public static function boot()
     {
-        self::registerArchiveRoute();
         self::registerSettingsRoute();
         self::registerInstanceRoute();
-    }
-
-    /**
-     * register plugin archive route
-     *
-     * @return void
-     */
-    protected static function registerArchiveRoute()
-    {
-        // set routing
-        config(['xe.routing' => array_merge(
-            config('xe.routing'),
-            ['cpt_archives' => 'cpts']
-        )]);
-
-        Route::group([
-            'prefix' => 'cpts',
-            'namespace' => 'Overcode\XePlugin\DynamicFactory\Controllers'
-        ], function () {
-            Route::get('/{slug}', ['as' => 'cpts', 'ArchivesController@index']);
-        });
     }
 
     /**
@@ -191,6 +169,7 @@ class CptModule extends AbstractModule
      */
     public static function getInstanceSettingURI($instanceId)
     {
+//        return route('settings.cpt.cpt.config', $instanceId);
         return route('settings.cpt.cpt.skin', $instanceId);
     }
 
