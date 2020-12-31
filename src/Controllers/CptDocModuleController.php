@@ -2,7 +2,7 @@
 
 namespace Overcode\XePlugin\DynamicFactory\Controllers;
 
-use Overcode\XePlugin\DynamicFactory\Components\Modules\CptModule\CptModule;
+use Overcode\XePlugin\DynamicFactory\Components\Modules\Cpt\CptModule;
 use Overcode\XePlugin\DynamicFactory\Exceptions\NotFoundDocumentException;
 use Overcode\XePlugin\DynamicFactory\Handlers\DynamicFactoryDocumentHandler;
 use Overcode\XePlugin\DynamicFactory\Models\CptDocument;
