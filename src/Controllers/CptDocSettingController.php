@@ -4,7 +4,7 @@ namespace Overcode\XePlugin\DynamicFactory\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Http\Sections\SkinSection;
-use Overcode\XePlugin\DynamicFactory\Components\Modules\CptModule;
+use Overcode\XePlugin\DynamicFactory\Components\Modules\CptModule\CptModule;
 use Overcode\XePlugin\DynamicFactory\Handlers\ModuleConfigHandler;
 use Overcode\XePlugin\DynamicFactory\Handlers\UrlHandler;
 use Xpressengine\Captcha\CaptchaManager;

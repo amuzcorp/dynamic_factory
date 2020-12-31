@@ -1,6 +1,6 @@
 <?php
 
-namespace Overcode\XePlugin\DynamicFactory\Components\Modules;
+namespace Overcode\XePlugin\DynamicFactory\Components\Modules\CptModule;
 
 use Overcode\XePlugin\DynamicFactory\Models\DfSlug;
 use Route;
@@ -93,7 +93,7 @@ class CptModule extends AbstractModule
         $dfService = app('overcode.df.service');
         $cpts = $dfService->getItemsAll();
 
-        return View::make('dynamic_factory::components/Modules/views/create', [
+        return View::make('dynamic_factory::components/Modules/CptModule/views/create', [
             'skins' => $skins,
             'cpts' => $cpts
         ])->render();
@@ -133,7 +133,7 @@ class CptModule extends AbstractModule
         $dfService = app('overcode.df.service');
         $cpts = $dfService->getItemsAll();
 
-        return View::make('dynamic_factory::components/Modules/views/edit', [
+        return View::make('dynamic_factory::components/Modules/CptModule/views/edit', [
             'instanceId' => $instanceId,
             'config' => app('overcode.df.moduleConfigHandler')->get($instanceId),
             'skins' => $skins,

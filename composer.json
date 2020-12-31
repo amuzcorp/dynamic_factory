@@ -24,7 +24,7 @@
             "title": "다이나믹 팩토리",
             "component": {
                 "module/cpt@cpt": {
-                    "class": "Overcode\\XePlugin\\DynamicFactory\\Components\\Modules\\CptModule",
+                    "class": "Overcode\\XePlugin\\DynamicFactory\\Components\\Modules\\CptModule\\CptModule",
                     "name": "CPT Document",
                     "description": "사용자 정의 문서 모듈"
                 },
