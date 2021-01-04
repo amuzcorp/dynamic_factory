@@ -406,6 +406,9 @@ class Plugin extends AbstractPlugin
 
         $cptModuleConfigHandler = app('overcode.df.cptModuleConfigHandler');
         $cptModuleConfigHandler->getDefault();
+
+        $taxoModuleConfigHandler = app('overcode.df.taxoModuleConfigHandler');
+        $taxoModuleConfigHandler->getDefault();
     }
 
     /**

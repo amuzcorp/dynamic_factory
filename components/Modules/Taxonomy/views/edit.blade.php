@@ -14,13 +14,12 @@
                     <label>사용할 카테고리</label>
                     <br>
                     @foreach($categoryExtras as $extra)
-                    <label class="form-check-label" for="extra_{{ $extra->category_id }}">
-                        <input class="form-check-input" type="checkbox" name="taxo_ids[]" id="extra_{{ $extra->category_id }}" value="{{ $extra->category_id }}"> {{ xe_trans($extra->category->name) }}
-                    </label>
+                        <label class="form-check-label" for="extra_{{ $extra->category_id }}">
+                            <input class="form-check-input" type="checkbox" name="taxo_ids[]" id="extra_{{ $extra->category_id }}" value="{{ $extra->category_id }}" @if(in_array($extra->category_id, $config->get('taxo_ids'))) checked="checked" @endif> {{ xe_trans($extra->category->name) }}
+                        </label>
                     @endforeach
                 </div>
             </div>
         </div>
     </div>
 </div>
-

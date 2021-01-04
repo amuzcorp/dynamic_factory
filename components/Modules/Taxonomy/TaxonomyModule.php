@@ -90,7 +90,10 @@ class TaxonomyModule extends AbstractModule
      */
     public function storeMenu($instanceId, $menuTypeParams, $itemParams)
     {
-        // TODO: Implement storeMenu() method.
+        $input = $menuTypeParams;
+        $input['instanceId'] = $instanceId;
+
+        app('overcode.df.instance')->createTaxonomy($input);
     }
 
     /**
@@ -102,7 +105,17 @@ class TaxonomyModule extends AbstractModule
      */
     public function editMenuForm($instanceId)
     {
-        // TODO: Implement editMenuForm() method.
+        $skins = XeSkin::getList(self::getId());
+
+        // 카테고리 리스트
+        $taxonomyHandler = app('overcode.df.taxonomyHandler');
+        $categoryExtras = $taxonomyHandler->getCategoryExtras();
+
+        return View::make('dynamic_factory::components/Modules/Taxonomy/views/edit', [
+            'config' => app('overcode.df.taxoModuleConfigHandler')->get($instanceId),
+            'skins' => $skins,
+            'categoryExtras' => $categoryExtras
+        ])->render();
     }
 
     /**
@@ -118,7 +131,10 @@ class TaxonomyModule extends AbstractModule
      */
     public function updateMenu($instanceId, $menuTypeParams, $itemParams)
     {
-        // TODO: Implement updateMenu() method.
+        $input = $menuTypeParams;
+        $input['instanceId'] = $instanceId;
+
+        app('overcode.df.instance')->updateTaxoConfig($input);
     }
 
     /**

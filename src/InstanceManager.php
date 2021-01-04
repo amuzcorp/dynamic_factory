@@ -5,6 +5,7 @@ namespace Overcode\XePlugin\DynamicFactory;
 use Overcode\XePlugin\DynamicFactory\Exceptions\AlreadyExistsInstanceException;
 use Overcode\XePlugin\DynamicFactory\Exceptions\InvalidConfigException;
 use Overcode\XePlugin\DynamicFactory\Exceptions\RequireCptIdException;
+use Overcode\XePlugin\DynamicFactory\Exceptions\RequireTaxoIdException;
 use Overcode\XePlugin\DynamicFactory\Handlers\CptModuleConfigHandler;
 use Overcode\XePlugin\DynamicFactory\Handlers\TaxoModuleConfigHandler;
 use Xpressengine\Database\VirtualConnection;
@@ -80,6 +81,50 @@ class InstanceManager
         $this->conn->beginTransaction();
 
         $config = $this->cptConfigHandler->modify($config);
+
+        $this->conn->commit();
+
+        return $config;
+    }
+
+    public function createTaxonomy(array $params)
+    {
+        if (empty($params['taxo_ids']) === true) {
+            throw new RequireTaxoIdException;
+        }
+
+        $config = $this->taxoConfigHandler->get($params['instanceId']);
+        if ($config !== null) {
+            throw new AlreadyExistsInstanceException;
+        }
+
+        $this->conn->beginTransaction();
+
+        $config = $this->taxoConfigHandler->add($params);
+
+        $this->conn->commit();
+
+        return $config;
+    }
+
+    public function updateTaxoConfig(array $params)
+    {
+        if (empty($params['taxo_ids']) === true) {
+            throw new RequireTaxoIdException;
+        }
+
+        $config = $this->taxoConfigHandler->get($params['instanceId']);
+        if ($config === null) {
+            throw new InvalidConfigException;
+        }
+
+        foreach ($params as $key => $val) {
+            $config->set($key, $val);
+        }
+
+        $this->conn->beginTransaction();
+
+        $config = $this->taxoConfigHandler->modify($config);
 
         $this->conn->commit();
 
