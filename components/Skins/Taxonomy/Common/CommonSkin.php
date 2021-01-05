@@ -1,19 +1,20 @@
 <?php
 
-namespace Overcode\XePlugin\DynamicFactory\Components\Skins\Cpt\Common;
+namespace Overcode\XePlugin\DynamicFactory\Components\Skins\Taxonomy\Common;
 
-use Overcode\XePlugin\DynamicFactory\GenericCptSkin;
+use Xpressengine\Presenter\Presenter;
+use Xpressengine\Skin\GenericSkin;
 use View;
 use Gate;
 use XeFrontend;
 use XeRegister;
 use XePresenter;
 Use XeSkin;
-use Xpressengine\Presenter\Presenter;
 
-class CommonSkin extends GenericCptSkin
+class CommonSkin extends GenericSkin
 {
-    protected static $path = 'dynamic_factory/components/Skins/Cpt/Common';
+    protected static $path = 'dynamic_factory/components/Skins/Taxonomy/Common';
+
     /**
      * render
      *
@@ -22,7 +23,6 @@ class CommonSkin extends GenericCptSkin
     public function render()
     {
         $this->setSkinConfig();
-        $this->setDynamicFieldSkins();
         $this->setPaginationPresenter();
         $this->setTerms();
 
@@ -79,7 +79,7 @@ class CommonSkin extends GenericCptSkin
     protected function setPaginationPresenter()
     {
         if (isset($this->data['paginate'])) {
-            $this->data['paginate']->setPath($this->data['cptUrlHandler']->get('index'));
+            $this->data['paginate']->setPath($this->data['taxoUrlHandler']->get('index'));
         }
     }
 

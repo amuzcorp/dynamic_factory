@@ -31,9 +31,9 @@ class TaxoUrlHandler
         return instance_route($name, $params, $instanceId);
     }
 
-    public function getShow(CptDocument $document, $params =[], ConfigEntity $config = null)
+    public function getShow($item, $params =[], ConfigEntity $config = null)
     {
-        $slug = $document->getSlug();
+        $slug = $item->id;
 
         return $this->get('slug', [$slug], $this->instanceId);
     }

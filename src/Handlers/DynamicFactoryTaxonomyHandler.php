@@ -425,11 +425,7 @@ class DynamicFactoryTaxonomyHandler
      */
     public function getCategoryDynamicField($category_id)
     {
-        $categoryExtra = $this->getCategoryExtra($category_id);
-
-        $slug = $categoryExtra->slug;
-
-        $group = 'tax_' . $slug;
+        $group = $this->getTaxFieldGroup($category_id);
 
         $category_items = XeCategory::cates()->find($category_id)->items;
 
@@ -513,5 +509,25 @@ class DynamicFactoryTaxonomyHandler
         }
 
         return $items;
+    }
+
+    /**
+     * item_id 로 검색하여 view 에 필요한 Dynamic Field Attributes 까지 붙여서 반환
+     *
+     * @param $item_id
+     * @return mixed
+     */
+    public function getCategoryItem($item_id)
+    {
+        $category_item = CategoryItem::find($item_id);
+        $category_id = $category_item->category_id;
+
+        $items = $this->getCategoryItemAttributes($category_id);
+
+        foreach ($items as $item){
+            if($item->id == $item_id) {
+                return $item;
+            }
+        }
     }
 }

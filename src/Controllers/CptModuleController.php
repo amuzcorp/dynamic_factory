@@ -147,8 +147,6 @@ class CptModuleController extends Controller
 
     public function slug(CptDocService $service, Request $request, $menuUrl, $strSlug)
     {
-//        dd($menuUrl, $strSlug, $this->instanceId);
-
         $cpt_id = $this->config->get('cpt_id');
 
         $slug = DfSlug::where('slug', $strSlug)->where('instance_id', $cpt_id)->first();

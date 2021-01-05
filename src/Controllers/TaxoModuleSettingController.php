@@ -13,21 +13,21 @@ class TaxoModuleSettingController extends Controller
 {
     protected $configHandler;
 
-    protected $urlHandler;
+    protected $taxoUrlHandler;
 
     protected $presenter;
 
     public function __construct(
         TaxoModuleConfigHandler $configHandler,
-        TaxoUrlHandler $urlHandler
+        TaxoUrlHandler $taxoUrlHandler
     )
     {
         $this->configHandler = $configHandler;
-        $this->urlHandler = $urlHandler;
+        $this->taxoUrlHandler = $taxoUrlHandler;
 
         $this->presenter = app('xe.presenter');
         $this->presenter->setSettingsSkinTargetId(TaxonomyModule::getId());
-        $this->presenter->share('urlHandler', $this->urlHandler);
+        $this->presenter->share('taxoUrlHandler', $this->taxoUrlHandler);
     }
 
     public function editConfig(CaptchaManager $captcha, $instanceId)

@@ -65,7 +65,7 @@ class TaxonomyModule extends AbstractModule
      */
     public function createMenuForm()
     {
-        $skins = XeSkin::getList('module/cpt@cpt');
+        $skins = XeSkin::getList('module/taxo@taxo');
 
         // 카테고리 리스트
         $taxonomyHandler = app('overcode.df.taxonomyHandler');
