@@ -22,7 +22,6 @@ class CommonSkin extends GenericCptSkin
     public function render()
     {
         $this->setSkinConfig();
-        $this->setDynamicFieldSkins();
         $this->setPaginationPresenter();
         $this->setTerms();
 
