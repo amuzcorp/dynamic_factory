@@ -57,14 +57,16 @@ class TaxoModuleController extends Controller
 
         $taxonomy_items = [];
         $taxo_field_types = [];
+        $groups = [];
 
         foreach($taxo_ids as $taxo_id){
             $taxonomy_items[$taxo_id] = $this->taxonomyHandler->getCategoryItemAttributes($taxo_id);
             $taxo_field_types[$taxo_id] = $this->taxonomyHandler->getCategoryFieldTypes($taxo_id);
+            $groups[$taxo_id] = $this->taxonomyHandler->getTaxFieldGroup($taxo_id);
         }
 
         return XePresenter::makeAll('index',
-            compact('taxonomy_items', 'taxo_field_types')
+            compact('taxonomy_items', 'taxo_field_types', 'groups')
         );
     }
 
