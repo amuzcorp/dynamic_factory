@@ -251,6 +251,15 @@ class Plugin extends AbstractPlugin
 
     protected function registerSettingsRoute()
     {
+        Route::group([
+            'prefix' => Plugin::getId(),
+            'as' => 'dyFac.',
+            'namespace' => 'Overcode\XePlugin\DynamicFactory\Controllers',
+            'middleware' => ['web']
+        ], function() {
+            Route::get('/categories', ['as' => 'categories', 'uses' => 'DynamicFactoryController@getCategories']);
+        });
+
         Route::settings(static::getId(), function() {
             Route::group([
                 'namespace' => 'Overcode\XePlugin\DynamicFactory\Controllers',

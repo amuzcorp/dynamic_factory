@@ -147,6 +147,19 @@ class DynamicFactoryTaxonomyHandler
         }
     }
 
+    public function getTaxonomyIds($cpt_id)
+    {
+        $cptTaxonomies = CptTaxonomy::where('cpt_id', $cpt_id)->get();
+
+        $taxo_ids = [];
+
+        foreach ($cptTaxonomies as $key => $val) {
+            $taxo_ids[] = $val->category_id;
+        }
+
+        return $taxo_ids;
+    }
+
     public function getTaxonomies($cpt_id)
     {
         $cptTaxonomies = CptTaxonomy::where('cpt_id', $cpt_id)->get();
