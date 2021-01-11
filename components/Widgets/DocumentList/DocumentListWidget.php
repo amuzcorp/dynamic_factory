@@ -29,7 +29,7 @@ class DocumentListWidget extends AbstractWidget
 
         if(isset($widgetConfig['categories']['item'])) {
             $categoryIds = $widgetConfig['categories']['item'];
-        }else {
+        }else if(isset($widgetConfig['categories'])) {
             $categoryIds[] = $widgetConfig['categories'];
         }
 
