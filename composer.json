@@ -105,6 +105,9 @@
         "psr-4": {
             "Overcode\\XePlugin\\DynamicFactory\\": "src/",
             "Overcode\\XePlugin\\DynamicFactory\\Components\\": "components/"
-        }
+        },
+        "files": [
+            "src/helpers.php"
+        ]
     }
 }
