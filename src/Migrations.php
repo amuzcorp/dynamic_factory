@@ -79,7 +79,7 @@ class Migrations
             $table->string('menu_name');
             $table->integer('menu_order');
             $table->string('menu_path');
-            $table->string('description')->nullable();;
+            $table->string('description')->nullable();
             $table->text('labels');
 
             $table->unique('cpt_id');
