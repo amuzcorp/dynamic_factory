@@ -137,6 +137,16 @@ class DynamicFactoryService
                 $cpt->is_made_plugin = true;    // plugin 에서 생성한 cpt 인지 구분
             }
         }
+        if(!isset($cpt->blades) || !is_array($cpt->blades)) {
+            $cpt->blades = [
+                'list' => 'dynamic_factory::views.documents.list',
+                'create' => 'dynamic_factory::views.documents.create',
+                'edit' => 'dynamic_factory::views.documents.edit'
+            ];
+        }
+        if(empty($cpt->blades['list'])) $cpt->blades['list'] = 'dynamic_factory::views.documents.list';
+        if(empty($cpt->blades['create'])) $cpt->blades['create'] = 'dynamic_factory::views.documents.create';
+        if(empty($cpt->blades['edit'])) $cpt->blades['edit'] = 'dynamic_factory::views.documents.edit';
 
         return $cpt;
     }

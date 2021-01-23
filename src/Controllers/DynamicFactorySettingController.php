@@ -369,7 +369,7 @@ class DynamicFactorySettingController extends BaseController
         $config = $this->configHandler->getConfig($cpt->cpt_id);
         $column_labels = $this->configHandler->getColumnLabels($config);
 
-        return $this->presenter->make('dynamic_factory::views.documents.list',[
+        return $this->presenter->make($cpt->blades['list'],[
             'cpt' => $cpt,
             'current_route_name' => $request->current_route_name,
             'cptDocs' => $cptDocs,
@@ -390,7 +390,7 @@ class DynamicFactorySettingController extends BaseController
         }
         $cptConfig = $this->dfService->getCptConfig($cpt->cpt_id);
 
-        return $this->presenter->make('dynamic_factory::views.documents.create',[
+        return $this->presenter->make($cpt->blades['create'],[
             'cpt' => $cpt,
             'taxonomies' => $taxonomies,
             'dynamicFields' => $dynamicFields,
@@ -415,7 +415,7 @@ class DynamicFactorySettingController extends BaseController
 
         $category_items = $this->dfService->getSelectCategoryItems($cpt->cpt_id, $item->id);
 
-        return $this->presenter->make('dynamic_factory::views.documents.edit',[
+        return $this->presenter->make($cpt->blades['edit'],[
             'cpt' => $cpt,
             'taxonomies' => $taxonomies,
             'dynamicFields' => $dynamicFields,
