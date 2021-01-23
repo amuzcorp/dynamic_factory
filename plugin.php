@@ -221,7 +221,7 @@ class Plugin extends AbstractPlugin
         \XeRegister::push('settings/menu', 'setting.dynamic_factory.category', [
             'title' => '카테고리',
             'display' => true,
-            'ordering' => 1000
+            'ordering' => 2000
         ]);
 
         foreach($this->cpts as $val){
