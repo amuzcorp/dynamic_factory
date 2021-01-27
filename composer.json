@@ -62,8 +62,18 @@
                 },
                 "widget/cpt@list/skin/cpt@default": {
                     "class": "Overcode\\XePlugin\\DynamicFactory\\Components\\Widgets\\DocumentList\\Skins\\Common\\CommonSkin",
-                    "name": "CPT 기본 게시물 위젯 스킨",
+                    "name": "기본 스킨",
                     "description": "CPT 게시물 리스트 위젯용 기본 스킨"
+                },
+                "widget/cpt@relateCpt": {
+                    "class": "Overcode\\XePlugin\\DynamicFactory\\Components\\Widgets\\RelateCpt\\RelateCptWidget",
+                    "name": "관련 게시물 리스트 위젯",
+                    "description": "CPT 관련 게시물 리스트 보여주는 위젯"
+                },
+                "widget/cpt@relateCpt/skin/cpt@default": {
+                    "class": "Overcode\\XePlugin\\DynamicFactory\\Components\\Widgets\\RelateCpt\\Skins\\Common\\CommonSkin",
+                    "name": "기본 스킨",
+                    "description": "CPT 관련 게시물 리스트 위젯용 기본 스킨"
                 },
                 "uiobject/df@taxo_select": {
                     "class": "Overcode\\XePlugin\\DynamicFactory\\Components\\UIObjects\\TaxoSelect\\TaxoSelectUIObject",
