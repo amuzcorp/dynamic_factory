@@ -244,4 +244,27 @@ class DynamicFactoryHandler
         }
         \XeDB::commit();
     }
+
+    /**
+     * 자신의 document_id 를 넣으면 자신을 relate_cpt 로 가지고 있는 document_id 들을 반환한다.
+     *
+     * @param $fieldId
+     * @param $group
+     * @param $documentId
+     * @return array
+     */
+    public function getRelateCpts($fieldId, $group, $documentId)
+    {
+        $targets = XeDB::table('field_dynamic_factory_relate_cpt')->where('field_id', $fieldId)->where('group', $group)->where('ids', 'like', '%"'.$documentId.'"%')->get();
+
+        $target_ids = [];
+
+        foreach($targets as $target){
+            $target_ids[] = $target->target_id;
+        }
+
+        $target_ids = array_unique($target_ids);    // 중복 제거
+
+        return $target_ids;
+    }
 }

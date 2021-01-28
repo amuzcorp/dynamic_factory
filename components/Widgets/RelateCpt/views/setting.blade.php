@@ -1,4 +1,12 @@
 <div class="form-group">
-    <label>관련 문서 ID</label>
-    <input type="text" name="relate_cpts" class="form-control" value="{{array_get($args, 'relate_cpts')}}" />
+    <label>CPT ID</label>
+    <input type="text" name="cpt_id" class="form-control" value="{{array_get($args, 'cpt_id')}}" />
+</div>
+<div class="form-group">
+    <label>Field ID</label>
+    <input type="text" name="field_id" class="form-control" value="{{array_get($args, 'field_id')}}" />
+</div>
+<div class="form-group">
+    <label>Document ID</label>
+    <input type="text" name="document_id" class="form-control" value="{{array_get($args, 'document_id')}}" />
 </div>
