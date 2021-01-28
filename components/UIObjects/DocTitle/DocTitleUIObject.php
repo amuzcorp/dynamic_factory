@@ -70,6 +70,10 @@ class DocTitleUIObject extends AbstractUIObject
             $args['titleClassName'] = 'xe-form-control title';
         }
 
+        if (empty($args['titleName'])) {
+            $args['titleName'] = '제목';
+        }
+
         $args['scriptInit'] = false;
         if (self::$loaded === false) {
             self::$loaded = true;

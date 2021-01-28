@@ -25,9 +25,13 @@
                     <table class="table">
                         <thead>
                         <tr>
-                            @foreach($config['listColumns'] as $columnName)
-                            <th>{{ xe_trans($column_labels[$columnName]) }}</th>
-                            @endforeach
+                        @foreach($config['listColumns'] as $columnName)
+                            @if($columnName == 'title')
+                                <th>{{ $cpt->labels['title'] }}</th>
+                            @else
+                                <th>{{ xe_trans($column_labels[$columnName]) }}</th>
+                            @endif
+                        @endforeach
                         </tr>
                         </thead>
                         <tbody>

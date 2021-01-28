@@ -14,15 +14,12 @@
                 <div class="panel-body">
                 @foreach($cptConfig['formColumns'] as $columnName)
                     @if($columnName === 'title')
-                    {{--<div class="form-group">
-                        <label for="">제목</label>
-                        <input type="text" class="form-control" id="title" name="title" placeholder="{{ sprintf($cpt->labels['here_title'], $cpt->cpt_name) }}">
-                    </div>--}}
                     <div class="xe-list-board-body--header-item xe-list-board-body--header-title xf-col-md-12">
                         {!! uio('uiobject/df@doc_title', [
                             'title' => Request::old('title'),
                             'slug' => Request::old('slug'),
                             'titleClassName' => 'bd_input',
+                            'titleName' => $cpt->labels['title'],
                             'cpt_id' => $cpt->cpt_id
                         ]) !!}
                     </div>
@@ -49,6 +46,9 @@
                         @endif
                     @endif
                 @endforeach
+                @if(!in_array('content', $cptConfig['formColumns']))
+                    <input type="hidden" name="content" value="empty" />
+                @endif
                 </div>
             </div>
             <button type="submit" class="btn btn-primary"><i class="xi-download"></i>저장</button>

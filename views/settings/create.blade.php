@@ -63,6 +63,12 @@
                     <div id="collapseOne" class="collapse" style="overflow: hidden;">
                         <div class="panel-body">
                             <div class="form-group row">
+                                <label class="col-sm-2 col-form-label">제목명</label>
+                                <div class="col-sm-10">
+                                    <input type="text" class="form-control" name="labels[title]" value="{{ $labels['title'] }}">
+                                </div>
+                            </div>
+                            <div class="form-group row">
                                 <label class="col-sm-2 col-form-label">새로 추가</label>
                                 <div class="col-sm-10">
                                     <input type="text" class="form-control" name="labels[new_add]" value="{{ $labels['new_add'] }}">
@@ -120,12 +126,6 @@
                                 <label class="col-sm-2 col-form-label">모든 항목</label>
                                 <div class="col-sm-10">
                                     <input type="text" class="form-control" name="labels[all_cpt]" value="{{ $labels['all_cpt'] }}">
-                                </div>
-                            </div>
-                            <div class="form-group row">
-                                <label class="col-sm-2 col-form-label">여기에 제목 입력</label>
-                                <div class="col-sm-10">
-                                    <input type="text" class="form-control" name="labels[here_title]" value="{{ $labels['here_title'] }}">
                                 </div>
                             </div>
                         </div>

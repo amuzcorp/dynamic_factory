@@ -17,6 +17,7 @@ class DynamicFactoryHandler
     protected $reserved = [];
 
     protected $defaultLabels = [
+        'title' => '제목',
         'new_add' => '새로 추가',
         'new_add_cpt' => '새 %s 추가',
         'cpt_edit' => 'Edit %s',
@@ -27,7 +28,7 @@ class DynamicFactoryHandler
         'no_trash' => '휴지통에서 %s을(를) 찾을 수 없음',
         'parent_txt' => '상위 텍스트',
         'all_cpt' => '모든 항목',
-        'here_title' => '여기에 제목 입력'
+//        'here_title' => '여기에 제목 입력'
     ];
 
     public function getDefaultLabels()

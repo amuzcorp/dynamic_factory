@@ -85,7 +85,7 @@
                                                             <span class="item-subtext">{{ xe_trans($columnLabels[$columnName]) }}</span>
                                                         </td>
                                                         <td>
-                                                            @if($columnName === 'title' || $columnName === 'content')
+                                                            @if($columnName === 'content')
                                                             <div class="xe-btn-toggle pull-right">
                                                                 <label>
                                                                     <span class="sr-only">toggle</span>
