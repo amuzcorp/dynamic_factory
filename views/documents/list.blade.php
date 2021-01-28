@@ -18,7 +18,8 @@
                         <h3 class="panel-title">{{ $cpt->cpt_name }} 목록</h3>
                     </div>
                     <div class="pull-right">
-                        <a href="{{ route($current_route_name, ['type' => 'create']) }}" class="xe-btn xe-btn-primary" data-toggle="xe-page-modal">{{ sprintf($cpt->labels['new_add_cpt'], $cpt->cpt_name) }}</a>
+                        <a href="{{ route('dyFac.setting.edit', ['cpt_id' => $cpt->cpt_id]) }}" class="xe-btn xe-btn-positive-outline"><i class="xi-cog"></i> 설정</a>
+                        <a href="{{ route($current_route_name, ['type' => 'create']) }}" class="xe-btn xe-btn-primary" data-toggle="xe-page-modal"><i class="xi-file-text-o"></i> {{ sprintf($cpt->labels['new_add_cpt'], $cpt->cpt_name) }}</a>
                     </div>
                 </div>
                 <div class="panel-body">

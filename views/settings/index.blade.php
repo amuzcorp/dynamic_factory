@@ -39,8 +39,8 @@
                         </div>
 
                         <div class="btn-right form-inline">
-                            <a href="{{ route('dyFac.setting.edit', ['cpt_id' => $cpt->cpt_id]) }}" class="xe-btn xe-btn-positive-outline">설정</a>
-                            <a href="javascript:alert('해당 기능은 준비중입니다.')" class="xe-btn xe-btn-danger-outline __xe_remove_plugin">삭제</a>
+                            <a href="{{ route('dyFac.setting.edit', ['cpt_id' => $cpt->cpt_id]) }}" class="xe-btn xe-btn-positive-outline"><i class="xi-cog"></i> 설정</a>
+                            <a href="javascript:alert('해당 기능은 준비중입니다.')" class="xe-btn xe-btn-danger-outline __xe_remove_plugin"><i class="xi-trash"></i> 삭제</a>
                         </div>
                     </li>
                 @endforeach
@@ -75,7 +75,7 @@
                         </div>
 
                         <div class="btn-right form-inline">
-                            <a href="{{ route('dyFac.setting.edit', ['cpt_id' => $cpt->cpt_id]) }}" class="xe-btn xe-btn-positive-outline">설정</a>
+                            <a href="{{ route('dyFac.setting.edit', ['cpt_id' => $cpt->cpt_id]) }}" class="xe-btn xe-btn-positive-outline"><i class="xi-cog"></i> 설정</a>
                         </div>
                     </li>
                 @endforeach
