@@ -394,7 +394,15 @@ class Plugin extends AbstractPlugin
      */
     public function activate($installedVersion = null)
     {
-        // implement code
+        /** @var DynamicFactoryConfigHandler $configHandler */
+        $configHandler = app('overcode.df.configHandler');
+        $configHandler->storeDfConfig();
+
+        $cptModuleConfigHandler = app('overcode.df.cptModuleConfigHandler');
+        $cptModuleConfigHandler->getDefault();
+
+        $taxoModuleConfigHandler = app('overcode.df.taxoModuleConfigHandler');
+        $taxoModuleConfigHandler->getDefault();
     }
 
     /**
@@ -408,16 +416,6 @@ class Plugin extends AbstractPlugin
         if ($migration->checkInstalled() === false) {
             $migration->install();
         }
-
-        /** @var DynamicFactoryConfigHandler $configHandler */
-        $configHandler = app('overcode.df.configHandler');
-        $configHandler->storeDfConfig();
-
-        $cptModuleConfigHandler = app('overcode.df.cptModuleConfigHandler');
-        $cptModuleConfigHandler->getDefault();
-
-        $taxoModuleConfigHandler = app('overcode.df.taxoModuleConfigHandler');
-        $taxoModuleConfigHandler->getDefault();
     }
 
     /**
