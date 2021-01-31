@@ -93,6 +93,7 @@ class Migrations
             $table->integer('category_id');
             $table->string('slug');
             $table->string('template', 50);
+            $table->string('site_key', 50);
 
             $table->primary('category_id');
         });
