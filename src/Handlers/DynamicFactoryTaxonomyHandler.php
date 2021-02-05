@@ -106,6 +106,7 @@ class DynamicFactoryTaxonomyHandler
                     $this->addCategoryItemForOut($category, $cate['items']);
 
                     $cateExtra = new CategoryExtra();
+                    $cateExtra->site_key = \XeSite::getCurrentSiteKey();
                     $cateExtra->category_id = $category_id;
                     $cateExtra->slug = $slug;
                     $cateExtra->template = $cate['template'];
@@ -345,7 +346,7 @@ class DynamicFactoryTaxonomyHandler
 
     public function getCategoryExtras()
     {
-        return CategoryExtra::all();
+        return CategoryExtra::where('site_key', \XeSite::getCurrentSiteKey())->get();
     }
 
     public function getTaxonomyItemAttributeName($taxonomyId)
@@ -360,7 +361,7 @@ class DynamicFactoryTaxonomyHandler
             $category = $this->categoryHandler->cates()->find($category_id);
             XeCategory::deleteCate($category);
             CategoryExtra::where('category_id', $category_id)->delete();
-            CptTaxonomy::where('category_id', $category_id)->where('site_key', \XeSite::getCurrentSiteKey())->delete();
+            CptTaxonomy::where('category_id', $category_id)->delete();
         } catch (\Exception $e) {
             \XeDB::rollback();
 
@@ -516,7 +517,7 @@ class DynamicFactoryTaxonomyHandler
 
     public function getSelectCategoryItems($cpt_id, $target_id)
     {
-        $cptTaxs = CptTaxonomy::get()->where('cpt_id', $cpt_id);
+        $cptTaxs = CptTaxonomy::get()->where('cpt_id', $cpt_id)->where('site_key', \XeSite::getCurrentSiteKey());
 
         $items = [];
 
