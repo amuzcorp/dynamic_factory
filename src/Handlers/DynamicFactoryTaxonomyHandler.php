@@ -68,6 +68,7 @@ class DynamicFactoryTaxonomyHandler
             if(isset($inputs['cpts'])) {
                 foreach ($inputs['cpts'] as $val) {
                     $cptTaxonomy = new CptTaxonomy();
+                    $cptTaxonomy->site_key = \XeSite::getCurrentSiteKey();
                     $cptTaxonomy->cpt_id = $val;
                     $cptTaxonomy->category_id = $taxonomyItem->id;
                     $cptTaxonomy->save();
@@ -112,6 +113,7 @@ class DynamicFactoryTaxonomyHandler
 
                     foreach ($cate['cpt_ids'] as $cpt_id) {
                         $cptTaxonomy = new CptTaxonomy();
+                        $cptTaxonomy->site_key = \XeSite::getCurrentSiteKey();
                         $cptTaxonomy->cpt_id = $cpt_id;
                         $cptTaxonomy->category_id = $category_id;
                         $cptTaxonomy->save();
@@ -149,7 +151,9 @@ class DynamicFactoryTaxonomyHandler
 
     public function getTaxonomyIds($cpt_id)
     {
-        $cptTaxonomies = CptTaxonomy::where('cpt_id', $cpt_id)->get();
+        $siteKey = \XeSite::getCurrentSiteKey();
+
+        $cptTaxonomies = CptTaxonomy::where('cpt_id', $cpt_id)->where('site_key', $siteKey)->get();
 
         $taxo_ids = [];
 
@@ -162,7 +166,9 @@ class DynamicFactoryTaxonomyHandler
 
     public function getTaxonomies($cpt_id)
     {
-        $cptTaxonomies = CptTaxonomy::where('cpt_id', $cpt_id)->get();
+        $siteKey = \XeSite::getCurrentSiteKey();
+
+        $cptTaxonomies = CptTaxonomy::where('cpt_id', $cpt_id)->where('site_key', $siteKey)->get();
 
         $taxonomies = [];
 
@@ -354,7 +360,7 @@ class DynamicFactoryTaxonomyHandler
             $category = $this->categoryHandler->cates()->find($category_id);
             XeCategory::deleteCate($category);
             CategoryExtra::where('category_id', $category_id)->delete();
-            CptTaxonomy::where('category_id', $category_id)->delete();
+            CptTaxonomy::where('category_id', $category_id)->where('site_key', \XeSite::getCurrentSiteKey())->delete();
         } catch (\Exception $e) {
             \XeDB::rollback();
 

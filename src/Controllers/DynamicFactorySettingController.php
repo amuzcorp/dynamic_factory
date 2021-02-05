@@ -208,7 +208,7 @@ class DynamicFactorySettingController extends BaseController
         if($tax_id){
             $category = $this->taxonomyHandler->getCategory($tax_id);
             $cpt_cate_extra = CategoryExtra::where('category_id', $tax_id)->first();
-            $cpt_taxonomy = CptTaxonomy::where('category_id', $tax_id)->get();
+            $cpt_taxonomy = CptTaxonomy::where('category_id', $tax_id)->where('site_key', \XeSite::getCurrentSiteKey())->get();
 
             $items = $this->taxonomyHandler->getCategoryDynamicField($tax_id);
         }

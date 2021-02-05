@@ -93,7 +93,6 @@ class Migrations
             $table->integer('category_id');
             $table->string('slug');
             $table->string('template', 50);
-            $table->string('site_key', 50);
 
             $table->primary('category_id');
         });
@@ -104,6 +103,7 @@ class Migrations
         Schema::create(self::CPT_TAXONOMY_TABLE_NAME, function (Blueprint $table) {
             $table->engine = "InnoDB";
 
+            $table->string('site_key', 50);
             $table->string('cpt_id');
             $table->integer('category_id');
         });
