@@ -501,4 +501,20 @@ class DynamicFactorySettingController extends BaseController
             'slug' => $slug,
         ]);
     }
+
+    /**
+     * cpt_id 로 cpt 와 config, dynamic_field, taxonomy 에서 cpt_id 제거, relate_cpt 에서 cpt_id 제거
+     * 그리고 해당 cpt 에 종속된 documents 를 삭제한다.
+     *
+     * @param $cpt_id
+     * @param Request $request
+     * @return mixed
+     */
+    public function destroy($cpt_id, Request $request)
+    {
+        // TODO 최고관리자 또는 자신이 작성한 CPT 만 삭제 가능하게 권한 체크
+        $this->dfService->destroyCpt($cpt_id);
+
+        return $this->presenter->makeApi([]);
+    }
 }

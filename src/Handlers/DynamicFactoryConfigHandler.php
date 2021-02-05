@@ -189,4 +189,15 @@ class DynamicFactoryConfigHandler
 
         return $config->get('categories');
     }
+
+    /**
+     * config 삭제
+     *
+     * @param ConfigEntity $config config
+     * @return void
+     */
+    public function remove(ConfigEntity $config)
+    {
+        $this->configManager->remove($config);
+    }
 }

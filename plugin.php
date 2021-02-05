@@ -59,12 +59,16 @@ class Plugin extends AbstractPlugin
             $dynamicFactoryConfigHandler = app('overcode.df.configHandler');
             $dynamicFactoryTaxonomyHandler = app('overcode.df.taxonomyHandler');
             $dynamicFactoryDocumentHandler = app('overcode.df.documentHandler');
+            $dynamicFieldHandler = app('xe.dynamicField');
+            $documentHandler = app('xe.document');
 
             return new DynamicFactoryService(
                 $dynamicFactoryHandler,
                 $dynamicFactoryConfigHandler,
                 $dynamicFactoryTaxonomyHandler,
-                $dynamicFactoryDocumentHandler
+                $dynamicFactoryDocumentHandler,
+                $dynamicFieldHandler,
+                $documentHandler
             );
         });
         $app->alias(DynamicFactoryService::class, 'overcode.df.service');
@@ -284,6 +288,7 @@ class Plugin extends AbstractPlugin
 
                 Route::get('/edit/{cpt_id}', [ 'as' => 'edit', 'uses' => 'DynamicFactorySettingController@edit' ]);
                 Route::post('/update/{cpt_id?}', [ 'as' => 'update', 'uses' => 'DynamicFactorySettingController@update' ]);
+                Route::post('/destroy/{cpt_id}', [ 'as' => 'destroy', 'uses' => 'DynamicFactorySettingController@destroy' ]);
 
                 Route::get('/create_taxonomy/{tax_id?}', [ 'as' => 'create_taxonomy', 'uses' => 'DynamicFactorySettingController@createTaxonomy' ]);
                 Route::get('/taxonomy_extra/{category_slug}', [ 'as' => 'taxonomy_extra', 'uses' => 'DynamicFactorySettingController@taxonomyExtra' ]);

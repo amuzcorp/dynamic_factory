@@ -24,6 +24,7 @@ class CptDocService
         $query = $model->where('instance_id', $config->get('cpt_id'));
 
         $this->handler->makeWhere($query, $request, $config);
+        $this->handler->makeOrder($query, $request, $config);
 
         $paginate = $query->paginate(10)->appends($request->except('page'));
 

@@ -268,4 +268,11 @@ class DynamicFactoryHandler
 
         return $target_ids;
     }
+
+    public function destroyCpt($cpt_id)
+    {
+        $siteKey = XeSite::getCurrentSiteKey();
+
+        XeDB::table('df_cpts')->where('cpt_id', $cpt_id)->where('site_key', $siteKey)->delete();
+    }
 }

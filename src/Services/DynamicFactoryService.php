@@ -1,6 +1,7 @@
 <?php
 namespace Overcode\XePlugin\DynamicFactory\Services;
 
+use Overcode\XePlugin\DynamicFactory\Exceptions\InvalidConfigException;
 use Overcode\XePlugin\DynamicFactory\Handlers\DynamicFactoryConfigHandler;
 use Overcode\XePlugin\DynamicFactory\Handlers\DynamicFactoryDocumentHandler;
 use Overcode\XePlugin\DynamicFactory\Handlers\DynamicFactoryTaxonomyHandler;
@@ -15,7 +16,9 @@ use XeSite;
 use Overcode\XePlugin\DynamicFactory\Handlers\DynamicFactoryHandler;
 use Xpressengine\Category\Models\CategoryItem;
 use Xpressengine\Config\ConfigEntity;
+use Xpressengine\Document\DocumentHandler;
 use Xpressengine\Document\Models\Document;
+use Xpressengine\DynamicField\DynamicFieldHandler;
 use Xpressengine\Http\Request;
 
 class DynamicFactoryService
@@ -28,19 +31,33 @@ class DynamicFactoryService
 
     protected $dfDocumentHandler;
 
+    /**
+     * @var DynamicFieldHandler
+     */
+    protected $dynamicField;
+
+    /**
+     * @var DocumentHandler
+     */
+    protected $document;
+
     protected $handlers = [];
 
     public function __construct(
         DynamicFactoryHandler $dfHandler,
         DynamicFactoryConfigHandler $dfConfigHandler,
         DynamicFactoryTaxonomyHandler $dfTaxonomyHandler,
-        DynamicFactoryDocumentHandler $dfDocumentHandler
+        DynamicFactoryDocumentHandler $dfDocumentHandler,
+        DynamicFieldHandler $dynamicField,
+        DocumentHandler $document
     )
     {
         $this->dfHandler = $dfHandler;
         $this->dfConfigHandler = $dfConfigHandler;
         $this->dfTaxonomyHandler = $dfTaxonomyHandler;
         $this->dfDocumentHandler = $dfDocumentHandler;
+        $this->dynamicField = $dynamicField;
+        $this->document = $document;
     }
 
     public function addHandlers($handler)
@@ -153,8 +170,7 @@ class DynamicFactoryService
 
     public function getCptConfig($cpt_id)
     {
-        $configName = $this->dfConfigHandler->getConfigName($cpt_id);
-        return $this->dfConfigHandler->get($configName);
+        return $this->dfConfigHandler->getConfig($cpt_id);
     }
 
     public function getFieldTypes(ConfigEntity $config)
@@ -283,5 +299,46 @@ class DynamicFactoryService
     public function getSelectCategoryItems($cpt_id, $target_id)
     {
         return $this->dfTaxonomyHandler->getSelectCategoryItems($cpt_id, $target_id);
+    }
+
+    public function destroyCpt($cpt_id)
+    {
+        $config = $this->dfConfigHandler->getConfig($cpt_id);
+        if($config === null) {
+            throw new InvalidConfigException;
+        }
+
+        XeDB::beginTransaction();
+        try {
+            // documents 삭제
+            $documentHandler = $this->document;
+            Document::where('instance_id', $cpt_id)->chunk(
+                100,
+                function ($docs) use ($documentHandler) {
+                    foreach ($docs as $doc) {
+                        $documentHandler->remove($doc);
+                    }
+                }
+            );
+
+            // cpt 삭제
+            $this->dfHandler->destroyCpt($cpt_id);
+
+            // remove dyFac config
+            $this->dfConfigHandler->removeConfig($config);
+
+            // 연결된 dynamic field 제거
+            foreach($this->dfConfigHandler->getDynamicFields($config) as $config){
+                $this->dynamicField->drop($config);
+            }
+
+            //relate cpt 와 df_cpt_taxonomy 와 df_taxonomy 에서 삭제
+
+        }catch (\Exception $e) {
+            XeDB::rollback();
+
+            throw $e;
+        }
+        XeDB::commit();
     }
 }

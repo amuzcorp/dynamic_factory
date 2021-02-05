@@ -174,4 +174,26 @@ class DynamicFactoryDocumentHandler
 
         return $query;
     }
+
+    public function makeOrder(Builder $query, Request $request, ConfigEntity $config)
+    {
+        $orderType = $request->get('order_type', '');
+        if ($orderType === '' && $config->get('orderType') != null) {
+            $orderType = $config->get('orderType', '');
+        }
+
+        if ($orderType == '') {
+            $query->orderBy('head', 'desc');
+        } elseif ($orderType == 'assent_count') {
+            $query->orderBy('assent_count', 'desc')->orderBy('head', 'desc');
+        } elseif ($orderType == 'recently_created') {
+            $query->orderBy(CptDocument::CREATED_AT, 'desc')->orderBy('head', 'desc');
+        } elseif ($orderType == 'recently_updated') {
+            $query->orderBy(CptDocument::UPDATED_AT, 'desc')->orderBy('head', 'desc');
+        }
+
+        $query->getProxyManager()->orders($query->getQuery(), $request->all());
+
+        return $query;
+    }
 }

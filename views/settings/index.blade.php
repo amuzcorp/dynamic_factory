@@ -40,7 +40,7 @@
 
                         <div class="btn-right form-inline">
                             <a href="{{ route('dyFac.setting.edit', ['cpt_id' => $cpt->cpt_id]) }}" class="xe-btn xe-btn-positive-outline"><i class="xi-cog"></i> 설정</a>
-                            <a href="javascript:alert('해당 기능은 준비중입니다.')" class="xe-btn xe-btn-danger-outline __xe_remove_plugin"><i class="xi-trash"></i> 삭제</a>
+                            <a href="#" class="xe-btn xe-btn-danger-outline __xe_remove_plugin remove_cpt_btn" data-url="{{ route('dyFac.setting.destroy', ['cpt_id' => $cpt->cpt_id]) }}"><i class="xi-trash"></i> 삭제</a>
                         </div>
                     </li>
                 @endforeach
@@ -87,3 +87,24 @@
         </div>
     </div>
 </div>
+<script type="text/javascript">
+    $(document).ready(function() {
+        $('.remove_cpt_btn').on('click', function(e) {
+            e.preventDefault();
+
+            if(confirm('해당 CPT 에 종속된 모든 게시물, 확장필드도 모두 함께 삭제됩니다.\n계속 하시겠습니까?')){
+                XE.ajax({
+                    url: $(this).data('url'),
+                    type: 'post',
+                    success: function (data) {
+                        console.log(data);
+                        location.reload();
+                    },
+                    error: function (data) {
+                        console.log(data);
+                    }
+                });
+            }
+        });
+    });
+</script>
