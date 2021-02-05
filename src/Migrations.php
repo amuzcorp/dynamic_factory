@@ -90,6 +90,7 @@ class Migrations
         Schema::create(self::CATEGORY_EXTRA_TABLE_NAME, function (Blueprint $table) {
             $table->engine = "InnoDB";
 
+            $table->string('site_key', 50);
             $table->integer('category_id');
             $table->string('slug');
             $table->string('template', 50);
