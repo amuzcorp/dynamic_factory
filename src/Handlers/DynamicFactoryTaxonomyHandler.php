@@ -63,6 +63,7 @@ class DynamicFactoryTaxonomyHandler
 
             $cateExtra->slug = $inputs['slug'];
             $cateExtra->template = $inputs['template'];
+            $cateExtra->site_key = \XeSite::getCurrentSiteKey();
             $cateExtra->save();
 
             if(isset($inputs['cpts'])) {
