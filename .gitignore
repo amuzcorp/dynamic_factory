@@ -1,0 +1,11 @@
+composer.lock
+yarn.lock
+composer.user.json
+/vendor
+/vendor-new
+/vendor-old
+!/assets/vendor
+.idea/
+.DS_Store
+node_modules
+*.map
