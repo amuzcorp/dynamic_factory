@@ -247,11 +247,11 @@ class DynamicFactoryHandler
     }
 
     /**
-     * 자신의 document_id 를 넣으면 자신을 relate_cpt 로 가지고 있는 document_id 들을 반환한다.
+     * 해당 document_id 를 가지고 있는 relate_cpt 의 document_id 들을 배열로 반환한다.
      *
-     * @param $fieldId
-     * @param $group
-     * @param $documentId
+     * @param $fieldId      // 검색대상 CPT 에서 사용하는 DF 의 ID
+     * @param $group        // 검색대상 CPT 의 group : documents_{targetCptId}
+     * @param $documentId   // 검색 키워드 Document ID
      * @return array
      */
     public function getRelateCpts($fieldId, $group, $documentId)
