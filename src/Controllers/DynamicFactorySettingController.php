@@ -461,7 +461,8 @@ class DynamicFactorySettingController extends BaseController
 
         // TODO 검색 조건 설정
 
-        $cptDocQuery = $this->dfService->getItemsOrderQuery($cptDocQuery, $request->all());
+        $cptDocQuery = $cptDocQuery->orderBy('created_at','desc');
+        //$cptDocQuery = $this->dfService->getItemsOrderQuery($cptDocQuery, $request->all());
 
         return $cptDocQuery->paginate($perPage, ['*'], 'page')->appends($request->except('page'));
     }
