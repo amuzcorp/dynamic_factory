@@ -23,6 +23,8 @@ class DocumentListWidget extends AbstractWidget
 
         $cptUrlHandler = app('overcode.df.url');
 
+        $site_key = $widgetConfig['site_key'];
+
         $cpt_id = $widgetConfig['cpt_id'];
 
         $categoryIds = [];
@@ -52,6 +54,10 @@ class DocumentListWidget extends AbstractWidget
 
         $model = CptDocument::division($cpt_id);
         $query = $model->where('instance_id', $cpt_id);
+
+        if($site_key != 'all_site') {
+            $query = $query->where('site_key', $site_key);
+        }
 
         if(count($categoryIds) > 0) {
             $query->leftJoin(
@@ -106,9 +112,12 @@ class DocumentListWidget extends AbstractWidget
      */
     public function renderSetting(array $args = [])
     {
+        $siteList = \XeDB::table('site')->get();
+
         return $view = View::make(sprintf('%s/views/setting', static::$path), [
             'args' => $args,
-            'cptList' => $this->getCptList()
+            'cptList' => $this->getCptList(),
+            'siteList' => $siteList
         ]);
     }
 

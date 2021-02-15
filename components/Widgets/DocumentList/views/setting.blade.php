@@ -1,4 +1,13 @@
 <div class="form-group">
+    <label>사이트 선택</label>
+    <select name="site_key" class="form-control">
+        <option value="all_site">전체</option>
+        @foreach($siteList as $site)
+            <option value="{{ $site->site_key }}" @if(array_get($args, 'site_key') == $site->site_key) selected="selected"  @endif>{{ $site->host }}</option>
+        @endforeach
+    </select>
+</div>
+<div class="form-group">
     <label>정렬</label>
     <select name="order_type" class="form-control">
         <option value="recentlyCreated" @if(array_get($args, 'order_type') == 'recentlyCreated') selected="selected" @endif >최신순</option>
@@ -20,7 +29,7 @@
     <select name="cpt_id" class="form-control">
         <option value="">선택</option>
         @foreach($cptList as $item)
-        <option value="{{ $item->cpt_id }}">{{ $item->cpt_name }}</option>
+        <option value="{{ $item->cpt_id }}" @if(array_get($args, 'cpt_id') == $item->cpt_id) selected="selected"  @endif>{{ $item->cpt_name }}</option>
         @endforeach
     </select>
 </div>
