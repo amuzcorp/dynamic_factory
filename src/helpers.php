@@ -8,7 +8,7 @@ if (function_exists('getMediaImageUrl') === false) {
      */
     function getMediaImageUrl($json_array)
     {
-        if(empty($json_array)) return [];
+        if(empty($json_array) || $json_array == '"null"') return [];
 
         $arr = json_decode($json_array);
 
