@@ -1,7 +1,6 @@
 <div class="form-group">
     <label>사이트 선택</label>
     <select name="site_key" class="form-control">
-        <option value="all_site">전체</option>
         @foreach($siteList as $site)
             <option value="{{ $site->site_key }}" @if(array_get($args, 'site_key') == $site->site_key) selected="selected"  @endif>{{ $site->host }}</option>
         @endforeach

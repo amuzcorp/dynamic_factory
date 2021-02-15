@@ -52,12 +52,10 @@ class DocumentListWidget extends AbstractWidget
 
         $title = $widgetConfig['@attributes']['title'];
 
-        $model = CptDocument::division($cpt_id);
+        $model = CptDocument::division($cpt_id, $site_key);
         $query = $model->where('instance_id', $cpt_id);
 
-        if($site_key != 'all_site') {
-            $query = $query->where('site_key', $site_key);
-        }
+        $query = $query->where('site_key', $site_key);
 
         if(count($categoryIds) > 0) {
             $query->leftJoin(
