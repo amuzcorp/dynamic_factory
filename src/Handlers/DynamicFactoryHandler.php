@@ -137,7 +137,8 @@ class DynamicFactoryHandler
 
     public function getItems()
     {
-        return Cpt::all();
+        $site_key = \XeSite::getCurrentSiteKey();
+        return Cpt::where('site_key', $site_key)->get();
     }
 
     public function getItemsFromPlugin()
