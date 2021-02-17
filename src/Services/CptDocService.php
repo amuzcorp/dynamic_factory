@@ -80,8 +80,15 @@ class CptDocService
     {
         $result_items = new Collection();
         $site_key = \XeSite::getCurrentSiteKey();
+
+        // site_key 컬럼을 가지고 있는지
+        $hasSiteKey = \Schema::hasColumn('documents', 'site_key');
+
         foreach($cpt_ids as $cpt_id) {
-            $query = CptDocument::division($cpt_id)->where('instance_id', $cpt_id)->where('site_key', $site_key);
+            $query = CptDocument::division($cpt_id)->where('instance_id', $cpt_id);
+            if($hasSiteKey == true) {
+                $query = $query->where('site_key', $site_key);
+            }
             if($author === 'author') {
                 $query = $query->where('user_id', $user->getId());
             }
