@@ -79,9 +79,9 @@ class CptDocService
     public function getItemsByCptIds(array $cpt_ids, UserInterface $user = null, $author = 'any')
     {
         $result_items = new Collection();
-
+        $site_key = \XeSite::getCurrentSiteKey();
         foreach($cpt_ids as $cpt_id) {
-            $query = CptDocument::division($cpt_id)->where('instance_id', $cpt_id);
+            $query = CptDocument::division($cpt_id)->where('instance_id', $cpt_id)->where('site_key', $site_key);
             if($author === 'author') {
                 $query = $query->where('user_id', $user->getId());
             }
