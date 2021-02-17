@@ -27,13 +27,20 @@ class CptDocService
     public function getItems(Request $request, ConfigEntity $config, $site_key = null)
     {
         $model = CptDocument::division($config->get('cpt_id'));
-        $query = $model->where('instance_id', $config->get('cpt_id'));
-        if($site_key == null){
-            $query->where('site_key', \XeSite::getCurrentSiteKey());
-        }else if($site_key == 'all_site') {
 
-        }else {
-            $query->where('site_key', $site_key);
+        $query = $model->where('instance_id', $config->get('cpt_id'));
+
+        // site_key 컬럼을 가지고 있는지
+        $hasSiteKey = \Schema::hasColumn('documents', 'site_key');
+
+        if($hasSiteKey == true) {
+            if ($site_key == null) {
+                $query->where('site_key', \XeSite::getCurrentSiteKey());
+            } else if ($site_key == 'all_site') {
+
+            } else {
+                $query->where('site_key', $site_key);
+            }
         }
 
         $this->handler->makeWhere($query, $request, $config);
