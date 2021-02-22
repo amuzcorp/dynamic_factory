@@ -54,6 +54,7 @@
             <button type="submit" class="btn btn-primary"><i class="xi-download"></i>저장</button>
         </div>
 
+        @if(count($taxonomies) > 0)
         <div class="col-sm-4">
             <div class="panel">
                 <div class="panel-heading"><h4>카테고리</h4></div>
@@ -81,6 +82,7 @@
                 </div>
             </div>
         </div>
+        @endif
     </div>
 </form>
 {{ XeFrontend::js('assets/vendor/jqueryui/jquery-ui.min.js')->load() }}

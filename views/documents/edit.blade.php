@@ -52,8 +52,10 @@
                 </div>
             </div>
             <button type="submit" class="btn btn-primary"><i class="xi-download"></i>저장</button>
+            <button type="button" id="delBtn" class="btn btn-danger pull-right" data-url="{{ route('dyFac.setting.'.$cpt->cpt_id, ['type' => 'delete', 'doc_id' => $item->id]) }}"><i class="xi-trash"></i>삭제</button>
         </div>
 
+        @if(count($taxonomies) > 0)
         <div class="col-sm-4">
             <div class="panel">
                 <div class="panel-heading"><h4>카테고리</h4></div>
@@ -82,6 +84,29 @@
                 </div>
             </div>
         </div>
+        @endif
     </div>
 </form>
 {{ XeFrontend::js('assets/vendor/jqueryui/jquery-ui.min.js')->load() }}
+
+<script>
+    $(document).ready(function() {
+        $('#delBtn').click(function() {
+            let delete_url = $(this).data('url');
+            if(confirm('삭제된 게시물은 복구할 수 없습니다. 계속하시겠습니까?')){
+                XE.ajax({
+                    type: 'get',
+                    dataType: 'json',
+                    url: delete_url,
+                    success: function(response) {
+                        XE.toast('success', '삭제에 성공했습니다.');
+                        document.location.href = "{{ route('dyFac.setting.'.$cpt->cpt_id) }}";
+                    },
+                    error: function(response) {
+                        XE.toast('error', '삭제에 실패하였습니다.');
+                    }
+                });
+            }
+        });
+    });
+</script>

@@ -428,7 +428,15 @@ class DynamicFactorySettingController extends BaseController
 
     public function documentDelete(Cpt $cpt, Request $request)
     {
+        // TODO 퍼미션 체크
 
+        $doc_id = $request->get('doc_id');
+
+        $item = CptDocument::division($cpt->cpt_id)->find($doc_id);
+
+        app('xe.document')->remove($item);
+
+        return $this->presenter->makeApi([]);
     }
 
     public function storeCptDocument(Request $request)
