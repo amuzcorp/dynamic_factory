@@ -344,13 +344,25 @@ class DynamicFactoryTaxonomyHandler
 
     public function getCategoryExtraBySlug($slug)
     {
-        $siteKey = \XeSite::getCurrentSiteKey();
-        return CategoryExtra::where('slug', $slug)->where('site_key', $siteKey)->first();
+        $query = CategoryExtra::where('slug', $slug);
+        // site_key 컬럼을 가지고 있는지
+        $hasSiteKey = \Schema::hasColumn('documents', 'site_key');
+        if($hasSiteKey == true) {
+            $query = $query->where('site_key', \XeSite::getCurrentSiteKey());
+        }
+
+        return $query->first();
     }
 
     public function getCategoryExtras()
     {
-        return CategoryExtra::where('site_key', \XeSite::getCurrentSiteKey())->get();
+        // site_key 컬럼을 가지고 있는지
+        $hasSiteKey = \Schema::hasColumn('documents', 'site_key');
+        if($hasSiteKey == true) {
+            return CategoryExtra::where('site_key', \XeSite::getCurrentSiteKey())->get();
+        }
+
+        return CategoryExtra::all();
     }
 
     public function getTaxonomyItemAttributeName($taxonomyId)
