@@ -186,6 +186,7 @@ class Plugin extends AbstractPlugin
                 // 해당 cpt_id 로 config 를 가져와서 없으면 타 플러그인에서 불러온 config 값으로 생성해준다.
                 if ($config === null || !isset($config)) {
                     $dfConfigHandler->addConfig($this->df_config[$val['cpt_id']], $configName);
+                    app('xe.config')->put('editors', [$val['cpt_id'] => 'editor/ckeditor@ckEditor']);   //기본 에디터 ckEditor 로 설정
                 }
             }
         }
