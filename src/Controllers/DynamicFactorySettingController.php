@@ -2,6 +2,7 @@
 namespace Overcode\XePlugin\DynamicFactory\Controllers;
 
 use App\Http\Sections\DynamicFieldSection;
+use Illuminate\Database\Eloquent\Collection;
 use Overcode\XePlugin\DynamicFactory\Exceptions\NotFoundDocumentException;
 use Overcode\XePlugin\DynamicFactory\Handlers\CptValidatorHandler;
 use Overcode\XePlugin\DynamicFactory\Handlers\DynamicFactoryConfigHandler;
@@ -14,6 +15,7 @@ use Overcode\XePlugin\DynamicFactory\Models\CptDocument;
 use Overcode\XePlugin\DynamicFactory\Models\CptTaxonomy;
 use Overcode\XePlugin\DynamicFactory\Models\DfSlug;
 use Overcode\XePlugin\DynamicFactory\Plugin;
+use Overcode\XePlugin\DynamicFactory\Services\CptDocService;
 use Overcode\XePlugin\DynamicFactory\Services\DynamicFactoryService;
 use App\Http\Sections\EditorSection;
 use XeFrontend;
@@ -24,6 +26,7 @@ use Route;
 use Xpressengine\Category\Models\Category;
 use Xpressengine\Http\Request;
 use App\Http\Controllers\Controller as BaseController;
+use Session;
 
 class DynamicFactorySettingController extends BaseController
 {
@@ -44,13 +47,16 @@ class DynamicFactorySettingController extends BaseController
 
     protected $cptValidatorHandler;
 
+    protected $cptDocService;
+
     public function __construct(
         DynamicFactoryService $dynamicFactoryService,
         DynamicFactoryHandler $dynamicFactoryHandler,
         DynamicFactoryTaxonomyHandler $dynamicFactoryTaxonomyHandler,
         DynamicFactoryConfigHandler $configHandler,
         CptUrlHandler $cptUrlHandler,
-        CptValidatorHandler $cptValidatorHandler
+        CptValidatorHandler $cptValidatorHandler,
+        CptDocService $cptDocService
     )
     {
         $this->dfService = $dynamicFactoryService;
@@ -60,6 +66,7 @@ class DynamicFactorySettingController extends BaseController
         $this->configHandler = $configHandler;
         $this->cptUrlHandler = $cptUrlHandler;
         $this->cptValidatorHandler = $cptValidatorHandler;
+        $this->cptDocService = $cptDocService;
 
         $this->presenter = app('xe.presenter');
 
@@ -467,6 +474,8 @@ class DynamicFactorySettingController extends BaseController
             'cpt_id' => $cpt_id
         ]));
 
+        $cptDocQuery->visible();
+
         // TODO 검색 조건 설정
 
         $cptDocQuery = $cptDocQuery->orderBy('created_at','desc');
@@ -536,6 +545,69 @@ class DynamicFactorySettingController extends BaseController
     {
         // TODO 최고관리자 또는 자신이 작성한 CPT 만 삭제 가능하게 권한 체크
         $this->dfService->destroyCpt($cpt_id);
+
+        return $this->presenter->makeApi([]);
+    }
+
+    /**
+     * @param Request $request
+     */
+    public function deleteDocuments(Request $request)
+    {
+        $documentIds = $request->get('id');
+        $documentIds = is_array($documentIds) ? $documentIds : [$documentIds];
+
+        XeDB::beginTransaction();
+        try {
+            $this->cptDocService->trash($documentIds);
+        }catch (\Exception $e) {
+            XeDB::rollback();
+
+            throw $e;
+        }
+        XeDB::commit();
+
+        Session::flash('alert', ['type' => 'success', 'message' => xe_trans('xe::processed')]);
+
+        return $this->presenter->makeApi([]);
+    }
+
+    /**
+     * 휴지통 관리
+     *
+     * @param Request $request
+     */
+    public function trash(Request $request)
+    {
+        $listColumns = $this->configHandler->getDefaultListColumns();
+
+        $column_labels = $this->configHandler->getDefaultColumnLabels();
+
+        $cptDocs = $this->cptDocService->getItemsAllCpt($request, 'trash');
+
+        return $this->presenter->make('dynamic_factory::views.documents.trash',compact(
+            'listColumns',
+            'column_labels',
+            'cptDocs'
+        ));
+    }
+
+    public function restoreDocuments(Request $request)
+    {
+        $documentIds = $request->get('id');
+        $documentIds = is_array($documentIds) ? $documentIds : [$documentIds];
+
+        XeDB::beginTransaction();
+        try {
+            $this->cptDocService->restore($documentIds);
+        }catch (\Exception $e) {
+            XeDB::rollback();
+
+            throw $e;
+        }
+        XeDB::commit();
+
+        Session::flash('alert', ['type' => 'success', 'message' => xe_trans('xe::processed')]);
 
         return $this->presenter->makeApi([]);
     }

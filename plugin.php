@@ -227,6 +227,11 @@ class Plugin extends AbstractPlugin
             'display' => true,
             'ordering' => 2000
         ]);
+        \XeRegister::push('settings/menu', 'setting.dynamic_factory.trash', [
+            'title' => '휴지통 관리',
+            'display' => true,
+            'ordering' => 3000
+        ]);
 
         foreach($this->cpts as $val){
             \XeRegister::push('settings/menu', $val->menu_path . $val->cpt_id, [
@@ -297,6 +302,10 @@ class Plugin extends AbstractPlugin
 
                 Route::post('/store_cpt_document', ['as' => 'store_cpt_document', 'uses' => 'DynamicFactorySettingController@storeCptDocument']);
                 Route::post('/update_cpt_document', ['as' => 'update_cpt_document', 'uses' => 'DynamicFactorySettingController@updateCptDocument']);
+                Route::post('/delete_cpt_documents', ['as' => 'delete_cpt_documents', 'uses' => 'DynamicFactorySettingController@deleteDocuments']);
+                Route::post('/restore_cpt_documents', ['as' => 'restore_cpt_documents', 'uses' => 'DynamicFactorySettingController@restoreDocuments']);
+
+                Route::get('/trash', ['as' => 'trash', 'uses' => 'DynamicFactorySettingController@trash', 'settings_menu' => 'setting.dynamic_factory.trash']);
             });
         });
 

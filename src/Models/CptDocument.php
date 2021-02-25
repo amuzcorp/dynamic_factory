@@ -1,8 +1,10 @@
 <?php
 namespace Overcode\XePlugin\DynamicFactory\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Xpressengine\Document\Models\Document;
+use Xpressengine\Plugins\Board\Models\Board;
 use Xpressengine\Seo\SeoUsable;
 use Xpressengine\User\Models\Guest;
 use Xpressengine\User\Models\UnknownUser;
@@ -32,6 +34,49 @@ class CptDocument extends Document implements SeoUsable
         }
 
         return $userId;
+    }
+
+    /**
+     * visible
+     *
+     * @param Builder $query query
+     * @return $this
+     */
+    public function scopeVisible(Builder $query)
+    {
+        $query->where('status', static::STATUS_PUBLIC)
+            ->whereIn('display', [static::DISPLAY_VISIBLE, static::DISPLAY_SECRET])
+            ->where('published', static::PUBLISHED_PUBLISHED)
+            ->where(function($query){
+                $query->where('approved',static::APPROVED_APPROVED)
+                    ->orWhere($this->getTable().'.user_id',auth()->id());
+            });
+    }
+
+    /**
+     * notice
+     *
+     * @param Builder $query query
+     * @return $this
+     */
+    public function scopeNotice(Builder $query)
+    {
+        $query->where('status', static::STATUS_NOTICE)
+            ->whereIn('display', [static::DISPLAY_VISIBLE, static::DISPLAY_SECRET])
+            ->where('published', static::PUBLISHED_PUBLISHED);
+    }
+
+    /**
+     * visible with notice
+     *
+     * @param Builder $query query
+     * @return void
+     */
+    public function scopeVisibleWithNotice(Builder $query)
+    {
+        $query->whereIn('status', [static::STATUS_PUBLIC, static::STATUS_NOTICE])
+            ->whereIn('display', [static::DISPLAY_VISIBLE, static::DISPLAY_SECRET])
+            ->where('published', static::PUBLISHED_PUBLISHED);
     }
 
     public function getTitle()

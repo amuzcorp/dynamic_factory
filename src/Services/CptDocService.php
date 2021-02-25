@@ -4,6 +4,7 @@ namespace Overcode\XePlugin\DynamicFactory\Services;
 use Illuminate\Support\Collection;
 use Overcode\XePlugin\DynamicFactory\Exceptions\NotFoundDocumentException;
 use Overcode\XePlugin\DynamicFactory\Handlers\DynamicFactoryDocumentHandler;
+use Overcode\XePlugin\DynamicFactory\Models\Cpt;
 use Overcode\XePlugin\DynamicFactory\Models\CptDocument;
 use Xpressengine\Config\ConfigEntity;
 use Xpressengine\Http\Request;
@@ -42,6 +43,8 @@ class CptDocService
                 $query->where('site_key', $site_key);
             }
         }
+
+        $query->visible();
 
         $this->handler->makeWhere($query, $request, $config);
         $this->handler->makeOrder($query, $request, $config);
@@ -105,10 +108,74 @@ class CptDocService
             if($author === 'author') {
                 $query = $query->where('user_id', $user->getId());
             }
+
+            $query->visible();
+
             $items = $query->get();
             $result_items = $result_items->merge($items);
         }
 
         return $result_items;
     }
+
+    public function getItemsAllCpt(Request $request, $type = 'all')
+    {
+        $cpt_ids = [];
+        $cpts = app('overcode.df.service')->getItemsAll();
+        foreach($cpts as $cpt){
+            $cpt_ids[] = $cpt->cpt_id;
+        }
+
+        $query = CptDocument::whereIn('instance_id', $cpt_ids);
+
+        if($type == 'trash') {
+            $query = $query->whereIn('status', [CptDocument::STATUS_TRASH, CptDocument::STATUS_TRASH_NOTICE]);
+        }
+
+        // 검색조건 붙을 부분
+
+        $paginate = $query->paginate(20)->appends($request->except('page'));
+
+        $total = $paginate->total();
+        $perPage = $paginate->perPage();
+        $currentPage = $paginate->currentPage();
+        $count = 0;
+
+        // 순번 필드를 추가하여 transform
+        $paginate->getCollection()->transform(function ($paginate) use ($total, $perPage, $currentPage, &$count) {
+            $paginate->seq = ($total - ($perPage * ($currentPage - 1))) - $count;
+            $count++;
+            return $paginate;
+        });
+
+        return $paginate;
+    }
+
+    /**
+     * 해당 id를 가진 문서를 휴지통으로 이동한다.
+     *
+     * @param array $documentIds
+     */
+    public function trash($documentIds)
+    {
+        $items = CptDocument::find($documentIds);
+        foreach($items as $item) {
+            $item->setTrash()->save();
+        }
+    }
+
+    /**
+     * 해당 id를 가진 문서를 복원한다.
+     *
+     * @param array $documentIds
+     */
+
+    public function restore($documentIds)
+    {
+        $items = CptDocument::find($documentIds);
+        foreach ($items as $item) {
+            $item->setRestore()->save();
+        }
+    }
+
 }

@@ -1,9 +1,9 @@
 @section('page_title')
-    <h2>{{ $cpt->cpt_name }}</h2>
+    <h2>휴지통 관리</h2>
 @stop
 
 @section('page_description')
-    <small>{{ $cpt->description }}</small>
+    <small>휴지통에 있는 사용자 정의 문서를 복원 또는 삭제합니다.</small>
 @endsection
 
 <div class="row">
@@ -12,17 +12,14 @@
             <div class="panel">
                 <div class="panel-heading">
                     <div class="pull-left">
-                        <h3 class="panel-title">{{ $cpt->cpt_name }} 목록</h3>
-                    </div>
-                    <div class="pull-right">
-                        <a href="{{ route('dyFac.setting.edit', ['cpt_id' => $cpt->cpt_id]) }}" class="xe-btn xe-btn-positive-outline"><i class="xi-cog"></i> 설정</a>
-                        <a href="{{ route($current_route_name, ['type' => 'create']) }}" class="xe-btn xe-btn-primary" data-toggle="xe-page-modal"><i class="xi-file-text-o"></i> {{ sprintf($cpt->labels['new_add_cpt'], $cpt->cpt_name) }}</a>
+                        <h3 class="panel-title">휴지통</h3> (total : {{$cptDocs->count()}})
                     </div>
                 </div>
                 <div class="panel-heading">
                     <div class="pull-left">
                         <div class="btn-group __xe_function_buttons" role="group" aria-label="...">
-                            <button type="button" class="btn btn-default __xe_button" data-mode="trash">{{xe_trans('xe::trash')}}</button>
+                            <button type="button" class="btn btn-default __xe_button" data-mode="restore">{{xe_trans('xe::restore')}}</button>
+                            <button type="button" class="btn btn-default __xe_button" data-mode="destroy">{{xe_trans('xe::destroy')}}</button>
                         </div>
                     </div>
                     <div class="pull-right">
@@ -56,58 +53,61 @@
                             <tr>
                                 <th scope="col"><input type="checkbox" class="__xe_check_all"></th>
                                 <th>#</th>
-                            @foreach($config['listColumns'] as $columnName)
-                                @if($columnName == 'title')
-                                    <th>{{ $cpt->labels['title'] }}</th>
-                                @else
+                                <th>CPT ID</th>
+                                @foreach($listColumns as $columnName)
                                     <th>{{ xe_trans($column_labels[$columnName]) }}</th>
-                                @endif
-                            @endforeach
+                                @endforeach
                             </tr>
                             </thead>
                             <tbody>
-                        @if ($cptDocs->count() > 0)
-                            @foreach($cptDocs as $doc)
-                            <tr>
-                                <td><input type="checkbox" name="id[]" class="__xe_checkbox" value="{{ $doc->id }}"></td>
-                                <td>{{ $doc->seq }}</td>
-                                @foreach($config['listColumns'] as $columnName)
-                                    @if ($columnName === 'title')
-                                        <td><a href="{{ route('dyFac.setting.'.$cpt->cpt_id, ['type' => 'edit', 'doc_id' => $doc->id]) }}">{{ $doc->title }}</a></td>
-                                    @elseif ($columnName === 'writer')
-                                        <td>
-                                            @if ($doc->user !== null)
-                                                {{ $doc->user->getDisplayName() }}
+                            @if ($cptDocs->count() == 0)
+                                <tr>
+                                   <td colspan="{{ count($listColumns) + 2 }}" style="padding:40px 0; text-align: center;">검색된 게시물이 없습니다.</td>
+                                </tr>
+                            @endif
+                            @if ($cptDocs->count() > 0)
+                                @foreach($cptDocs as $doc)
+                                    <tr>
+                                        <td><input type="checkbox" name="id[]" class="__xe_checkbox" value="{{ $doc->id }}"></td>
+                                        <td>{{ $doc->seq }}</td>
+                                        <td>{{ $doc->instance_id }}</td>
+                                        @foreach($listColumns as $columnName)
+                                            @if ($columnName === 'title')
+                                                <td><a href="{{ route('dyFac.setting.'.$doc->type, ['type' => 'edit', 'doc_id' => $doc->id]) }}">{{ $doc->title }}</a></td>
+                                            @elseif ($columnName === 'writer')
+                                                <td>
+                                                    @if ($doc->user !== null)
+                                                        {{ $doc->user->getDisplayName() }}
+                                                    @else
+                                                        Guest
+                                                    @endif
+                                                </td>
+                                            @elseif ($columnName === 'assent_count')
+                                                <td>{{ $doc->assent_count }}</td>
+                                            @elseif ($columnName === 'dissent_count')
+                                                <td>{{ $doc->dissent_count }}</td>
+                                            @elseif ($columnName === 'read_count')
+                                                <td>{{ $doc->read_count }}</td>
+                                            @elseif ($columnName === 'created_at')
+                                                <td>{{ $doc->created_at->format('Y-m-d H:i:s') }}</td>
+                                            @elseif ($columnName === 'updated_at')
+                                                <td>{{ $doc->updated_at->format('Y-m-d H:i:s') }}</td>
                                             @else
-                                                Guest
+                                                <td>
+                                                    @if (($fieldType = XeDynamicField::get('documents_'.$cpt->cpt_id, $columnName)) !== null)
+                                                        <div class="xe-list-board-list__dynamic-field xe-list-board-list__dynamic-field-{{ $columnName }} xe-list-board-list__mobile-style">
+                                                            <span class="sr-only">{{ xe_trans($column_labels[$columnName]) }}</span>
+                                                            {!! $fieldType->getSkin()->output($columnName, $doc->getAttributes()) !!}
+                                                        </div>
+                                                    @else
+                                                        {!! $doc->{$columnName} !!}
+                                                    @endif
+                                                </td>
                                             @endif
-                                        </td>
-                                    @elseif ($columnName === 'assent_count')
-                                        <td>{{ $doc->assent_count }}</td>
-                                    @elseif ($columnName === 'dissent_count')
-                                        <td>{{ $doc->dissent_count }}</td>
-                                    @elseif ($columnName === 'read_count')
-                                        <td>{{ $doc->read_count }}</td>
-                                    @elseif ($columnName === 'created_at')
-                                        <td>{{ $doc->created_at->format('Y-m-d H:i:s') }}</td>
-                                    @elseif ($columnName === 'updated_at')
-                                        <td>{{ $doc->updated_at->format('Y-m-d H:i:s') }}</td>
-                                    @else
-                                        <td>
-                                            @if (($fieldType = XeDynamicField::get('documents_'.$cpt->cpt_id, $columnName)) !== null)
-                                                <div class="xe-list-board-list__dynamic-field xe-list-board-list__dynamic-field-{{ $columnName }} xe-list-board-list__mobile-style">
-                                                    <span class="sr-only">{{ xe_trans($column_labels[$columnName]) }}</span>
-                                                    {!! $fieldType->getSkin()->output($columnName, $doc->getAttributes()) !!}
-                                                </div>
-                                            @else
-                                                {!! $doc->{$columnName} !!}
-                                            @endif
-                                        </td>
-                                    @endif
+                                        @endforeach
+                                    </tr>
                                 @endforeach
-                            </tr>
-                            @endforeach
-                        @endif
+                            @endif
                             </tbody>
                         </table>
                     </form>
@@ -160,26 +160,24 @@
     });
 
     var actions = {
-        trash: function ($f) {
-            $f.attr('action', '{{ route('dyFac.setting.delete_cpt_documents') }}');
+        restore: function ($f) {
+            $f.attr('action', '{{ route('dyFac.setting.restore_cpt_documents') }}');
             send($f);
         }
     };
 
     var send = function($f) {
-        if(confirm('선택한 글들을 휴지통으로 이동하시겠습니까?')) {
-            var url = $f.attr('action'),
-                params = $f.serialize();
+        var url = $f.attr('action'),
+            params = $f.serialize();
 
-            XE.ajax({
-                type: 'post',
-                dataType: 'json',
-                data: params,
-                url: url,
-                success: function (response) {
-                    document.location.reload();
-                }
-            });
-        }
+        XE.ajax({
+            type: 'post',
+            dataType: 'json',
+            data: params,
+            url: url,
+            success: function (response) {
+                document.location.reload();
+            }
+        });
     }
 </script>

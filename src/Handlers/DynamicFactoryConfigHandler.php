@@ -18,11 +18,11 @@ class DynamicFactoryConfigHandler
 
     // id 에 따른 text 는 여기에 저장
     const COLUMN_LABELS = [
-        'title' => '제목', 'content' => '내용', 'writer' => '작성자', 'assent_count' => '추천', 'read_count' => '읽음', 'created_at' => '작성일', 'updated_at' => '수정일', 'dissent_count' => '비추천',
+        'title' => '제목', 'content' => '내용', 'writer' => '작성자', 'read_count' => '읽음', 'created_at' => '작성일', 'updated_at' => '수정일', 'assent_count' => '추천', 'dissent_count' => '비추천',
     ];
 
     const DEFAULT_LIST_COLUMNS = [
-        'title', 'writer', 'assent_count', 'read_count', 'created_at', 'updated_at', 'dissent_count',
+        'title', 'writer', 'read_count', 'created_at', 'updated_at', 'assent_count', 'dissent_count',
     ];
 
     const DEFAULT_SELECTED_LIST_COLUMNS = [
@@ -44,6 +44,16 @@ class DynamicFactoryConfigHandler
     {
         $this->configManager = $configManager;
         $this->dynamicField = $dynamicField;
+    }
+
+    public function getDefaultListColumns()
+    {
+        return self::DEFAULT_SELECTED_LIST_COLUMNS;
+    }
+
+    public function getDefaultColumnLabels()
+    {
+        return self::COLUMN_LABELS;
     }
 
     public function storeDfConfig()
