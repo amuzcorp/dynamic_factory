@@ -161,7 +161,7 @@
 
     var actions = {
         trash: function ($f) {
-            $f.attr('action', '{{ route('dyFac.setting.delete_cpt_documents') }}');
+            $f.attr('action', '{{ route('dyFac.setting.trash_cpt_documents') }}');
             send($f);
         }
     };

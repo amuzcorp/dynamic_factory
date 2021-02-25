@@ -159,7 +159,7 @@ class CptDocService
     public function trash($documentIds)
     {
         $items = CptDocument::find($documentIds);
-        foreach($items as $item) {
+        foreach ($items as $item) {
             $item->setTrash()->save();
         }
     }
@@ -175,6 +175,19 @@ class CptDocService
         $items = CptDocument::find($documentIds);
         foreach ($items as $item) {
             $item->setRestore()->save();
+        }
+    }
+
+    /**
+     * 해당 id를 가진 문서를 삭제한다.
+     *
+     * @param array $documentIds
+     */
+    public function remove($documentIds)
+    {
+        $items = CptDocument::find($documentIds);
+        foreach ($items as $item) {
+            app('xe.document')->remove($item);
         }
     }
 

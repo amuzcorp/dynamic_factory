@@ -52,7 +52,8 @@
                 </div>
             </div>
             <button type="submit" class="btn btn-primary"><i class="xi-download"></i>저장</button>
-            <button type="button" id="delBtn" class="btn btn-danger pull-right" data-url="{{ route('dyFac.setting.'.$cpt->cpt_id, ['type' => 'delete', 'doc_id' => $item->id]) }}"><i class="xi-trash"></i>삭제</button>
+            <button type="button" id="delBtn" class="btn btn-danger pull-right" data-url="{{ route('dyFac.setting.remove_cpt_documents', ['id' => $item->id]) }}"><i class="xi-close-square"></i> 완전 삭제</button>
+            <button type="button" id="trashBtn" class="btn btn-warning pull-right" data-url="{{ route('dyFac.setting.trash_cpt_documents', ['id' => $item->id]) }}"><i class="xi-trash"></i> 휴지통</button>
         </div>
 
         @if(count($taxonomies) > 0)
@@ -91,19 +92,37 @@
 
 <script>
     $(document).ready(function() {
+        // 완전 삭제
         $('#delBtn').click(function() {
             let delete_url = $(this).data('url');
             if(confirm('삭제된 게시물은 복구할 수 없습니다. 계속하시겠습니까?')){
                 XE.ajax({
-                    type: 'get',
+                    type: 'post',
                     dataType: 'json',
                     url: delete_url,
                     success: function(response) {
-                        XE.toast('success', '삭제에 성공했습니다.');
                         document.location.href = "{{ route('dyFac.setting.'.$cpt->cpt_id) }}";
                     },
                     error: function(response) {
                         XE.toast('error', '삭제에 실패하였습니다.');
+                    }
+                });
+            }
+        });
+
+        // 휴지통으로 이동
+        $('#trashBtn').click(function() {
+            let delete_url = $(this).data('url');
+            if(confirm('게시물을 휴지통으로 이동합니다. 계속하시겠습니까?')) {
+                XE.ajax({
+                    type: 'post',
+                    dataType: 'json',
+                    url: delete_url,
+                    success: function (response) {
+                        document.location.href = "{{ route('dyFac.setting.'.$cpt->cpt_id) }}";
+                    },
+                    error: function (response) {
+                        XE.toast('error', '휴지통 이동에 실패하였습니다.');
                     }
                 });
             }

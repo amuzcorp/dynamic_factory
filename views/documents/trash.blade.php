@@ -163,7 +163,11 @@
         restore: function ($f) {
             $f.attr('action', '{{ route('dyFac.setting.restore_cpt_documents') }}');
             send($f);
-        }
+        },
+        destroy: function ($f) {
+            $f.attr('action', '{{ route('dyFac.setting.remove_cpt_documents') }}');
+            send($f);
+        },
     };
 
     var send = function($f) {

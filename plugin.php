@@ -303,7 +303,8 @@ class Plugin extends AbstractPlugin
 
                 Route::post('/store_cpt_document', ['as' => 'store_cpt_document', 'uses' => 'DynamicFactorySettingController@storeCptDocument']);
                 Route::post('/update_cpt_document', ['as' => 'update_cpt_document', 'uses' => 'DynamicFactorySettingController@updateCptDocument']);
-                Route::post('/delete_cpt_documents', ['as' => 'delete_cpt_documents', 'uses' => 'DynamicFactorySettingController@deleteDocuments']);
+                Route::post('/trash_cpt_documents', ['as' => 'trash_cpt_documents', 'uses' => 'DynamicFactorySettingController@trashDocuments']);
+                Route::post('/remove_cpt_documents', ['as' => 'remove_cpt_documents', 'uses' => 'DynamicFactorySettingController@removeDocuments']);
                 Route::post('/restore_cpt_documents', ['as' => 'restore_cpt_documents', 'uses' => 'DynamicFactorySettingController@restoreDocuments']);
 
                 Route::get('/trash', ['as' => 'trash', 'uses' => 'DynamicFactorySettingController@trash', 'settings_menu' => 'setting.dynamic_factory.trash']);

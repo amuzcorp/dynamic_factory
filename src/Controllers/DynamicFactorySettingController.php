@@ -362,9 +362,9 @@ class DynamicFactorySettingController extends BaseController
         else if($type == 'edit'){
             return $this->documentEdit($cpt, $request);
         }
-        else if($type == 'delete'){
+        /*else if($type == 'delete'){
             return $this->documentDelete($cpt, $request);
-        }
+        }*/
 
         return $this->documentList($cpt, $request);
     }
@@ -433,7 +433,7 @@ class DynamicFactorySettingController extends BaseController
         ]);
     }
 
-    public function documentDelete(Cpt $cpt, Request $request)
+    /*public function documentDelete(Cpt $cpt, Request $request)
     {
         // TODO 퍼미션 체크
 
@@ -444,7 +444,7 @@ class DynamicFactorySettingController extends BaseController
         app('xe.document')->remove($item);
 
         return $this->presenter->makeApi([]);
-    }
+    }*/
 
     public function storeCptDocument(Request $request)
     {
@@ -550,9 +550,33 @@ class DynamicFactorySettingController extends BaseController
     }
 
     /**
+     * 휴지통 관리
+     *
      * @param Request $request
      */
-    public function deleteDocuments(Request $request)
+    public function trash(Request $request)
+    {
+        $listColumns = $this->configHandler->getDefaultListColumns();
+
+        $column_labels = $this->configHandler->getDefaultColumnLabels();
+
+        $cptDocs = $this->cptDocService->getItemsAllCpt($request, 'trash');
+
+        return $this->presenter->make('dynamic_factory::views.documents.trash',compact(
+            'listColumns',
+            'column_labels',
+            'cptDocs'
+        ));
+    }
+
+    /**
+     * 휴지통으로
+     *
+     * @param Request $request
+     * @return mixed
+     * @throws \Exception
+     */
+    public function trashDocuments(Request $request)
     {
         $documentIds = $request->get('id');
         $documentIds = is_array($documentIds) ? $documentIds : [$documentIds];
@@ -573,25 +597,12 @@ class DynamicFactorySettingController extends BaseController
     }
 
     /**
-     * 휴지통 관리
+     * 휴지통 문서를 복원
      *
      * @param Request $request
+     * @return mixed
+     * @throws \Exception
      */
-    public function trash(Request $request)
-    {
-        $listColumns = $this->configHandler->getDefaultListColumns();
-
-        $column_labels = $this->configHandler->getDefaultColumnLabels();
-
-        $cptDocs = $this->cptDocService->getItemsAllCpt($request, 'trash');
-
-        return $this->presenter->make('dynamic_factory::views.documents.trash',compact(
-            'listColumns',
-            'column_labels',
-            'cptDocs'
-        ));
-    }
-
     public function restoreDocuments(Request $request)
     {
         $documentIds = $request->get('id');
@@ -600,6 +611,33 @@ class DynamicFactorySettingController extends BaseController
         XeDB::beginTransaction();
         try {
             $this->cptDocService->restore($documentIds);
+        }catch (\Exception $e) {
+            XeDB::rollback();
+
+            throw $e;
+        }
+        XeDB::commit();
+
+        Session::flash('alert', ['type' => 'success', 'message' => xe_trans('xe::processed')]);
+
+        return $this->presenter->makeApi([]);
+    }
+
+    /**
+     * 문서를 완전 삭제
+     *
+     * @param Request $request
+     * @return mixed
+     * @throws \Exception
+     */
+    public function removeDocuments(Request $request)
+    {
+        $documentIds = $request->get('id');
+        $documentIds = is_array($documentIds) ? $documentIds : [$documentIds];
+
+        XeDB::beginTransaction();
+        try {
+            $this->cptDocService->remove($documentIds);
         }catch (\Exception $e) {
             XeDB::rollback();
 
