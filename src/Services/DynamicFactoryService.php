@@ -255,6 +255,8 @@ class DynamicFactoryService
 
         $query = CptDocument::division($instance_id)->where('instance_id', $instance_id);
 
+        $query->visible(); // trash 가 아닌것만
+
         foreach ($this->handlers as $handler) {
             if ($handler instanceof Searchable) {
                 $query = $handler->getItems($query, $attributes);

@@ -474,8 +474,6 @@ class DynamicFactorySettingController extends BaseController
             'cpt_id' => $cpt_id
         ]));
 
-        $cptDocQuery->visible();
-
         // TODO 검색 조건 설정
 
         $cptDocQuery = $cptDocQuery->orderBy('created_at','desc');
