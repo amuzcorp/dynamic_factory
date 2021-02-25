@@ -472,7 +472,20 @@ class DynamicFactorySettingController extends BaseController
         $cptDocQuery = $cptDocQuery->orderBy('created_at','desc');
         //$cptDocQuery = $this->dfService->getItemsOrderQuery($cptDocQuery, $request->all());
 
-        return $cptDocQuery->paginate($perPage, ['*'], 'page')->appends($request->except('page'));
+        $paginate = $cptDocQuery->paginate($perPage, ['*'], 'page')->appends($request->except('page'));
+
+        $total = $paginate->total();
+        $currentPage = $paginate->currentPage();
+        $count = 0;
+
+        // 순번 필드를 추가하여 transform
+        $paginate->getCollection()->transform(function ($paginate) use ($total, $perPage, $currentPage, &$count) {
+            $paginate->seq = ($total - ($perPage * ($currentPage - 1))) - $count;
+            $count++;
+            return $paginate;
+        });
+
+        return $paginate;
     }
 
     public function categoryList()

@@ -5,6 +5,7 @@
         <thead class="xe-hidden-xs">
         <!-- LIST HEADER -->
         <tr>
+            <th>#</th>
         @foreach($dfConfig['listColumns'] as $columnName)
             @if($columnName === 'title')
             <th scope="col" class="title column-th-title"><span>제목</span></th>
@@ -31,6 +32,7 @@
         <!-- LIST -->
         @foreach($paginate as $item)
             <tr>
+                <td>{{ $item->seq }}</td>
             @foreach($dfConfig['listColumns'] as $columnName)
                 @if ($columnName == 'title')
                     <td class="title column-{{$columnName}} xe-hidden-xs">

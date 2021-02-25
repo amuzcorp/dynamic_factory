@@ -26,6 +26,7 @@
                     <table class="table">
                         <thead>
                         <tr>
+                            <th>#</th>
                         @foreach($config['listColumns'] as $columnName)
                             @if($columnName == 'title')
                                 <th>{{ $cpt->labels['title'] }}</th>
@@ -39,6 +40,7 @@
                     @if ($cptDocs->count() > 0)
                         @foreach($cptDocs as $doc)
                         <tr>
+                            <td>{{ $doc->seq }}</td>
                             @foreach($config['listColumns'] as $columnName)
                                 @if ($columnName === 'title')
                                 <td><a href="{{ route('dyFac.setting.'.$cpt->cpt_id, ['type' => 'edit', 'doc_id' => $doc->id]) }}">{{ $doc->title }}</a></td>
