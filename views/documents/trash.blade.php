@@ -62,7 +62,7 @@
                             <tbody>
                             @if ($cptDocs->count() == 0)
                                 <tr>
-                                   <td colspan="{{ count($listColumns) + 2 }}" style="padding:40px 0; text-align: center;">검색된 게시물이 없습니다.</td>
+                                   <td colspan="{{ count($listColumns) + 3 }}" style="padding:40px 0; text-align: center;">게시물이 없습니다.</td>
                                 </tr>
                             @endif
                             @if ($cptDocs->count() > 0)

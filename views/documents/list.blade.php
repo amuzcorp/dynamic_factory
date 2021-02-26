@@ -66,48 +66,53 @@
                             </tr>
                             </thead>
                             <tbody>
-                        @if ($cptDocs->count() > 0)
-                            @foreach($cptDocs as $doc)
-                            <tr>
-                                <td><input type="checkbox" name="id[]" class="__xe_checkbox" value="{{ $doc->id }}"></td>
-                                <td>{{ $doc->seq }}</td>
-                                @foreach($config['listColumns'] as $columnName)
-                                    @if ($columnName === 'title')
-                                        <td><a href="{{ route('dyFac.setting.'.$cpt->cpt_id, ['type' => 'edit', 'doc_id' => $doc->id]) }}">{{ $doc->title }}</a></td>
-                                    @elseif ($columnName === 'writer')
-                                        <td>
-                                            @if ($doc->user !== null)
-                                                {{ $doc->user->getDisplayName() }}
-                                            @else
-                                                Guest
-                                            @endif
-                                        </td>
-                                    @elseif ($columnName === 'assent_count')
-                                        <td>{{ $doc->assent_count }}</td>
-                                    @elseif ($columnName === 'dissent_count')
-                                        <td>{{ $doc->dissent_count }}</td>
-                                    @elseif ($columnName === 'read_count')
-                                        <td>{{ $doc->read_count }}</td>
-                                    @elseif ($columnName === 'created_at')
-                                        <td>{{ $doc->created_at->format('Y-m-d H:i:s') }}</td>
-                                    @elseif ($columnName === 'updated_at')
-                                        <td>{{ $doc->updated_at->format('Y-m-d H:i:s') }}</td>
-                                    @else
-                                        <td>
-                                            @if (($fieldType = XeDynamicField::get('documents_'.$cpt->cpt_id, $columnName)) !== null)
-                                                <div class="xe-list-board-list__dynamic-field xe-list-board-list__dynamic-field-{{ $columnName }} xe-list-board-list__mobile-style">
-                                                    <span class="sr-only">{{ xe_trans($column_labels[$columnName]) }}</span>
-                                                    {!! $fieldType->getSkin()->output($columnName, $doc->getAttributes()) !!}
-                                                </div>
-                                            @else
-                                                {!! $doc->{$columnName} !!}
-                                            @endif
-                                        </td>
-                                    @endif
+                            @if ($cptDocs->count() == 0)
+                                <tr>
+                                    <td colspan="{{ count($config['listColumns']) + 2 }}" style="padding:40px 0; text-align: center;">게시물이 없습니다.</td>
+                                </tr>
+                            @endif
+                            @if ($cptDocs->count() > 0)
+                                @foreach($cptDocs as $doc)
+                                <tr>
+                                    <td><input type="checkbox" name="id[]" class="__xe_checkbox" value="{{ $doc->id }}"></td>
+                                    <td>{{ $doc->seq }}</td>
+                                    @foreach($config['listColumns'] as $columnName)
+                                        @if ($columnName === 'title')
+                                            <td><a href="{{ route('dyFac.setting.'.$cpt->cpt_id, ['type' => 'edit', 'doc_id' => $doc->id]) }}">{{ $doc->title }}</a></td>
+                                        @elseif ($columnName === 'writer')
+                                            <td>
+                                                @if ($doc->user !== null)
+                                                    {{ $doc->user->getDisplayName() }}
+                                                @else
+                                                    Guest
+                                                @endif
+                                            </td>
+                                        @elseif ($columnName === 'assent_count')
+                                            <td>{{ $doc->assent_count }}</td>
+                                        @elseif ($columnName === 'dissent_count')
+                                            <td>{{ $doc->dissent_count }}</td>
+                                        @elseif ($columnName === 'read_count')
+                                            <td>{{ $doc->read_count }}</td>
+                                        @elseif ($columnName === 'created_at')
+                                            <td>{{ $doc->created_at->format('Y-m-d H:i:s') }}</td>
+                                        @elseif ($columnName === 'updated_at')
+                                            <td>{{ $doc->updated_at->format('Y-m-d H:i:s') }}</td>
+                                        @else
+                                            <td>
+                                                @if (($fieldType = XeDynamicField::get('documents_'.$cpt->cpt_id, $columnName)) !== null)
+                                                    <div class="xe-list-board-list__dynamic-field xe-list-board-list__dynamic-field-{{ $columnName }} xe-list-board-list__mobile-style">
+                                                        <span class="sr-only">{{ xe_trans($column_labels[$columnName]) }}</span>
+                                                        {!! $fieldType->getSkin()->output($columnName, $doc->getAttributes()) !!}
+                                                    </div>
+                                                @else
+                                                    {!! $doc->{$columnName} !!}
+                                                @endif
+                                            </td>
+                                        @endif
+                                    @endforeach
+                                </tr>
                                 @endforeach
-                            </tr>
-                            @endforeach
-                        @endif
+                            @endif
                             </tbody>
                         </table>
                     </form>
