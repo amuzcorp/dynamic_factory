@@ -22,7 +22,9 @@
 
     var values_{{ $key['ids'] }} = [
         @foreach($values as $value)
-            @if(!empty($value)) "{{ $value }}", @endif
+            @foreach($items as $item)
+                @if(!empty($value) && $item->find($value)) "{{ $value }}", @endif
+            @endforeach
         @endforeach
     ];
 
