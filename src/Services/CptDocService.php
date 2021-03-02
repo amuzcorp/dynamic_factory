@@ -118,12 +118,15 @@ class CptDocService
         return $result_items;
     }
 
-    public function getItemsAllCpt(Request $request, $type = 'all')
+    public function getItemsAllCpt(Request $request, $type = 'all', $cpt_id = null)
     {
-        $cpt_ids = [];
-        $cpts = app('overcode.df.service')->getItemsAll();
-        foreach($cpts as $cpt){
-            $cpt_ids[] = $cpt->cpt_id;
+        if($cpt_id == null) {
+            $cpts = app('overcode.df.service')->getItemsAll();
+            foreach ($cpts as $cpt) {
+                $cpt_ids[] = $cpt->cpt_id;
+            }
+        }else{
+            $cpt_ids = [$cpt_id];
         }
 
         $query = CptDocument::whereIn('instance_id', $cpt_ids);

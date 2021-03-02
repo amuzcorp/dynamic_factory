@@ -8,7 +8,7 @@
     {!! csrf_field() !!}
     <input type="hidden" name="cpt_id" value="{{ $cpt->cpt_id }}" />
     <div class="row">
-        <div class="col-sm-8">
+        <div class="{{ (count($taxonomies) > 0) ? 'col-sm-8 col-md-9 col-lg-10' : 'col-sm-12'}}">
             <div class="panel">
                 <div class="panel-heading"><h4>입력 필드</h4></div>
                 <div class="panel-body">
@@ -55,7 +55,7 @@
         </div>
 
         @if(count($taxonomies) > 0)
-        <div class="col-sm-4">
+        <div class="col-sm-4 col-md-3 col-lg-2">
             <div class="panel">
                 <div class="panel-heading"><h4>카테고리</h4></div>
                 <div class="panel-body">

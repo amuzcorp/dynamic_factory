@@ -552,13 +552,12 @@ class DynamicFactorySettingController extends BaseController
      *
      * @param Request $request
      */
-    public function trash(Request $request)
+    public function trash(Request $request, $cpt_id = null)
     {
         $listColumns = $this->configHandler->getDefaultListColumns();
 
         $column_labels = $this->configHandler->getDefaultColumnLabels();
-
-        $cptDocs = $this->cptDocService->getItemsAllCpt($request, 'trash');
+        $cptDocs = $this->cptDocService->getItemsAllCpt($request, 'trash', $cpt_id);
 
         return $this->presenter->make('dynamic_factory::views.documents.trash',compact(
             'listColumns',
