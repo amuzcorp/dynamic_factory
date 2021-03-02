@@ -33,9 +33,9 @@
                             </div>
                         @else
                             @if(isset($dynamicFieldsById[$columnName]) && $dynamicFieldsById[$columnName]->get('use') == true)
-                                <div class="__xe_{{$columnName}} __xe_section">
+{{--                                <div class="__xe_{{$columnName}} __xe_section">--}}
                                     {!! df_edit($cptConfig->get('documentGroup'), $columnName, $item->getAttributes()) !!}
-                                </div>
+{{--                                </div>--}}
                                 {{--
                                 @foreach ($dynamicFields as $dynamicField)
                                     @if ($dynamicField->getConfig()->get('use') === true)
