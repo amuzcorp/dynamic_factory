@@ -21,7 +21,7 @@
             <!-- NO ARTICLE -->
             <tr class="no_article">
                 <!-- [D] 컬럼수에 따라 colspan 적용 -->
-                <td>
+                <td colspan="{{ count($dfConfig['listColumns']) + 1 }}">
                     <img src="{{ asset('plugins/board/assets/img/img_pen.jpg') }}" alt="">
                     <p>{{ xe_trans('xe::noPost') }}</p>
                 </td>
