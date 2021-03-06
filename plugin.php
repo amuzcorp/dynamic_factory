@@ -393,12 +393,21 @@ class Plugin extends AbstractPlugin
                 $cptId = str_replace('documents_', '', $config->get('group'));
 
                 /** @var Overcode\XePlugin\DynamicFactory\Handlers\DynamicFactoryConfigHandler $configHandler */
-                $configHandler = app('overcode.df.configHandler');
-                $cptConfig = $configHandler->getConfig($cptId);
-                if ($cptConfig !== null) {
-                    $cptConfig->set('formColumns', $configHandler->getSortFormColumns($cptConfig));
-                    XeConfig::modify($cptConfig);
-                }
+                app('overcode.df.configHandler')->setCurrentSortFormColumns($cptId);
+            }
+        );
+
+        intercept(
+            DynamicFieldHandler::class . '@drop',
+            'dynamic_factory::dropDynamicField',
+            function ($func, ConfigEntity $config, ColumnEntity $column = null) {
+                $func($config, $column);
+
+                // remove prefix name of group
+                $cptId = str_replace('documents_', '', $config->get('group'));
+
+                /** @var Overcode\XePlugin\DynamicFactory\Handlers\DynamicFactoryConfigHandler $configHandler */
+                app('overcode.df.configHandler')->setCurrentSortFormColumns($cptId);
             }
         );
     }

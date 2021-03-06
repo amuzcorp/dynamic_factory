@@ -210,4 +210,18 @@ class DynamicFactoryConfigHandler
     {
         $this->configManager->remove($config);
     }
+
+    /**
+     * 추가된 DF에 대한 sort 를 반영하여 config 를 수정한다.
+     *
+     * @param $cpt_id
+     */
+    public function setCurrentSortFormColumns($cpt_id)
+    {
+        $cptConfig = $this->getConfig($cpt_id);
+        if ($cptConfig !== null) {
+            $cptConfig->set('formColumns', $this->getSortFormColumns($cptConfig));
+            $this->configManager->modify($cptConfig);
+        }
+    }
 }
