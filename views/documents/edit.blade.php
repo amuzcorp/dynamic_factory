@@ -11,7 +11,6 @@
     <div class="row">
         <div class="col-sm-8">
             <div class="panel">
-                <div class="panel-heading"><h4>입력 필드</h4></div>
                 <div class="panel-body">
                     @foreach($cptConfig['formColumns'] as $columnName)
                         @if($columnName === 'title')
