@@ -70,6 +70,8 @@ class DocumentListWidget extends AbstractWidget
             }
         }
 
+        $query->visible();
+
         //$recent_date
         if ($recent_date !== 0) {
             $current = Carbon::now();
@@ -87,8 +89,6 @@ class DocumentListWidget extends AbstractWidget
         } elseif ($orderType == 'recentlyUpdated') {
             $query = $query->orderBy(CptDocument::UPDATED_AT, 'desc')->orderBy('head', 'desc');
         }
-
-        $query->visible();
 
         if ($take) {
             $query = $query->take($take);
