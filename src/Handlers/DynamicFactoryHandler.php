@@ -210,11 +210,16 @@ class DynamicFactoryHandler
             //$registerHandler = $dynamicField->getRegisterHandler();
             $configHandler = $dynamicField->getConfigHandler();
 
+            $new_cpt_ids = [];  // DF 추가 감지
+
             foreach ((array)$df_dfs as $dfs) {
                 foreach ((array)$dfs as $df) {
                     $configName = 'dynamicField.' . $df['group'] . '.' . $df['id'];
 
                     if (XeConfig::get($configName) === null) {
+                        $cpt_id = str_replace('documents_', '', $df['group']);
+                        $new_cpt_ids[] = $cpt_id;
+
                         $config = $configHandler->getDefault();
                         foreach ($df as $name => $value) {
                             if($name === 'label') {
@@ -238,6 +243,11 @@ class DynamicFactoryHandler
                         $dynamicField->create($config);
                     }
                 }
+            }
+
+            $new_cpt_ids = array_unique($new_cpt_ids);  // 새로운 DF 가 추가되었으면 DyFac Config 를 Update 한다.
+            foreach ($new_cpt_ids as $cpt_id) {
+                app('overcode.df.configHandler')->setCurrentSortFormColumns($cpt_id);
             }
         } catch (\Exception $e) {
             \XeDB::rollback();
