@@ -97,7 +97,9 @@ class DocumentListWidget extends AbstractWidget
         return $this->renderSkin([
             'widgetConfig' => $widgetConfig,
             'list' => $list,
-            'title' => $title
+            'title' => $title,
+            'cptUrlHandler' => $cptUrlHandler,
+            'site_key' => $site_key
         ]);
     }
 
