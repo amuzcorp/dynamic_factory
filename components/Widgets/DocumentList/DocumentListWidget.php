@@ -88,6 +88,8 @@ class DocumentListWidget extends AbstractWidget
             $query = $query->orderBy(CptDocument::UPDATED_AT, 'desc')->orderBy('head', 'desc');
         }
 
+        $query->visible();
+
         if ($take) {
             $query = $query->take($take);
         }
