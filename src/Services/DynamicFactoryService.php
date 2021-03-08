@@ -89,7 +89,7 @@ class DynamicFactoryService
                 'sortFormColumns' => DynamicFactoryConfigHandler::DEFAULT_FORM_COLUMNS
             ], $configName);
 
-            app('xe.config')->put('editors', [$inputs['cpt_id'] => 'editor/ckeditor@ckEditor']);   //기본 에디터 ckEditor 로 설정
+            $this->dfConfigHandler->addEditor($inputs['cpt_id']);   //기본 에디터 ckEditor 로 설정
 
         }catch (\Exception $e) {
             XeDB::rollback();
