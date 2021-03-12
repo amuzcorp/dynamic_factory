@@ -29,11 +29,26 @@ class CptModule extends AbstractModule
     protected static function registerSettingsRoute()
     {
         Route::settings(self::getId(), function () {
+            // global
+            Route::get(
+                '/global/permission',
+                ['as' => 'settings.cpt.cpt.global.permission', 'uses' => 'CptModuleSettingController@editGlobalPermission']
+            );
+            Route::post(
+                '/global/permission/update',
+                ['as' => 'settings.cpt.cpt.global.permission.update', 'uses' => 'CptModuleSettingController@updateGlobalPermission']
+            );
+
             // module
             Route::get('config/{instanceId}', ['as' => 'settings.cpt.cpt.config', 'uses' => 'CptModuleSettingController@editConfig']);
             Route::post(
                 'config/update/{instanceId}',
                 ['as' => 'settings.cpt.cpt.config.update', 'uses' => 'CptModuleSettingController@updateConfig']
+            );
+            Route::get('permission/{instanceId}', ['as' => 'settings.cpt.cpt.permission', 'uses' => 'CptModuleSettingController@editPermission']);
+            Route::post(
+                'permission/update/{instanceId}',
+                ['as' => 'settings.cpt.cpt.permission.update', 'uses' => 'CptModuleSettingController@updatePermission']
             );
             Route::get('skin/edit/{instanceId}', ['as' => 'settings.cpt.cpt.skin', 'uses' => 'CptModuleSettingController@editSkin']);
         }, ['namespace' => 'Overcode\XePlugin\DynamicFactory\Controllers']);
@@ -49,6 +64,14 @@ class CptModule extends AbstractModule
         Route::instance(self::getId(), function () {
             Route::get('/', ['as' => 'index', 'uses' => 'CptModuleController@index']);
             Route::get('/show/{id}', ['as' => 'show', 'uses' => 'CptModuleController@showByItemId']);
+
+            Route::get('/create', ['as' => 'create', 'uses' => 'CptModuleController@create']);
+            Route::post('/store', ['as' => 'store', 'uses' => 'CptModuleController@store']);
+
+            Route::get('/edit/{id}', ['as' => 'edit', 'uses' => 'CptModuleController@edit']);
+            Route::post('/update', ['as' => 'update', 'uses' => 'CptModuleController@update']);
+
+            Route::delete('/destroy/{id}', ['as' => 'destroy', 'uses' => 'CptModuleController@destroy']);
 
             Route::get('/{slug}', ['as' => 'slug', 'uses' => 'CptModuleController@slug']);
         }, ['namespace' => 'Overcode\XePlugin\DynamicFactory\Controllers']);

@@ -1,6 +1,8 @@
 <?php
 namespace Overcode\XePlugin\DynamicFactory;
 
+use Overcode\XePlugin\DynamicFactory\Components\Modules\Cpt\CptModule;
+use Overcode\XePlugin\DynamicFactory\Handlers\CptPermissionHandler;
 use Overcode\XePlugin\DynamicFactory\Handlers\DynamicFactoryConfigHandler;
 use Overcode\XePlugin\DynamicFactory\Handlers\DynamicFactoryDocumentHandler;
 use Overcode\XePlugin\DynamicFactory\Handlers\DynamicFactoryHandler;
@@ -129,10 +131,18 @@ class Plugin extends AbstractPlugin
             return new InstanceManager(
                 XeDB::connection(),
                 app('overcode.df.cptModuleConfigHandler'),
-                app('overcode.df.taxoModuleConfigHandler')
+                app('overcode.df.taxoModuleConfigHandler'),
+                app('overcode.df.permission')
             );
         });
         $app->alias(InstanceManager::class, 'overcode.df.instance');
+
+        $app->singleton(CptPermissionHandler::class, function ($app) {
+            $cptPermission = new CptPermissionHandler(app('xe.permission'));
+            $cptPermission->setPrefix(CptModule::getId());
+            return $cptPermission;
+        });
+        $app->alias(CptPermissionHandler::class, 'overcode.df.permission');
     }
 
     /**
@@ -431,6 +441,10 @@ class Plugin extends AbstractPlugin
 
         $taxoModuleConfigHandler = app('overcode.df.taxoModuleConfigHandler');
         $taxoModuleConfigHandler->getDefault();
+
+        // create default permission
+        $permission = new CptPermissionHandler(app('xe.permission'));
+        $permission->addGlobal();
     }
 
     /**

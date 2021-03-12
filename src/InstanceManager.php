@@ -7,8 +7,10 @@ use Overcode\XePlugin\DynamicFactory\Exceptions\InvalidConfigException;
 use Overcode\XePlugin\DynamicFactory\Exceptions\RequireCptIdException;
 use Overcode\XePlugin\DynamicFactory\Exceptions\RequireTaxoIdException;
 use Overcode\XePlugin\DynamicFactory\Handlers\CptModuleConfigHandler;
+use Overcode\XePlugin\DynamicFactory\Handlers\CptPermissionHandler;
 use Overcode\XePlugin\DynamicFactory\Handlers\TaxoModuleConfigHandler;
 use Xpressengine\Database\VirtualConnection;
+use Xpressengine\Permission\Grant;
 
 /**
  * InstanceManager
@@ -33,15 +35,22 @@ class InstanceManager
      */
     protected $taxoConfigHandler;
 
+    /**
+     * @var CptPermissionHandler
+     */
+    protected $permissionHandler;
+
     public function __construct(
         VirtualConnection $conn,
         CptModuleConfigHandler $cptConfigHandler,
-        TaxoModuleConfigHandler $taxoConfigHandler
+        TaxoModuleConfigHandler $taxoConfigHandler,
+        CptPermissionHandler $cptPermissionHandler
     )
     {
         $this->conn = $conn;
         $this->cptConfigHandler = $cptConfigHandler;
         $this->taxoConfigHandler = $taxoConfigHandler;
+        $this->permissionHandler = $cptPermissionHandler;
     }
 
     public function createCpt(array $params)
@@ -58,6 +67,8 @@ class InstanceManager
         $this->conn->beginTransaction();
 
         $config = $this->cptConfigHandler->add($params);
+
+        $this->permissionHandler->setByInstanceId($params['instanceId'], new Grant());
 
         $this->conn->commit();
 

@@ -4,18 +4,22 @@ namespace Overcode\XePlugin\DynamicFactory\Controllers;
 
 use Overcode\XePlugin\DynamicFactory\Components\Modules\Cpt\CptModule;
 use Overcode\XePlugin\DynamicFactory\Exceptions\NotFoundDocumentException;
+use Overcode\XePlugin\DynamicFactory\Handlers\CptPermissionHandler;
 use Overcode\XePlugin\DynamicFactory\Handlers\DynamicFactoryDocumentHandler;
 use Overcode\XePlugin\DynamicFactory\Models\CptDocument;
 use Overcode\XePlugin\DynamicFactory\Models\DfSlug;
 use Overcode\XePlugin\DynamicFactory\Services\CptDocService;
 use Auth;
+use Gate;
 use XeFrontend;
 use XePresenter;
 use App\Http\Controllers\Controller;
 use Overcode\XePlugin\DynamicFactory\Handlers\CptModuleConfigHandler;
 use Overcode\XePlugin\DynamicFactory\Handlers\CptUrlHandler;
 use Xpressengine\Http\Request;
+use Xpressengine\Permission\Instance;
 use Xpressengine\Routing\InstanceConfig;
+use Xpressengine\Support\Exceptions\AccessDeniedHttpException;
 
 class CptModuleController extends Controller
 {
@@ -57,8 +61,15 @@ class CptModuleController extends Controller
         XePresenter::share('config', $this->config);
     }
 
-    public function index(CptDocService $service, Request $request)
+    public function index(CptDocService $service, Request $request, CptPermissionHandler $cptPermissionHandler)
     {
+        if (Gate::denies(
+            CptPermissionHandler::ACTION_LIST,
+            new Instance($cptPermissionHandler->name($this->instanceId))
+        )) {
+            throw new AccessDeniedHttpException;
+        }
+
         \XeFrontend::title($this->getSiteTitle());
 
         $cpt_id = $this->config->get('cpt_id');
@@ -156,5 +167,12 @@ class CptModuleController extends Controller
         }
 
         return $this->show($service, $request, $menuUrl, $slug->target_id);
+    }
+
+    public function create(
+        CptDocService $service, Request $request
+    )
+    {
+
     }
 }
