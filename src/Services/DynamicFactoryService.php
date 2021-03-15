@@ -202,6 +202,9 @@ class DynamicFactoryService
         XeDB::beginTransaction();
         try {
             $cpt_id = $request->cpt_id;
+            if(array_get($inputs, 'cpt_id') == null) {
+                $inputs['cpt_id'] = $cpt_id;
+            }
 
             /** @var DocumentHandler $documentConfigHandler */
             $documentConfigHandler = app('xe.document');
@@ -222,7 +225,7 @@ class DynamicFactoryService
         }
         XeDB::commit();
 
-        return $document;
+        return $cptDocument;
     }
 
     public function updateCptDocument(Request $request)

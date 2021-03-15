@@ -17,6 +17,7 @@ use Route;
 use XeConfig;
 use XeCounter;
 use XeDynamicField;
+use XeDocument;
 use XeDB;
 use XeInterception;
 use Xpressengine\Config\ConfigEntity;
@@ -104,6 +105,11 @@ class Plugin extends AbstractPlugin
         });
         $app->alias(CptUrlHandler::class, 'overcode.df.url');
 
+        $app->singleton(Validator::class, function ($app) {
+            return new Validator(app('overcode.df.cptModuleConfigHandler'), app('xe.dynamicField'));
+        });
+        $app->alias(Validator::class, 'overcode.df.validator');
+
         // DynamicFactoryTaxonomyHandler
         $app->singleton(DynamicFactoryTaxonomyHandler::class, function() {
             return new DynamicFactoryTaxonomyHandler();
@@ -113,7 +119,9 @@ class Plugin extends AbstractPlugin
         // CptModuleConfigHandler
         $app->singleton(CptModuleConfigHandler::class, function () {
             return new CptModuleConfigHandler(
-                app('xe.config')
+                app('xe.config'),
+                XeDynamicField::getConfigHandler(),
+                XeDocument::getConfigHandler()
             );
         });
         $app->alias(CptModuleConfigHandler::class, 'overcode.df.cptModuleConfigHandler');

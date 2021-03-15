@@ -11,15 +11,20 @@ use Overcode\XePlugin\DynamicFactory\Models\DfSlug;
 use Overcode\XePlugin\DynamicFactory\Services\CptDocService;
 use Auth;
 use Gate;
+use Overcode\XePlugin\DynamicFactory\Services\DynamicFactoryService;
+use Overcode\XePlugin\DynamicFactory\Validator;
 use XeFrontend;
 use XePresenter;
 use App\Http\Controllers\Controller;
 use Overcode\XePlugin\DynamicFactory\Handlers\CptModuleConfigHandler;
 use Overcode\XePlugin\DynamicFactory\Handlers\CptUrlHandler;
+use Xpressengine\Editor\PurifierModules\EditorContent;
 use Xpressengine\Http\Request;
 use Xpressengine\Permission\Instance;
 use Xpressengine\Routing\InstanceConfig;
 use Xpressengine\Support\Exceptions\AccessDeniedHttpException;
+use Xpressengine\Support\Purifier;
+use Xpressengine\Support\PurifierModules\Html5;
 
 class CptModuleController extends Controller
 {
@@ -35,10 +40,13 @@ class CptModuleController extends Controller
 
     protected $taxonomyHandler;
 
+    protected $dfService;
+
     public function __construct(
         CptModuleConfigHandler $configHandler,
         CptUrlHandler $cptUrlHandler,
-        DynamicFactoryDocumentHandler $dfDocHandler
+        DynamicFactoryDocumentHandler $dfDocHandler,
+        DynamicFactoryService $dynamicFactoryService
     )
     {
         $instanceConfig = InstanceConfig::instance();
@@ -53,6 +61,7 @@ class CptModuleController extends Controller
             $cptUrlHandler->setConfig($this->config);
         }
         $this->taxonomyHandler = app('overcode.df.taxonomyHandler');
+        $this->dfService = $dynamicFactoryService;
 
         XePresenter::setSkinTargetId(CptModule::getId());
         XePresenter::share('configHandler', $configHandler);
@@ -127,19 +136,6 @@ class CptModuleController extends Controller
         ]);
     }
 
-    private function getSiteTitle()
-    {
-        $siteTitle = \XeFrontend::output('title');
-
-        $instanceConfig = InstanceConfig::instance();
-        $menuItem = $instanceConfig->getMenuItem();
-
-        $title = xe_trans($menuItem['title']) . ' - ' . xe_trans($siteTitle);
-        $title = strip_tags(html_entity_decode($title));
-
-        return $title;
-    }
-
     /**
      * 문자열을 넘겨 slug 반환
      *
@@ -170,9 +166,124 @@ class CptModuleController extends Controller
     }
 
     public function create(
-        CptDocService $service, Request $request
+        CptDocService $service,
+        Request $request,
+        Validator $validator,
+        CptPermissionHandler $cptPermission
     )
     {
+        if (Gate::denies(
+            CptPermissionHandler::ACTION_CREATE,
+            new Instance($cptPermission->name($this->instanceId))
+        )) {
+            throw new AccessDeniedHttpException;
+        }
 
+        // if use consultation option Guest cannot create article
+        if ($this->config->get('useConsultation') === true && Auth::check() === false) {
+            throw new AccessDeniedHttpException;
+        }
+
+        $cpt_id = $this->config->get('cpt_id');
+
+        $taxonomies = $this->taxonomyHandler->getTaxonomies($cpt_id);
+        $rules = $validator->getCreateRule(Auth::user(), $this->config);
+
+        $cptConfig = $this->dfService->getCptConfig($cpt_id);
+        $fieldTypes = $service->getFieldTypes($cptConfig);
+
+        $dynamicFieldsById = [];
+        foreach ($fieldTypes as $fieldType) {
+            $dynamicFieldsById[$fieldType->get('id')] = $fieldType;
+        }
+
+        return XePresenter::make('create', [
+            'taxonomies' => $taxonomies,
+            'rules' => $rules,
+            'head' => '',
+            'fieldTypes' => $fieldTypes,
+            'cptConfig' => $cptConfig,
+            'dynamicFieldsById' => $dynamicFieldsById
+        ]);
+    }
+
+    public function store(
+        CptDocService $service,
+        Request $request,
+        Validator $validator,
+        CptPermissionHandler $cptPermission
+    ) {
+        if (Gate::denies(
+            CptPermissionHandler::ACTION_CREATE,
+            new Instance($cptPermission->name($this->instanceId))
+        )) {
+            throw new AccessDeniedHttpException;
+        }
+
+        // if use consultation option Guest cannot create article
+        if ($this->config->get('useConsultation') === true && Auth::check() === false) {
+            throw new AccessDeniedHttpException;
+        }
+
+        $purifier = new Purifier();
+        $purifier->allowModule(EditorContent::class);
+        $purifier->allowModule(HTML5::class);
+
+        $inputs = $request->all();
+        $originInputs = $request->originAll();
+        $inputs['title'] = htmlspecialchars($originInputs['title'], ENT_COMPAT | ENT_HTML401, 'UTF-8', false);
+
+        if ($this->isManager()) {
+            $inputs['content'] = $originInputs['content'];
+        } else {
+            $inputs['content'] = $purifier->purify($originInputs['content']);
+        }
+
+        $request->replace($inputs);
+
+        // 유효성 체크
+        $this->validate($request, $validator->getCreateRule(Auth::user(), $this->config));
+
+        // 공지 등록 권한 확인
+        // 비밀글 등록 설정 확인
+
+        $request->request->add(['cpt_id' => $this->config->get('cpt_id')]); // cpt_id 추가
+        $item = $this->dfService->storeCptDocument($request);
+
+        return XePresenter::redirect()
+            ->to($this->cptUrlHandler->getShow($item, $request->query->all()))
+            ->setData(['item' => $item]);
+    }
+
+    /**
+     * is manager
+     *
+     * @return bool
+     */
+    protected function isManager()
+    {
+        $cptPermission = app('overcode.df.permission');
+        return Gate::allows(
+            CptPermissionHandler::ACTION_MANAGE,
+            new Instance($cptPermission->name($this->instanceId))
+        ) ? true : false;
+    }
+
+    /**
+     * get site title
+     *
+     * @return string
+     */
+    private function getSiteTitle()
+    {
+        $siteTitle = \XeFrontend::output('title');
+
+        $instanceConfig = InstanceConfig::instance();
+        $menuItem = $instanceConfig->getMenuItem();
+
+        $title = xe_trans($menuItem['title']) . ' - ' . xe_trans($siteTitle);
+        $title = strip_tags(html_entity_decode($title));
+
+        return $title;
     }
 }

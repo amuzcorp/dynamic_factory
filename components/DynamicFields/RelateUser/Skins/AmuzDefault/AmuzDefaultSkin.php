@@ -105,9 +105,12 @@ class AmuzDefaultSkin extends AbstractSkin
     {
         list($data, $key) = $this->filter($args);
 
-        $ids = json_decode($data['ids']);
+        $items = [];
 
-        $items = app('xe.user')->users()->whereIn('id', $ids)->get();
+        $ids = json_decode($data['ids']);
+        if($ids != null) {
+            $items = app('xe.user')->users()->whereIn('id', $ids)->get();
+        }
 
         $viewFactory = $this->handler->getViewFactory();
         return $viewFactory->make($this->getViewPath('show'), [

@@ -4,6 +4,8 @@ namespace Overcode\XePlugin\DynamicFactory\Handlers;
 
 use Xpressengine\Config\ConfigEntity;
 use Xpressengine\Config\ConfigManager;
+use Xpressengine\DynamicField\ConfigHandler as DynamicFieldConfigHandler;
+use Xpressengine\Document\ConfigHandler as DocumentConfigHandler;
 
 class CptModuleConfigHandler
 {
@@ -19,15 +21,29 @@ class CptModuleConfigHandler
     protected $configManager;
 
     /**
+     * @var DynamicFieldConfigHandler
+     */
+    protected $dynamicField;
+
+    /**
+     * @var DocumentConfigHandler
+     */
+    protected $document;
+
+    /**
      * @var array
      */
     protected $defaultConfig = [];
 
     public function __construct(
-        ConfigManager $configManager
+        ConfigManager $configManager,
+        DynamicFieldConfigHandler $dynamicField,
+        DocumentConfigHandler $document
     )
     {
         $this->configManager = $configManager;
+        $this->dynamicField = $dynamicField;
+        $this->document = $document;
     }
 
     /**
@@ -97,6 +113,21 @@ class CptModuleConfigHandler
     public function modify(ConfigEntity $config)
     {
         return $this->configManager->modify($config);
+    }
+
+    /**
+     * get dynamic field config list
+     *
+     * @param ConfigEntity $config board config entity
+     * @return array
+     */
+    public function getDynamicFields(ConfigEntity $config)
+    {
+        $configs = $this->dynamicField->gets($config->get('documentGroup'));
+        if (count($configs) == 0) {
+            return [];
+        }
+        return $configs;
     }
 
 }
