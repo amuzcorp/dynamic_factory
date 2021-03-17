@@ -235,6 +235,9 @@ class DynamicFactoryService
         XeDB::beginTransaction();
         try {
             $cpt_id = $request->cpt_id;
+            if(array_get($inputs, 'cpt_id') == null){
+                $inputs['cpt_id'] = $cpt_id;
+            }
 
             $doc = CptDocument::division($cpt_id)->find($request->get('doc_id'));
 
@@ -250,6 +253,9 @@ class DynamicFactoryService
             throw $e;
         }
         XeDB::commit();
+
+        $doc = CptDocument::division($cpt_id)->find($request->get('doc_id'));
+        return $doc;
     }
 
     public function getItemsWhereQuery(array $attributes)

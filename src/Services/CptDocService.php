@@ -4,6 +4,7 @@ namespace Overcode\XePlugin\DynamicFactory\Services;
 use Illuminate\Support\Collection;
 use Overcode\XePlugin\DynamicFactory\Exceptions\NotFoundDocumentException;
 use Overcode\XePlugin\DynamicFactory\Handlers\DynamicFactoryDocumentHandler;
+use Overcode\XePlugin\DynamicFactory\IdentifyManager;
 use Overcode\XePlugin\DynamicFactory\Models\Cpt;
 use Overcode\XePlugin\DynamicFactory\Models\CptDocument;
 use Xpressengine\Config\ConfigEntity;
@@ -192,6 +193,30 @@ class CptDocService
         foreach ($items as $item) {
             app('xe.document')->remove($item);
         }
+    }
+
+    /**
+     * has article permission
+     *
+     * @param CptDocument $item
+     * @param UserInterface $user
+     * @param IdentifyManager $identifyManager
+     * @param bool $force
+     *
+     * @return bool
+     */
+    public function hasItemPerm(CptDocument $item, UserInterface $user, IdentifyManager $identifyManager, $force = false)
+    {
+        $perm = false;
+        if ($force === true) {
+            $perm = true;
+        } elseif ($item->user_id == $user->getId()) {
+            $perm = true;
+        } elseif ($item->user_id == '' && $user->getId() === null &&
+            $identifyManager->identified($item) === true) {
+            $perm = true;
+        }
+        return $perm;
     }
 
 }

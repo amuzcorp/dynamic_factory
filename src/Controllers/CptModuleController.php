@@ -6,6 +6,7 @@ use Overcode\XePlugin\DynamicFactory\Components\Modules\Cpt\CptModule;
 use Overcode\XePlugin\DynamicFactory\Exceptions\NotFoundDocumentException;
 use Overcode\XePlugin\DynamicFactory\Handlers\CptPermissionHandler;
 use Overcode\XePlugin\DynamicFactory\Handlers\DynamicFactoryDocumentHandler;
+use Overcode\XePlugin\DynamicFactory\IdentifyManager;
 use Overcode\XePlugin\DynamicFactory\Models\CptDocument;
 use Overcode\XePlugin\DynamicFactory\Models\DfSlug;
 use Overcode\XePlugin\DynamicFactory\Services\CptDocService;
@@ -15,6 +16,7 @@ use Overcode\XePlugin\DynamicFactory\Services\DynamicFactoryService;
 use Overcode\XePlugin\DynamicFactory\Validator;
 use XeFrontend;
 use XePresenter;
+use XeSEO;
 use App\Http\Controllers\Controller;
 use Overcode\XePlugin\DynamicFactory\Handlers\CptModuleConfigHandler;
 use Overcode\XePlugin\DynamicFactory\Handlers\CptUrlHandler;
@@ -249,6 +251,113 @@ class CptModuleController extends Controller
 
         $request->request->add(['cpt_id' => $this->config->get('cpt_id')]); // cpt_id 추가
         $item = $this->dfService->storeCptDocument($request);
+
+        return XePresenter::redirect()
+            ->to($this->cptUrlHandler->getShow($item, $request->query->all()))
+            ->setData(['item' => $item]);
+    }
+
+    public function edit(
+        CptDocService $service,
+        Request $request,
+        Validator $validator,
+        IdentifyManager $identifyManager,
+        $menuUrl,
+        $id
+    ) {
+        $item = CptDocument::division($this->instanceId)->find($id);
+
+        if ($item == null) {
+            throw new NotFoundDocumentException;
+        }
+
+        // 비회원이 작성 한 글일 때 인증페이지로 이동
+        if ($this->isManager() !== true &&
+            $item->isGuest() === true &&
+            $identifyManager->identified($item) === false &&
+            Auth::user()->getRation() != 'super') {
+            return xe_redirect()->to($this->cptUrlHandler->get('guest.id', [
+                'id' => $item->id,
+                'referrer' => app('url')->current(),
+            ]));
+        }
+
+        // 접근 권한 확인
+        if ($service->hasItemPerm($item, Auth::user(), $identifyManager, $this->isManager()) == false) {
+            throw new AccessDeniedHttpException;
+        }
+
+        $cpt_id = $this->config->get('cpt_id');
+
+        $taxonomies = $this->taxonomyHandler->getTaxonomies($cpt_id);
+        $rules = $validator->getEditRule(Auth::user(), $this->config);
+
+        $cptConfig = $this->dfService->getCptConfig($cpt_id);
+        $fieldTypes = $service->getFieldTypes($cptConfig);
+
+        $dynamicFieldsById = [];
+        foreach ($fieldTypes as $fieldType) {
+            $dynamicFieldsById[$fieldType->get('id')] = $fieldType;
+        }
+
+        XeSEO::notExec();
+
+        return XePresenter::make('edit', [
+            'item' => $item,
+            'taxonomies' => $taxonomies,
+            'rules' => $rules,
+            'parent' => null,
+            'fieldTypes' => $fieldTypes,
+            'cptConfig' => $cptConfig,
+            'dynamicFieldsById' => $dynamicFieldsById
+        ]);
+    }
+
+    public function update(
+        CptDocService $service,
+        Request $request,
+        Validator $validator,
+        IdentifyManager $identifyManager,
+        $menuUrl
+    ) {
+        $item = CptDocument::division($this->instanceId)->find($request->get('id'));
+
+        // 비회원이 작성 한 글 인증
+        if ($this->isManager() !== true &&
+            $item->isGuest() === true &&
+            $identifyManager->identified($item) === false &&
+            Auth::user()->getRating() != 'super') {
+            return xe_redirect()->to($this->cptUrlHandler->get('guest.id', [
+                'id' => $item->id,
+                'referrer' => $this->cptUrlHandler->get('edit', ['id' => $item->id]),
+            ]));
+        }
+
+        $purifier = new Purifier();
+        $purifier->allowModule(EditorContent::class);
+        $purifier->allowModule(HTML5::class);
+
+        $inputs = $request->all();
+        $originInputs = $request->originAll();
+        $inputs['title'] = htmlspecialchars($originInputs['title'], ENT_COMPAT | ENT_HTML401, 'UTF-8', false);
+
+        if ($this->isManager()) {
+            $inputs['content'] = $originInputs['content'];
+        } else {
+            $inputs['content'] = $purifier->purify($originInputs['content']);
+        }
+
+        $request->replace($inputs);
+
+        $this->validate($request, $validator->getEditRule(Auth::user(), $this->config));
+
+        if ($service->hasItemPerm($item, Auth::user(), $identifyManager, $this->isManager()) == false) {
+            throw new AccessDeniedHttpException;
+        }
+
+        $request->request->add(['cpt_id' => $this->config->get('cpt_id')]); // cpt_id 추가
+        $request->request->add(['doc_id' => $request->get('id')]);  // doc_id 추가
+        $item = $this->dfService->updateCptDocument($request);
 
         return XePresenter::redirect()
             ->to($this->cptUrlHandler->getShow($item, $request->query->all()))
