@@ -9,6 +9,7 @@ use Xpressengine\Config\ConfigEntity;
 use Xpressengine\Counter\Counter;
 use Xpressengine\Database\Eloquent\Builder;
 use Xpressengine\Document\DocumentHandler;
+use Xpressengine\Storage\File;
 use Xpressengine\Storage\Storage;
 use Xpressengine\User\UserInterface;
 
@@ -55,7 +56,13 @@ class DynamicFactoryDocumentHandler
         $attributes['instance_id'] = $cpt_id;
         $attributes['type'] = $cpt_id;
 
-        return $this->documentHandler->add($attributes);
+        $doc = $this->documentHandler->add($attributes);
+
+        $cptDoc = CptDocument::division($cpt_id)->find($doc->id);
+
+        $this->setFiles($cptDoc, $attributes);
+
+        return $cptDoc;
     }
 
     public function update($doc, $inputs)
@@ -68,7 +75,11 @@ class DynamicFactoryDocumentHandler
             }
         }
 
-        return $this->documentHandler->put($doc);
+        $this->documentHandler->put($doc);
+
+        $this->setFiles($doc, $inputs);
+
+        return $doc->find($doc->id);
     }
 
     public function incrementReadCount(CptDocument $doc, UserInterface $user)
@@ -196,4 +207,29 @@ class DynamicFactoryDocumentHandler
 
         return $query;
     }
+
+    /**
+     * set files
+     *
+     * @param CptDocument $doc
+     * @param array $args
+     * @return array
+     */
+    protected function setFiles(CptDocument $doc, array $args)
+    {
+        $fileIds = [];
+        if (empty($args['_files']) === false) {
+            $this->storage->sync($doc->getKey(), $args['_files']);
+        }
+        return $fileIds;
+    }
+
+    protected function unsetFiles(CptDocument $doc, array $fileIds)
+    {
+        $files = File::whereIn('id', array_diff($doc->getFileIds(), $fileIds))->get();
+        foreach ($files as $file) {
+            $this->storage->unBind($doc->id, $file, true);
+        }
+    }
+
 }

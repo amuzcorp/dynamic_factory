@@ -162,6 +162,21 @@ class CptDocument extends Document implements SeoUsable
         return $slug === null ? '' : $slug->slug;
     }
 
+    /**
+     * get file ids
+     *
+     * @return array
+     */
+    public function getFileIds()
+    {
+        $files = $this->files;
+        $ids = [];
+        foreach ($files as $file) {
+            $ids[] = $file->id;
+        }
+        return $ids;
+    }
+
     public function taxonomy()
     {
         return $this->hasMany(DfTaxonomy::class, 'target_id', 'id');

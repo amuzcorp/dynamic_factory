@@ -13,6 +13,7 @@ use Overcode\XePlugin\DynamicFactory\Models\DfSlug;
 use Overcode\XePlugin\DynamicFactory\Plugin;
 use XeDB;
 use XeSite;
+use XeEditor;
 use Overcode\XePlugin\DynamicFactory\Handlers\DynamicFactoryHandler;
 use Xpressengine\Category\Models\CategoryItem;
 use Xpressengine\Config\ConfigEntity;
@@ -212,6 +213,14 @@ class DynamicFactoryService
             if(!$config){
                 $documentConfigHandler->createInstance($cpt_id, ['instanceId' => $cpt_id, 'group' => Plugin::getId() . '_' . $cpt_id, 'siteKey' => XeSite::getCurrentSiteKey()]);
             }
+            $editor = XeEditor::get($cpt_id);
+            $inputs['format'] = $editor->htmlable() ? CptDocument::FORMAT_HTML : CptDocument::FORMAT_NONE;
+
+            // set file, tag
+            $inputs['_files'] = array_get($inputs, $editor->getFileInputName(), []);
+            $inputs['_hashTags'] = array_get($inputs, $editor->getTagInputName(), []);
+            $inputs['_coverId'] = array_get($inputs, $editor->getCoverInputName(), []);
+
             $document = $this->dfDocumentHandler->store($inputs);
 
             $this->dfTaxonomyHandler->storeTaxonomy($document, $inputs);
@@ -240,6 +249,14 @@ class DynamicFactoryService
             }
 
             $doc = CptDocument::division($cpt_id)->find($request->get('doc_id'));
+
+            $editor = XeEditor::get($cpt_id);
+            $inputs['format'] = $editor->htmlable() ? CptDocument::FORMAT_HTML : CptDocument::FORMAT_NONE;
+
+            // set file, tag
+            $inputs['_files'] = array_get($inputs, $editor->getFileInputName(), []);
+            $inputs['_hashTags'] = array_get($inputs, $editor->getTagInputName(), []);
+            $inputs['_coverId'] = array_get($inputs, $editor->getCoverInputName(), []);
 
             $this->dfDocumentHandler->update($doc, $inputs);
 
