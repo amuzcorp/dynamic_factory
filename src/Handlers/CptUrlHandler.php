@@ -32,9 +32,25 @@ class CptUrlHandler
 
     public function getShow(CptDocument $document, $params =[], ConfigEntity $config = null)
     {
-        $slug = $document->getSlug();
+        $slug = $document->slug;
+        if ($slug != null) {
+            return $this->getSlug($slug->slug, $params, $this->instanceId);
+        }
 
-        return $this->get('slug', [$slug], $this->instanceId);
+        $id = $document->id;
+        $params['id'] = $id;
+        return $this->get('show', $params, $this->instanceId);
+    }
+
+    public function getSlug($slug, array $params, $instanceId)
+    {
+        unset($params['id']);
+        $params['slug'] = $slug;
+
+        // 페이지 정보는 넘기지 않음
+        unset($params['page']);
+
+        return $this->get('slug', $params, $instanceId);
     }
 
     public function managerUrl($name, $params = [])

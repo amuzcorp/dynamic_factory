@@ -62,7 +62,7 @@
                     type: 'get',
                     dataType: 'json',
                     success: function(res) {
-                        console.log(res);
+                        // console.log(res);
                         $container.find('.__xe_slug_edit input').val(res.slug);
                         $container.find('.current-slug').text('/' + res.slug);
 
