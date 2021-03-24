@@ -10,6 +10,7 @@ use Overcode\XePlugin\DynamicFactory\Handlers\DynamicFactoryTaxonomyHandler;
 use Overcode\XePlugin\DynamicFactory\Handlers\CptModuleConfigHandler;
 use Overcode\XePlugin\DynamicFactory\Handlers\CptUrlHandler;
 use Overcode\XePlugin\DynamicFactory\Handlers\TaxoModuleConfigHandler;
+use Overcode\XePlugin\DynamicFactory\Models\CptTaxonomy;
 use Overcode\XePlugin\DynamicFactory\Services\CptDocService;
 use Overcode\XePlugin\DynamicFactory\Services\DynamicFactoryService;
 use Route;
@@ -175,6 +176,8 @@ class Plugin extends AbstractPlugin
 
     protected function loadCpts()
     {
+        $site_key = \XeSite::getCurrentSiteKey();
+
         $dfService = app('overcode.df.service');
         $comment_manager = app('overcode.df.comment_manager');
         $dfConfigHandler = app('overcode.df.configHandler');
@@ -208,7 +211,7 @@ class Plugin extends AbstractPlugin
                 \XeRegister::push('df_df', $cpt->cpt_id, $cpt->document_dynamic_field);
             }
 
-            //set admin menu
+            //set admin menus
             $display = isset($cpt->display) ? $cpt->display : true;
             \XeRegister::push('settings/menu', $cpt->menu_path . $cpt->cpt_id, [
                 'title' => $cpt->menu_name,
@@ -216,11 +219,16 @@ class Plugin extends AbstractPlugin
                 'display' => $display,
                 'ordering' => $cpt->menu_order
             ]);
-
-            \XeRegister::push('settings/menu', 'setting.dynamic_factory.trash', [
-                'title' => '휴지통 관리',
-                'display' => true,
-                'ordering' => 3000
+            \XeRegister::push('settings/menu', $cpt->menu_path . $cpt->cpt_id . '.articles', [
+                'title' => $cpt->menu_name,
+                'description' => $cpt->description,
+                'display' => $display,
+                'ordering' => 100
+            ]);
+            \XeRegister::push('settings/menu', $cpt->menu_path . $cpt->cpt_id . '.trash', [
+                'title' => '휴지통',
+                'display' => $display,
+                'ordering' => 1000
             ]);
 
             //set routes
@@ -228,9 +236,32 @@ class Plugin extends AbstractPlugin
                 Route::get('/'.$cpt->cpt_id. '/{type?}', [
                     'as' => 'dyFac.setting.'.$cpt->cpt_id,
                     'uses' => 'DynamicFactorySettingController@cptDocument',
-                    'settings_menu' => $cpt->menu_path . $cpt->cpt_id
+                    'settings_menu' => $cpt->menu_path . $cpt->cpt_id . '.articles'
+                ]);
+                Route::get('/trash/' . $cpt->cpt_id, [
+                    'as' => 'dyFac.setting.'.$cpt->cpt_id.'.trash',
+                    'uses' => 'DynamicFactorySettingController@trash',
+                    'settings_menu' => $cpt->menu_path . $cpt->cpt_id . '.trash'
                 ]);
             },['namespace' => 'Overcode\XePlugin\DynamicFactory\Controllers']);
+
+            //get Taxonomy
+            $taxonomies = CptTaxonomy::where('cpt_id',$cpt->cpt_id)->where('site_key',$site_key)->get();
+            foreach($taxonomies as $taxonomy){
+                \XeRegister::push('settings/menu', $cpt->menu_path . $cpt->cpt_id . '.' . $taxonomy->category_id, [
+                    'title' => xe_trans($taxonomy->category->name),
+                    'display' => true,
+                    'ordering' => 500 + (int) $taxonomy->category_id
+                ]);
+
+                Route::settings(static::getId() . "/" . $cpt->cpt_id, function () use ($cpt, $taxonomy) {
+                    Route::get("/taxonomy" . "/" . $taxonomy->category_id, [
+                        'as' => 'dyFac.setting.cpt_taxonomy.' . $cpt->cpt_id . $taxonomy->category_id,
+                        'uses' => 'DynamicFactorySettingController@cpt_taxonomy',
+                        'settings_menu' => $cpt->menu_path . $cpt->cpt_id . '.' . $taxonomy->category_id
+                    ]);
+                },['namespace' => 'Overcode\XePlugin\DynamicFactory\Controllers']);
+            }
 
         }
     }
@@ -304,6 +335,19 @@ class Plugin extends AbstractPlugin
             Route::get('/categories', ['as' => 'categories', 'uses' => 'DynamicFactoryController@getCategories']);
         });
 
+        Route::settings(static::getId() . "/taxonomy", function() {
+            Route::group([
+                'namespace' => 'Overcode\XePlugin\DynamicFactory\Controllers',
+                'as' => 'dyFac.setting.'
+            ], function(){
+                Route::get('/', [ 'as' => 'category', 'uses' => 'DynamicFactorySettingController@categoryList', 'settings_menu' => 'setting.dynamic_factory.category' ]);
+                Route::get('/create/{tax_id?}', [ 'as' => 'create_taxonomy', 'uses' => 'DynamicFactorySettingController@createTaxonomy' ]);
+                Route::get('/extra/{category_slug}', [ 'as' => 'taxonomy_extra', 'uses' => 'DynamicFactorySettingController@taxonomyExtra' ]);
+
+                Route::post('/destroy', [ 'as' => 'category.delete', 'uses' => 'DynamicFactorySettingController@categoryDelete' ]);
+            });
+        });
+
         Route::settings(static::getId(), function() {
             Route::group([
                 'namespace' => 'Overcode\XePlugin\DynamicFactory\Controllers',
@@ -314,8 +358,6 @@ class Plugin extends AbstractPlugin
                     'uses' => 'DynamicFactorySettingController@index',
                     'settings_menu' => 'setting.dynamic_factory.index'
                 ]);
-                Route::get('/category_list', [ 'as' => 'category', 'uses' => 'DynamicFactorySettingController@categoryList', 'settings_menu' => 'setting.dynamic_factory.category' ]);
-                Route::post('/delete_category', [ 'as' => 'category.delete', 'uses' => 'DynamicFactorySettingController@categoryDelete' ]);
 
                 Route::get('/create', [ 'as' => 'create', 'uses' => 'DynamicFactorySettingController@create' ]);
                 Route::post('/store_cpt', ['as' => 'store_cpt', 'uses' => 'DynamicFactorySettingController@storeCpt']);
@@ -329,9 +371,6 @@ class Plugin extends AbstractPlugin
                 Route::get('/edit/{cpt_id}', [ 'as' => 'edit', 'uses' => 'DynamicFactorySettingController@edit' ]);
                 Route::post('/update/{cpt_id?}', [ 'as' => 'update', 'uses' => 'DynamicFactorySettingController@update' ]);
                 Route::post('/destroy/{cpt_id}', [ 'as' => 'destroy', 'uses' => 'DynamicFactorySettingController@destroy' ]);
-
-                Route::get('/create_taxonomy/{tax_id?}', [ 'as' => 'create_taxonomy', 'uses' => 'DynamicFactorySettingController@createTaxonomy' ]);
-                Route::get('/taxonomy_extra/{category_slug}', [ 'as' => 'taxonomy_extra', 'uses' => 'DynamicFactorySettingController@taxonomyExtra' ]);
 
                 Route::post('/store_cpt_tax', ['as' => 'store_cpt_tax', 'uses' => 'DynamicFactorySettingController@storeTaxonomy']);
 

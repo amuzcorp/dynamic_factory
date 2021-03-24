@@ -95,32 +95,30 @@ class DynamicFactoryTaxonomyHandler
         \XeDB::beginTransaction();
         try {
             foreach((array)$df_categories as $cate) {
-                if(!isset($cate['share']) || $cate['share'] == false) {
-                    $slug = $cate['slug'];
-                    $cate_extra = $this->getCategoryExtraBySlug($slug);
-                    if (!isset($cate_extra)) {
-                        $langKey = XeLang::genUserKey();
-                        XeLang::save($langKey, 'ko', $cate['name'], false);
+                $slug = $cate['slug'];
+                $cate_extra = $this->getCategoryExtraBySlug($slug);
+                if (!isset($cate_extra)) {
+                    $langKey = XeLang::genUserKey();
+                    XeLang::save($langKey, 'ko', $cate['name'], false);
 
-                        $category = $this->categoryHandler->createCate(['name' => $langKey]);
-                        $category_id = $category->id;
+                    $category = $this->categoryHandler->createCate(['name' => $langKey]);
+                    $category_id = $category->id;
 
-                        $this->addCategoryItemForOut($category, $cate['items']);
+                    $this->addCategoryItemForOut($category, $cate['items']);
 
-                        $cateExtra = new CategoryExtra();
-                        $cateExtra->site_key = \XeSite::getCurrentSiteKey();
-                        $cateExtra->category_id = $category_id;
-                        $cateExtra->slug = $slug;
-                        $cateExtra->template = $cate['template'];
-                        $cateExtra->save();
+                    $cateExtra = new CategoryExtra();
+                    $cateExtra->site_key = \XeSite::getCurrentSiteKey();
+                    $cateExtra->category_id = $category_id;
+                    $cateExtra->slug = $slug;
+                    $cateExtra->template = $cate['template'];
+                    $cateExtra->save();
 
-                        foreach ($cate['cpt_ids'] as $cpt_id) {
-                            $cptTaxonomy = new CptTaxonomy();
-                            $cptTaxonomy->site_key = \XeSite::getCurrentSiteKey();
-                            $cptTaxonomy->cpt_id = $cpt_id;
-                            $cptTaxonomy->category_id = $category_id;
-                            $cptTaxonomy->save();
-                        }
+                    foreach ($cate['cpt_ids'] as $cpt_id) {
+                        $cptTaxonomy = new CptTaxonomy();
+                        $cptTaxonomy->site_key = \XeSite::getCurrentSiteKey();
+                        $cptTaxonomy->cpt_id = $cpt_id;
+                        $cptTaxonomy->category_id = $category_id;
+                        $cptTaxonomy->save();
                     }
                 }
             }

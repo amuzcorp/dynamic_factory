@@ -202,6 +202,11 @@ class DynamicFactorySettingController extends BaseController
         return redirect()->route('dyFac.setting.edit', ['cpt_id' => $request->cpt_id]);
     }
 
+    public function cpt_taxonomy(){
+        $tax_id = request()->segment(count(request()->segments()));
+        return $this->createTaxonomy($tax_id);
+    }
+
     /**
      * 카테고리 등록/수정 화면
      *
@@ -296,7 +301,7 @@ class DynamicFactorySettingController extends BaseController
     {
         $category_id = $this->dfService->storeCptTaxonomy($request);
 
-        return redirect()->route('dyFac.setting.create_taxonomy', ['tax_id' => $category_id]);  //TODO 경로 수정
+        return redirect()->back()->with('alert', ['type' => 'success', 'message' => xe_trans('xe::saved')]);
     }
 
     public function editEditor($cpt_id)
