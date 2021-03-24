@@ -28,7 +28,7 @@
                                 {!! editor($cpt->cpt_id, [
                                     'content' => Request::old('content', $item->content),
                                     'cover' => true
-                                ], $item->id) !!}
+                                ], $item->id, $thumb ? $thumb->df_thumbnail_file_id : null) !!}
                             </div>
                         @else
                             @if(isset($dynamicFieldsById[$columnName]) && $dynamicFieldsById[$columnName]->get('use') == true)

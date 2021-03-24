@@ -24,6 +24,9 @@ class Migrations
     // CPT 에성 생성한 Document 의 Slug 를 저장
     const CPT_DOCUMENT_SLUG_TABLE_NAME = 'df_slug';
 
+    // CPT 에성 생성한 Document 의 Thumbnail 를 저장
+    const CPT_THUMBNAIL_TABLE_NAME = 'df_thumbs';
+
     public function checkInstalled()
     {
         if ($this->checkExistCptTable() === false) return false;
@@ -31,6 +34,7 @@ class Migrations
         if ($this->checkExistCptTaxTable() === false) return false;
         if ($this->checkExistCptDocumentTaxTable() === false) return false;
         if ($this->checkExistCptDocumentSlugTable() === false) return false;
+        if ($this->checkExistThumbnailTable() === false) return false;
     }
 
     public function install()
@@ -40,6 +44,7 @@ class Migrations
         if ($this->checkExistCptTaxTable() === false) $this->createCptTaxTable();
         if ($this->checkExistCptDocumentTaxTable() === false) $this->createCptDocumentTaxTable();
         if ($this->checkExistCptDocumentSlugTable() === false) $this->createCptDocumentSlugTable();
+        if ($this->checkExistThumbnailTable() === false) $this->createThumbnailTable();
     }
 
     protected function checkExistCptTable()
@@ -65,6 +70,11 @@ class Migrations
     protected function checkExistCptDocumentSlugTable()
     {
         return Schema::hasTable(self::CPT_DOCUMENT_SLUG_TABLE_NAME);
+    }
+
+    protected function checkExistThumbnailTable()
+    {
+        return Schema::hasTable(self::CPT_THUMBNAIL_TABLE_NAME);
     }
 
     protected function createCptTable()
@@ -141,6 +151,20 @@ class Migrations
         });
     }
 
+    protected function createThumbnailTable()
+    {
+        Schema::create(self::CPT_THUMBNAIL_TABLE_NAME, function (Blueprint $table) {
+            $table->engine = "InnoDB";
+
+            $table->string('target_id', 36);
+            $table->string('df_thumbnail_file_id', 255);
+            $table->string('df_thumbnail_external_path', 255);
+            $table->string('df_thumbnail_path', 255);
+
+            $table->primary(array('target_id'));
+        });
+    }
+
     public function dropTables()
     {
         Schema::drop(self::CPT_TABLE_NAME);
@@ -148,6 +172,7 @@ class Migrations
         Schema::drop(self::CPT_TAXONOMY_TABLE_NAME);
         Schema::drop(self::CPT_DOCUMENT_TAXONOMY_TABLE_NAME);
         Schema::drop(self::CPT_DOCUMENT_SLUG_TABLE_NAME);
+        Schema::drop(self::CPT_THUMBNAIL_TABLE_NAME);
     }
 
 }

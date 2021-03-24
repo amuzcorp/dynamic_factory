@@ -53,7 +53,7 @@
                         {!! editor($config->get('cpt_id'), [
                             'content' => Request::old('content', $item->content),
                             'cover' => true
-                        ]) !!}
+                        ], $item->id, $thumb ? $thumb->df_thumbnail_file_id : null) !!}
                     </div>
                 </div>
 

@@ -10,6 +10,8 @@ use Xpressengine\Menu\AbstractModule;
 
 class CptModule extends AbstractModule
 {
+    const THUMBNAIL_TYPE = 'spill';
+
     /**
      * boot
      *

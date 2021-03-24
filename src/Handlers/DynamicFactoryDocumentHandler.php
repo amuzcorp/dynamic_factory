@@ -3,12 +3,15 @@
 namespace Overcode\XePlugin\DynamicFactory\Handlers;
 
 use Illuminate\Http\Request;
+use Overcode\XePlugin\DynamicFactory\Components\Modules\Cpt\CptModule;
 use Overcode\XePlugin\DynamicFactory\Models\CptDocument;
+use Overcode\XePlugin\DynamicFactory\Models\DfThumb;
 use Xpressengine\Category\Models\CategoryItem;
 use Xpressengine\Config\ConfigEntity;
 use Xpressengine\Counter\Counter;
 use Xpressengine\Database\Eloquent\Builder;
 use Xpressengine\Document\DocumentHandler;
+use Xpressengine\Media\Models\Media;
 use Xpressengine\Storage\File;
 use Xpressengine\Storage\Storage;
 use Xpressengine\User\UserInterface;
@@ -61,6 +64,7 @@ class DynamicFactoryDocumentHandler
         $cptDoc = CptDocument::division($cpt_id)->find($doc->id);
 
         $this->setFiles($cptDoc, $attributes);
+        $this->saveCover($cptDoc, $attributes);
 
         return $cptDoc;
     }
@@ -78,6 +82,7 @@ class DynamicFactoryDocumentHandler
         $this->documentHandler->put($doc);
 
         $this->setFiles($doc, $inputs);
+        $this->saveCover($doc, $inputs);
 
         return $doc->find($doc->id);
     }
@@ -230,6 +235,76 @@ class DynamicFactoryDocumentHandler
         foreach ($files as $file) {
             $this->storage->unBind($doc->id, $file, true);
         }
+    }
+
+    protected function saveCover(CptDocument $doc, array $args)
+    {
+        $fileIds = [];
+
+        if (isset($args['_coverId']) == false || $args['_coverId'] == null) {
+            if($doc->thumb != null) {
+                $doc->thumb()->delete();
+            }
+        } else {
+            if ($thumbnail = $doc->thumb) {
+                if ($thumbnail->df_thumbnail_file_id !== $args['_coverId']) {
+                    $this->saveThumb($doc, $args['_coverId']);
+                }
+            } else {
+                $this->saveThumb($doc, $args['_coverId']);
+            }
+        }
+
+        return $fileIds;
+    }
+
+    public function getThumb($docId)
+    {
+        $thumb = DfThumb::find($docId);
+
+        return $thumb;
+    }
+
+    protected function saveThumb(CptDocument $doc, $fileId)
+    {
+        /** @var \Xpressengine\Media\MediaManager $mediaManager */
+        $mediaManager = \App::make('xe.media');
+
+        // find file by document id
+        $file = \XeStorage::find($fileId);
+
+        // check file
+        if ($file == false) {
+            // cover image 를 찾을 수 없음
+        }
+
+        // get file
+        /**
+         * set thumbnail size
+         */
+        $dimension = 'L';
+
+        $media = \XeMedia::getHandler(Media::TYPE_IMAGE)->getThumbnail(
+            $mediaManager->make($file),
+            CptModule::THUMBNAIL_TYPE,
+            $dimension
+        );
+        $fileId = $file->id;
+        $thumbnailPath = $media->url();
+        $externalPath = '';
+
+        $model = DfThumb::find($doc->id);
+        if ($model === null) {
+            $model = new DfThumb;
+        }
+
+        $model->fill([
+            'target_id' => $doc->id,
+            'df_thumbnail_file_id' => $fileId,
+            'df_thumbnail_external_path' => $externalPath,
+            'df_thumbnail_path' => $thumbnailPath,
+        ]);
+        $model->save();
     }
 
 }

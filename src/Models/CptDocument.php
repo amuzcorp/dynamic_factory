@@ -151,6 +151,11 @@ class CptDocument extends Document implements SeoUsable
         return compile($this->instance_id, $this->content, $this->format === static::FORMAT_HTML);
     }
 
+    public function thumb()
+    {
+        return $this->belongsTo(DfThumb::class, 'id', 'target_id');
+    }
+
     public function slug()
     {
         return $this->belongsTo(DfSlug::class, 'id', 'target_id');

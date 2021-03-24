@@ -287,6 +287,8 @@ class CptModuleController extends Controller
             throw new AccessDeniedHttpException;
         }
 
+        $thumb = $this->dfDocHandler->getThumb($item->id);
+
         $cpt_id = $this->config->get('cpt_id');
 
         $taxonomies = $this->taxonomyHandler->getTaxonomies($cpt_id);
@@ -304,6 +306,7 @@ class CptModuleController extends Controller
 
         return XePresenter::make('edit', [
             'item' => $item,
+            'thumb' => $thumb,
             'taxonomies' => $taxonomies,
             'rules' => $rules,
             'parent' => null,

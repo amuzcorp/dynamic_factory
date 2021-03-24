@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Collection;
 use Overcode\XePlugin\DynamicFactory\Exceptions\NotFoundDocumentException;
 use Overcode\XePlugin\DynamicFactory\Handlers\CptValidatorHandler;
 use Overcode\XePlugin\DynamicFactory\Handlers\DynamicFactoryConfigHandler;
+use Overcode\XePlugin\DynamicFactory\Handlers\DynamicFactoryDocumentHandler;
 use Overcode\XePlugin\DynamicFactory\Handlers\DynamicFactoryHandler;
 use Overcode\XePlugin\DynamicFactory\Handlers\DynamicFactoryTaxonomyHandler;
 use Overcode\XePlugin\DynamicFactory\Handlers\CptUrlHandler;
@@ -41,6 +42,8 @@ class DynamicFactorySettingController extends BaseController
     /** @var ConfigHandler $dynamicFieldConfigHandler */
     protected $dynamicFieldConfigHandler;
 
+    protected $dfDocHandler;
+
     protected $presenter;
 
     protected $cptUrlHandler;
@@ -56,7 +59,8 @@ class DynamicFactorySettingController extends BaseController
         DynamicFactoryConfigHandler $configHandler,
         CptUrlHandler $cptUrlHandler,
         CptValidatorHandler $cptValidatorHandler,
-        CptDocService $cptDocService
+        CptDocService $cptDocService,
+        DynamicFactoryDocumentHandler $dfDocHandler
     )
     {
         $this->dfService = $dynamicFactoryService;
@@ -67,6 +71,7 @@ class DynamicFactorySettingController extends BaseController
         $this->cptUrlHandler = $cptUrlHandler;
         $this->cptValidatorHandler = $cptValidatorHandler;
         $this->cptDocService = $cptDocService;
+        $this->dfDocHandler = $dfDocHandler;
 
         $this->presenter = app('xe.presenter');
 
@@ -420,6 +425,12 @@ class DynamicFactorySettingController extends BaseController
 
         $item = CptDocument::division($cpt->cpt_id)->find($request->doc_id);
 
+        if ($item === null) {
+            throw new NotFoundDocumentException;
+        }
+
+        $thumb = $this->dfDocHandler->getThumb($item->id);
+
         $category_items = $this->dfService->getSelectCategoryItems($cpt->cpt_id, $item->id);
 
         return $this->presenter->make($cpt->blades['edit'],[
@@ -429,6 +440,7 @@ class DynamicFactorySettingController extends BaseController
             'cptConfig' => $cptConfig,
             'dynamicFieldsById' => $dynamicFieldsById,
             'item' => $item,
+            'thumb' => $thumb,
             'category_items' => $category_items
         ]);
     }
