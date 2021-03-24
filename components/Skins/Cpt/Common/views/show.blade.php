@@ -46,3 +46,10 @@
         </div>
     </div>
 </div>
+
+
+@if($cpt->use_comment == "Y")
+    <div class="__xe_comment board_comment">
+        {!! uio('comment', ['target' => $item]) !!}
+    </div>
+@endif

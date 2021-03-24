@@ -12,7 +12,6 @@ use Overcode\XePlugin\DynamicFactory\Handlers\CptUrlHandler;
 use Overcode\XePlugin\DynamicFactory\Handlers\TaxoModuleConfigHandler;
 use Overcode\XePlugin\DynamicFactory\Services\CptDocService;
 use Overcode\XePlugin\DynamicFactory\Services\DynamicFactoryService;
-use Overcode\XePlugin\DynamicFactory\InstanceManager;
 use Route;
 use XeConfig;
 use XeCounter;
@@ -29,8 +28,6 @@ use Xpressengine\Plugin\AbstractPlugin;
 class Plugin extends AbstractPlugin
 {
     protected $cpts;
-
-    protected $cpts_from_plugin;
 
     protected $df_config;
 
@@ -151,6 +148,11 @@ class Plugin extends AbstractPlugin
             return $cptPermission;
         });
         $app->alias(CptPermissionHandler::class, 'overcode.df.permission');
+
+        $app->singleton(CommentManager::class, function ($app){
+            return new CommentManager(app('xe.plugin.comment')->getHandler());
+        });
+        $app->alias(CommentManager::class, 'overcode.df.comment_manager');
     }
 
     /**
@@ -161,7 +163,6 @@ class Plugin extends AbstractPlugin
     public function boot()
     {
         $this->loadCpts();
-        $this->CptConfigSettingFromPlugin();
         $this->CptCategorySettingFromPlugin();
         $this->CptDynamicFieldSettingFromPlugin();
 
@@ -172,41 +173,80 @@ class Plugin extends AbstractPlugin
         $this->interceptDynamicField();
     }
 
-    protected function registerSitesPermissions()
-    {
-
-    }
-
     protected function loadCpts()
     {
         $dfService = app('overcode.df.service');
-        // DB 에 저장된 cpt 를 불러온다.
-        $this->cpts = $dfService->getItems();
-
-        // 타 플러그인에서 등록한 cpt 를 불러온다.
-        $this->cpts_from_plugin = \XeRegister::get('dynamic_factory');
+        $comment_manager = app('overcode.df.comment_manager');
+        $dfConfigHandler = app('overcode.df.configHandler');
 
         // 타 플러그인에서 등록한 cpt 의 config 를 불러온다.
         $this->df_config = \XeRegister::get('df_config');
+
+        // DB 에 저장된 cpt 를 불러온다.
+        $this->cpts = $dfService->getItemsAll();
+
+        foreach($this->cpts as $cpt){
+            //set config for from plugin
+            if(isset($cpt->from_plugin))
+                $this->CptConfigSettingFromPlugin($dfConfigHandler, $cpt->cpt_id);
+
+            //set comment config
+            if(isset($cpt->use_comment) && $cpt->use_comment == "Y"){
+                $comment_instance_id = $comment_manager->hasCommentConfig($cpt->cpt_id);
+                if($comment_instance_id == null)
+                    $comment_instance_id = $comment_manager->createCommentConfig($cpt->cpt_id);
+
+
+                //set comment dynamic field
+                if(is_array($cpt->comment_dynamic_field) && count($cpt->comment_dynamic_field) > 0){
+                    \XeRegister::push('df_df', $comment_instance_id, $cpt->comment_dynamic_field);
+                }
+            }
+
+            //set document dynamic field
+            if(is_array($cpt->document_dynamic_field) && count($cpt->document_dynamic_field) > 0){
+                \XeRegister::push('df_df', $cpt->cpt_id, $cpt->document_dynamic_field);
+            }
+
+            //set admin menu
+            $display = isset($cpt->display) ? $cpt->display : true;
+            \XeRegister::push('settings/menu', $cpt->menu_path . $cpt->cpt_id, [
+                'title' => $cpt->menu_name,
+                'description' => $cpt->description,
+                'display' => $display,
+                'ordering' => $cpt->menu_order
+            ]);
+
+            \XeRegister::push('settings/menu', 'setting.dynamic_factory.trash', [
+                'title' => '휴지통 관리',
+                'display' => true,
+                'ordering' => 3000
+            ]);
+
+            //set routes
+            Route::settings(static::getId(), function () use ($cpt){
+                Route::get('/'.$cpt->cpt_id. '/{type?}', [
+                    'as' => 'dyFac.setting.'.$cpt->cpt_id,
+                    'uses' => 'DynamicFactorySettingController@cptDocument',
+                    'settings_menu' => $cpt->menu_path . $cpt->cpt_id
+                ]);
+            },['namespace' => 'Overcode\XePlugin\DynamicFactory\Controllers']);
+
+        }
     }
 
     /**
      * 타 플러그인에서 지정한 Config 를 체크하여 없으면 생성해준다.
      */
-    protected function CptConfigSettingFromPlugin()
+    protected function CptConfigSettingFromPlugin($dfConfigHandler, $cpt_id)
     {
-        $dfConfigHandler = app('overcode.df.configHandler');
-        if(isset($this->cpts_from_plugin)) {
-            foreach ($this->cpts_from_plugin as $key => $val) {
-                $configName = $dfConfigHandler->getConfigName($val['cpt_id']);
-                $config = $dfConfigHandler->get($configName);
+        $configName = $dfConfigHandler->getConfigName($cpt_id);
+        $config = $dfConfigHandler->get($configName);
 
-                // 해당 cpt_id 로 config 를 가져와서 없으면 타 플러그인에서 불러온 config 값으로 생성해준다.
-                if ($config === null || !isset($config)) {
-                    $dfConfigHandler->addConfig($this->df_config[$val['cpt_id']], $configName);
-                    $dfConfigHandler->addEditor($val['cpt_id']);   //기본 에디터 ckEditor 로 설정
-                }
-            }
+        // 해당 cpt_id 로 config 를 가져와서 없으면 타 플러그인에서 불러온 config 값으로 생성해준다.
+        if ($config === null || !isset($config)) {
+            $dfConfigHandler->addConfig($this->df_config[$cpt_id], $configName);
+            $dfConfigHandler->addEditor($cpt_id);   //기본 에디터 ckEditor 로 설정
         }
     }
 
@@ -251,33 +291,6 @@ class Plugin extends AbstractPlugin
             'display' => true,
             'ordering' => 3000
         ]);
-
-        foreach($this->cpts as $val){
-            \XeRegister::push('settings/menu', $val->menu_path . $val->cpt_id, [
-                'title' => $val->menu_name,
-                'description' => $val->description,
-                'display' => true,
-                'ordering' => $val->menu_order
-            ]);
-
-            \XeRegister::push('settings/menu', 'setting.dynamic_factory.trash', [
-                'title' => '휴지통 관리',
-                'display' => true,
-                'ordering' => 3000
-            ]);
-        }
-
-        if($this->cpts_from_plugin) {
-            foreach ($this->cpts_from_plugin as $val) {
-                $display = isset($val['display']) ? $val['display'] : true;
-                \XeRegister::push('settings/menu', $val['menu_path'] . $val['cpt_id'], [
-                    'title' => $val['menu_name'],
-                    'description' => $val['description'],
-                    'display' => $display,
-                    'ordering' => $val['menu_order']
-                ]);
-            }
-        }
     }
 
     protected function registerSettingsRoute()
@@ -331,28 +344,6 @@ class Plugin extends AbstractPlugin
                 Route::get('/trash/{cpt_id?}', ['as' => 'trash', 'uses' => 'DynamicFactorySettingController@trash', 'settings_menu' => 'setting.dynamic_factory.trash']);
             });
         });
-
-        Route::settings(static::getId(), function () {
-            foreach($this->cpts as $val) {
-                Route::get('/'.$val->cpt_id. '/{type?}', [
-                    'as' => 'dyFac.setting.'.$val->cpt_id,
-                    'uses' => 'DynamicFactorySettingController@cptDocument',
-                    'settings_menu' => $val->menu_path . $val->cpt_id
-                ]);
-            }
-        },['namespace' => 'Overcode\XePlugin\DynamicFactory\Controllers']);
-
-        if($this->cpts_from_plugin) {
-            Route::settings(static::getId(), function () {
-                foreach ($this->cpts_from_plugin as $val) {
-                    Route::get('/'.$val['cpt_id']. '/{type?}', [
-                        'as' => 'dyFac.setting.'.$val['cpt_id'],
-                        'uses' => 'DynamicFactorySettingController@cptDocument',
-                        'settings_menu' => $val['menu_path'] . $val['cpt_id']
-                    ]);
-                }
-            },['namespace' => 'Overcode\XePlugin\DynamicFactory\Controllers']);
-        }
 
         Route::settings(static::getId(), function() {
             Route::get('/hasSlug/{cpt_id}', ['as' => 'dyFac.setting.hasSlug' , 'uses' => 'DynamicFactorySettingController@hasSlug']);
@@ -492,8 +483,8 @@ class Plugin extends AbstractPlugin
     public function update()
     {
         $migration = new Migrations();
-        if ($migration->checkInstalled() === false) {
-            $migration->install();
+        if ($migration->checkUpdated() === false) {
+            $migration->update();
         }
     }
 
@@ -506,7 +497,7 @@ class Plugin extends AbstractPlugin
     public function checkUpdated()
     {
         $migration = new Migrations();
-        if ($migration->checkInstalled() === false) {
+        if ($migration->checkUpdated() === false) {
             return false;
         }
 

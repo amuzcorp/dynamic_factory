@@ -5,12 +5,14 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Xpressengine\Document\Models\Document;
 use Xpressengine\Plugins\Board\Models\Board;
+use Xpressengine\Plugins\Comment\CommentUsable;
+use Xpressengine\Routing\InstanceRoute;
 use Xpressengine\Seo\SeoUsable;
 use Xpressengine\User\Models\Guest;
 use Xpressengine\User\Models\UnknownUser;
 use Xpressengine\User\Models\User;
 
-class CptDocument extends Document implements SeoUsable
+class CptDocument extends Document implements CommentUsable, SeoUsable
 {
     use SoftDeletes;
 
@@ -231,5 +233,37 @@ class CptDocument extends Document implements SeoUsable
         }
 
         return null;
+    }
+
+
+    /**
+     * Returns unique identifier
+     *
+     * @return string
+     */
+    public function getUid()
+    {
+        return $this->getAttribute('id');
+    }
+
+    /**
+     * Returns instance identifier
+     *
+     * @return mixed
+     */
+    public function getInstanceId()
+    {
+        return $this->getAttribute('instance_id');
+    }
+
+    /**
+     * Returns the link
+     *
+     * @param InstanceRoute $route route instance
+     * @return string
+     */
+    public function getLink(InstanceRoute $route)
+    {
+        return $route->url . '/show/' . $this->getKey();
     }
 }

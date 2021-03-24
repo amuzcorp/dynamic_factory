@@ -116,6 +116,7 @@ class CptModuleController extends Controller
     {
         $user = Auth::user();
 
+        $cpt = $this->dfService->getItem($this->config->get('cpt_id'));
         $item = $service->getItem($id, $user, $this->config);
 
         // 글 조회수 증가
@@ -131,11 +132,7 @@ class CptModuleController extends Controller
             $dynamicFieldsById[$fieldType->get('id')] = $fieldType;
         }
 
-        return XePresenter::make('show', [
-            'item' => $item,
-            'fieldTypes' => $fieldTypes,
-            'dynamicFieldsById' => $dynamicFieldsById
-        ]);
+        return XePresenter::make('show', compact('item','fieldTypes','dynamicFieldsById','cpt'));
     }
 
     /**

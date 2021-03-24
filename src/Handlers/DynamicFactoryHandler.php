@@ -111,7 +111,9 @@ class DynamicFactoryHandler
             'menu_order' => $inputs['menu_order'],
             'menu_path' => $inputs['menu_path'] ?? '',
             'description' => $inputs['description'] ?? '',
-            'labels' => $inputs['labels'] ?? ''
+            'labels' => $inputs['labels'] ?? '',
+            'use_comment' => $inputs['use_comment'] ?? '',
+            'show_admin_comment' => $inputs['show_admin_comment'] ?? ''
         ]);
         $newCpt->save();
 
@@ -127,7 +129,9 @@ class DynamicFactoryHandler
             'menu_order' => $inputs['menu_order'],
             'menu_path' => $inputs['menu_path'] ?? '',
             'description' => $inputs['description'] ?? '',
-            'labels' => $inputs['labels'] ?? ''
+            'labels' => $inputs['labels'] ?? '',
+            'use_comment' => $inputs['use_comment'] ?? '',
+            'show_admin_comment' => $inputs['show_admin_comment'] ?? ''
         ]);
 
         $cpt->save();
@@ -149,6 +153,7 @@ class DynamicFactoryHandler
         if(isset($cptsFromPlugin)) {
             foreach ($cptsFromPlugin as $cpt_fp) {
                 $cpt = new Cpt();
+                $cpt_fp['from_plugin'] = true;
                 $cpt->setRawAttributes($cpt_fp);
                 //$cpts[] = $cpt;
                 $cpts->push($cpt);
@@ -212,32 +217,25 @@ class DynamicFactoryHandler
 
             $new_cpt_ids = [];  // DF 추가 감지
 
-            foreach ((array)$df_dfs as $dfs) {
+            $need_lang_configs = ['label','placeholder'];
+            foreach ((array)$df_dfs as $cpt_id => $dfs) {
                 foreach ((array)$dfs as $df) {
-                    $configName = 'dynamicField.' . $df['group'] . '.' . $df['id'];
+                    $configName = sprintf('dynamicField.documents_%s.%s',$cpt_id,$df['id']);
+                    $df['group'] = 'documents_' . $cpt_id;
 
                     if (XeConfig::get($configName) === null) {
-                        $cpt_id = str_replace('documents_', '', $df['group']);
                         $new_cpt_ids[] = $cpt_id;
 
                         $config = $configHandler->getDefault();
                         foreach ($df as $name => $value) {
-                            if($name === 'label') {
+                            if(in_array($name,$need_lang_configs) && !empty($value)) {
                                 $langKey = XeLang::genUserKey();
                                 XeLang::save($langKey, 'ko', $value, false);
 
                                 $config->set($name, $langKey);
-                                continue;
+                            }else{
+                                $config->set($name, $value);
                             }
-                            if($name === 'placeholder' && !empty($value)) {
-                                $langKey = XeLang::genUserKey();
-                                XeLang::save($langKey, 'ko', $value, false);
-
-                                $config->set($name, $langKey);
-                                continue;
-                            }
-
-                            $config->set($name, $value);
                         }
                         $dynamicField->setConnection(\XeDB::connection());
                         $dynamicField->create($config);

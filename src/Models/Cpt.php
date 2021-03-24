@@ -9,7 +9,7 @@ class Cpt extends DynamicModel
 {
     protected $table = 'df_cpts';
 
-    protected $fillable = ['site_key', 'cpt_id', 'cpt_name', 'menu_name', 'menu_order', 'menu_path', 'description', 'labels'];
+    protected $fillable = ['site_key', 'cpt_id', 'cpt_name', 'menu_name', 'menu_order', 'menu_path', 'description', 'labels', 'use_comment', 'show_admin_comment'];
 
     protected $casts = ['labels' => 'array'];
 

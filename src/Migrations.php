@@ -47,6 +47,36 @@ class Migrations
         if ($this->checkExistThumbnailTable() === false) $this->createThumbnailTable();
     }
 
+    /**
+     * check updated
+     *
+     * @param null $installedVersion installed version
+     *
+     * @return bool
+     */
+    public function checkUpdated($installedVersion = null)
+    {
+        if(Schema::hasColumn('df_cpts', 'use_comment') == false) return false;
+    }
+
+
+    /**
+     * run update
+     *
+     * @param null $installedVersion installed version
+     *
+     * @return void
+     */
+    public function update($installedVersion = null)
+    {
+        if(Schema::hasColumn('df_cpts', 'use_comment') == false){
+            Schema::table('df_cpts', function (Blueprint $table) {
+                $table->string('use_comment',1)->nullable()->default('N');
+                $table->string('show_admin_comment',1)->nullable()->default('N');
+            });
+        }
+    }
+
     protected function checkExistCptTable()
     {
         return Schema::hasTable(self::CPT_TABLE_NAME);
@@ -90,6 +120,8 @@ class Migrations
             $table->integer('menu_order');
             $table->string('menu_path');
             $table->string('description')->nullable();
+            $table->string('use_comment',1)->default('N')->nullable();
+            $table->string('show_admin_comment',1)->default('N')->nullable();
             $table->text('labels');
 
             $table->unique('cpt_id');

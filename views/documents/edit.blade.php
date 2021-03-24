@@ -50,9 +50,13 @@
                     @endif
                 </div>
             </div>
-            <button type="submit" class="btn btn-primary"><i class="xi-download"></i>저장</button>
-            <button type="button" id="delBtn" class="btn btn-danger pull-right" data-url="{{ route('dyFac.setting.remove_cpt_documents', ['id' => $item->id]) }}"><i class="xi-close-square"></i> 완전 삭제</button>
-            <button type="button" id="trashBtn" class="btn btn-warning pull-right" data-url="{{ route('dyFac.setting.trash_cpt_documents', ['id' => $item->id]) }}"><i class="xi-trash"></i> 휴지통</button>
+            <div class="col-12">
+                <div class="clearfix">
+                    <button type="submit" class="btn btn-primary"><i class="xi-download"></i>저장</button>
+                    <button type="button" id="delBtn" class="btn btn-danger pull-right" data-url="{{ route('dyFac.setting.remove_cpt_documents', ['id' => $item->id]) }}"><i class="xi-close-square"></i> 완전 삭제</button>
+                    <button type="button" id="trashBtn" class="btn btn-warning pull-right" data-url="{{ route('dyFac.setting.trash_cpt_documents', ['id' => $item->id]) }}"><i class="xi-trash"></i> 휴지통</button>
+                </div>
+            </div>
         </div>
 
         @if(count($taxonomies) > 0)
@@ -87,6 +91,22 @@
         @endif
     </div>
 </form>
+
+@if($cpt->use_comment == "Y" && $cpt->show_admin_comment == "Y")
+    <div class="row">
+        <div class="col-sm-8">
+            <div class="panel board_comment">
+                <div class="panel-body">
+                    <div class="__xe_comment ">
+                        {!! uio('comment', ['target' => $item]) !!}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+@endif
+
+
 {{ XeFrontend::js('assets/vendor/jqueryui/jquery-ui.min.js')->load() }}
 
 <script>

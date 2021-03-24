@@ -58,6 +58,30 @@
                                 <input type="text" class="form-control" name="description" value="{{ $cpt['description'] }}" @if($readonly) disabled="disabled" @endif>
                             </div>
                         </div>
+
+                        <div class="form-group row">
+                            <label class="col-sm-2 col-form-label">댓글 사용</label>
+                            <div class="col-sm-5">
+                                <select class="form-control" name="use_comment" @if($readonly) disabled="disabled" @endif>
+                                    <option value="N" {!! $cpt['use_comment'] != 'Y' ? 'selected="selected"' : '' !!} >사용안함</option>
+                                    <option value="Y" {!! $cpt['use_comment'] == 'Y' ? 'selected="selected"' : '' !!}>사용함</option>
+                                </select>
+                            </div>
+                            @if($cpt['use_comment'] == "Y")
+                            <div class="col-sm-3">
+                                <a href="{{route('manage.comment.setting', ['targetInstanceId' => $cpt['cpt_id']])}}" class="btn">{{xe_trans('xe::settings')}}</a>
+                            </div>
+                            @endif
+                        </div>
+                        <div class="form-group row">
+                            <label class="col-sm-2 col-form-label">관리자페이지에 댓글 출력</label>
+                            <div class="col-sm-5">
+                                <select class="form-control" name="show_admin_comment" @if($readonly) disabled="disabled" @endif>
+                                    <option value="N" {!! $cpt['show_admin_comment'] != 'Y' ? 'selected="selected"' : '' !!}>사용안함</option>
+                                    <option value="Y" {!! $cpt['show_admin_comment'] == 'Y' ? 'selected="selected"' : '' !!}>사용함</option>
+                                </select>
+                            </div>
+                        </div>
                     </div>
                 </div>
 

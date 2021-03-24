@@ -52,6 +52,24 @@
                                 <input type="text" class="form-control" name="description">
                             </div>
                         </div>
+                        <div class="form-group row">
+                            <label class="col-sm-2 col-form-label">댓글 사용</label>
+                            <div class="col-sm-5">
+                                <select class="form-control" name="use_comment">
+                                    <option value="N">사용안함</option>
+                                    <option value="Y">사용함</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="col-sm-2 col-form-label">관리자페이지에 댓글 출력</label>
+                            <div class="col-sm-5">
+                                <select class="form-control" name="show_admin_comment">
+                                    <option value="N">사용안함</option>
+                                    <option value="Y">사용함</option>
+                                </select>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
