@@ -240,7 +240,7 @@ class Plugin extends AbstractPlugin
                 ]);
                 Route::get('/trash/' . $cpt->cpt_id, [
                     'as' => 'dyFac.setting.'.$cpt->cpt_id.'.trash',
-                    'uses' => 'DynamicFactorySettingController@trash',
+                    'uses' => 'DynamicFactorySettingController@trashAlias',
                     'settings_menu' => $cpt->menu_path . $cpt->cpt_id . '.trash'
                 ]);
             },['namespace' => 'Overcode\XePlugin\DynamicFactory\Controllers']);

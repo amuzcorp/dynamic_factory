@@ -53,7 +53,9 @@
                             <tr>
                                 <th scope="col"><input type="checkbox" class="__xe_check_all"></th>
                                 <th>#</th>
+                                @if(is_null($cpt_id))
                                 <th>CPT ID</th>
+                                @endif
                                 @foreach($listColumns as $columnName)
                                     <th>{{ xe_trans($column_labels[$columnName]) }}</th>
                                 @endforeach
@@ -70,7 +72,11 @@
                                     <tr>
                                         <td><input type="checkbox" name="id[]" class="__xe_checkbox" value="{{ $doc->id }}"></td>
                                         <td>{{ $doc->seq }}</td>
+
+                                        @if(is_null($cpt_id))
                                         <td>{{ $doc->instance_id }}</td>
+                                        @endif
+
                                         @foreach($listColumns as $columnName)
                                             @if ($columnName === 'title')
                                                 <td><a href="{{ route('dyFac.setting.'.$doc->type, ['type' => 'edit', 'doc_id' => $doc->id]) }}">{{ $doc->title }}</a></td>

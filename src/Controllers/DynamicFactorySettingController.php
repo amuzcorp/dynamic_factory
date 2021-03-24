@@ -577,10 +577,16 @@ class DynamicFactorySettingController extends BaseController
         $cptDocs = $this->cptDocService->getItemsAllCpt($request, 'trash', $cpt_id);
 
         return $this->presenter->make('dynamic_factory::views.documents.trash',compact(
+            'cpt_id',
             'listColumns',
             'column_labels',
             'cptDocs'
         ));
+    }
+
+    public function trashAlias(Request $request){
+        $cpt_id = request()->segment(count(request()->segments()) -1);
+        return $this->trash($request,$cpt_id);
     }
 
     /**
