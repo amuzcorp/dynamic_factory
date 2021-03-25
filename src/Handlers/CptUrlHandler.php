@@ -22,6 +22,11 @@ class CptUrlHandler
         return $this;
     }
 
+    public function getInstanceId()
+    {
+        return $this->instanceId;
+    }
+
     public function get($name = 'index', array $params = [], $instanceId = null)
     {
         if ($instanceId == null) {
