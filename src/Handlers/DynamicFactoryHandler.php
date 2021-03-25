@@ -220,8 +220,13 @@ class DynamicFactoryHandler
             $need_lang_configs = ['label','placeholder'];
             foreach ((array)$df_dfs as $cpt_id => $dfs) {
                 foreach ((array)$dfs as $df) {
-                    $configName = sprintf('dynamicField.documents_%s.%s',$cpt_id,$df['id']);
-                    $df['group'] = 'documents_' . $cpt_id;
+                    $configName = sprintf('dynamicField.documents_%s.%s', $cpt_id, $df['id']);
+                    if(array_get($df, 'group') != null) {
+                        $cpt_id = str_replace('documents_', '', $df['group']);
+                        $configName = sprintf('dynamicField.%s.%s', $df['group'], $df['id']);
+                    }else {
+                        $df['group'] = 'documents_' . $cpt_id;
+                    }
 
                     if (XeConfig::get($configName) === null) {
                         $new_cpt_ids[] = $cpt_id;
