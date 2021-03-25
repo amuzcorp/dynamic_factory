@@ -56,20 +56,15 @@ class Plugin extends AbstractPlugin
 
         // DynamicFactoryService
         $app->singleton(DynamicFactoryService::class, function () {
-            $dynamicFactoryHandler = app('overcode.df.handler');
-            $dynamicFactoryConfigHandler = app('overcode.df.configHandler');
-            $dynamicFactoryTaxonomyHandler = app('overcode.df.taxonomyHandler');
-            $dynamicFactoryDocumentHandler = app('overcode.df.documentHandler');
-            $dynamicFieldHandler = app('xe.dynamicField');
-            $documentHandler = app('xe.document');
+            $proxyHandler = XeInterception::proxy(DynamicFactoryService::class);
 
-            return new DynamicFactoryService(
-                $dynamicFactoryHandler,
-                $dynamicFactoryConfigHandler,
-                $dynamicFactoryTaxonomyHandler,
-                $dynamicFactoryDocumentHandler,
-                $dynamicFieldHandler,
-                $documentHandler
+            return new $proxyHandler(
+                app('overcode.df.handler'),
+                app('overcode.df.configHandler'),
+                app('overcode.df.taxonomyHandler'),
+                app('overcode.df.documentHandler'),
+                app('xe.dynamicField'),
+                app('xe.document')
             );
         });
         $app->alias(DynamicFactoryService::class, 'overcode.df.service');
