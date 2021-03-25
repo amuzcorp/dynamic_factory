@@ -585,7 +585,7 @@ class DynamicFactorySettingController extends BaseController
     }
 
     public function trashAlias(Request $request){
-        $cpt_id = request()->segment(count(request()->segments()) -1);
+        $cpt_id = request()->segment(count(request()->segments()));
         return $this->trash($request,$cpt_id);
     }
 
