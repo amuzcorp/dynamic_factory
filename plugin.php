@@ -550,7 +550,8 @@ class Plugin extends AbstractPlugin
      */
     public function uninstall()
     {
-        $migration = new Migrations();
-        $migration->dropTables();
+        // 플러그인 삭제시 테이블 같이 삭제되게 하려면 아래 주석 해제
+        //$migration = new Migrations();
+        //$migration->dropTables();
     }
 }

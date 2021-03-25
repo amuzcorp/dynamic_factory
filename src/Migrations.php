@@ -8,43 +8,109 @@ use Illuminate\Support\Facades\Schema;
 class Migrations
 {
     // 현재 플러그인에서 사용 되는 SLUG 는 CPT_SLUG, CATEGORY_SLUG, CPT_DOCUMENT_SLUG 이다.
-
-    // CPT 정보를 저장
-    const CPT_TABLE_NAME = 'df_cpts';
-
-    // xe 카테고리의 확장 정보를 저장
-    const CATEGORY_EXTRA_TABLE_NAME = 'df_category_extra';
-
-    // CPT 에서 사용하는 CATEGORY_ID 를 저장 n:n
-    const CPT_TAXONOMY_TABLE_NAME = 'df_cpt_taxonomy';
-
-    // CPT 에서 생성한 Document 의 Category 를 저장
-    const CPT_DOCUMENT_TAXONOMY_TABLE_NAME = 'df_taxonomy';
-
-    // CPT 에성 생성한 Document 의 Slug 를 저장
-    const CPT_DOCUMENT_SLUG_TABLE_NAME = 'df_slug';
-
-    // CPT 에성 생성한 Document 의 Thumbnail 를 저장
-    const CPT_THUMBNAIL_TABLE_NAME = 'df_thumbs';
+    const CPTS = 'df_cpts';                     // CPT 정보를 저장
+    const CATEGORY_EXTRA = 'df_category_extra'; // xe 카테고리의 확장 정보를 저장
+    const CPT_TAXONOMY = 'df_cpt_taxonomy';     // CPT 에서 사용하는 CATEGORY_ID 를 저장 n:n
+    const TAXONOMY = 'df_taxonomy';             // CPT 에서 생성한 Document 의 Category 를 저장
+    const SLUG = 'df_slug';                     // CPT 에성 생성한 Document 의 Slug 를 저장
+    const THUMBS = 'df_thumbs';                 // CPT 에서 생성한 Document 의 Thumbnail 를 저장
 
     public function checkInstalled()
     {
-        if ($this->checkExistCptTable() === false) return false;
-        if ($this->checkExistCategoryExtraTable() === false) return false;
-        if ($this->checkExistCptTaxTable() === false) return false;
-        if ($this->checkExistCptDocumentTaxTable() === false) return false;
-        if ($this->checkExistCptDocumentSlugTable() === false) return false;
-        if ($this->checkExistThumbnailTable() === false) return false;
+        if (Schema::hasTable(self::CPTS) === false) return false;
+        if (Schema::hasTable(self::CATEGORY_EXTRA) === false) return false;
+        if (Schema::hasTable(self::CPT_TAXONOMY) === false) return false;
+        if (Schema::hasTable(self::TAXONOMY) === false) return false;
+        if (Schema::hasTable(self::SLUG) === false) return false;
+        if (Schema::hasTable(self::THUMBS) === false) return false;
     }
 
     public function install()
     {
-        if ($this->checkExistCptTable() === false) $this->createCptTable();
-        if ($this->checkExistCategoryExtraTable() === false) $this->createCategoryExtraTable();
-        if ($this->checkExistCptTaxTable() === false) $this->createCptTaxTable();
-        if ($this->checkExistCptDocumentTaxTable() === false) $this->createCptDocumentTaxTable();
-        if ($this->checkExistCptDocumentSlugTable() === false) $this->createCptDocumentSlugTable();
-        if ($this->checkExistThumbnailTable() === false) $this->createThumbnailTable();
+        if (Schema::hasTable(self::CPTS) === false) {
+            Schema::create(self::CPTS, function (Blueprint $table) {
+                $table->engine = "InnoDB";
+
+                $table->bigIncrements('id');
+                $table->string('site_key', 50);
+                $table->string('cpt_id', 36);   //documents 에서 instance_id 로 사용
+                $table->string('cpt_name');
+                $table->string('menu_name');
+                $table->integer('menu_order');
+                $table->string('menu_path');
+                $table->string('description')->nullable();
+                $table->string('use_comment', 1)->default('N')->nullable();
+                $table->string('show_admin_comment', 1)->default('N')->nullable();
+                $table->text('labels');
+
+                $table->unique('cpt_id');
+            });
+        }
+
+        if (Schema::hasTable(self::CATEGORY_EXTRA) === false) {
+            Schema::create(self::CATEGORY_EXTRA, function (Blueprint $table) {
+                $table->engine = "InnoDB";
+
+                $table->string('site_key', 50);
+                $table->integer('category_id');
+                $table->string('slug');
+                $table->string('template', 50);
+
+                $table->primary('category_id');
+            });
+        }
+
+        if (Schema::hasTable(self::CPT_TAXONOMY) === false) {
+            Schema::create(self::CPT_TAXONOMY, function (Blueprint $table) {
+                $table->engine = "InnoDB";
+
+                $table->string('site_key', 50);
+                $table->string('cpt_id');
+                $table->integer('category_id');
+            });
+        }
+
+        if (Schema::hasTable(self::TAXONOMY) === false) {
+            Schema::create(self::TAXONOMY, function (Blueprint $table) {
+                $table->engine = "InnoDB";
+
+                $table->increments('id');
+
+                $table->string('target_id', 36);
+                $table->integer('category_id');
+                $table->text('item_ids');
+            });
+        }
+
+        if (Schema::hasTable(self::SLUG) === false) {
+            Schema::create(self::SLUG, function (Blueprint $table) {
+                $table->engine = "InnoDB";
+
+                $table->increments('id');
+
+                $table->string('target_id', 36);
+                $table->string('instance_id', 36);
+                $table->string('slug');
+                $table->string('title');
+
+                $table->unique('slug');
+                $table->index('title');
+                $table->index('target_id');
+            });
+        }
+
+        if (Schema::hasTable(self::THUMBS) === false) {
+            Schema::create(self::THUMBS, function (Blueprint $table) {
+                $table->engine = "InnoDB";
+
+                $table->string('target_id', 36);
+                $table->string('df_thumbnail_file_id', 255);
+                $table->string('df_thumbnail_external_path', 255);
+                $table->string('df_thumbnail_path', 255);
+
+                $table->primary(array('target_id'));
+            });
+        }
     }
 
     /**
@@ -56,7 +122,7 @@ class Migrations
      */
     public function checkUpdated($installedVersion = null)
     {
-        if(Schema::hasColumn('df_cpts', 'use_comment') == false) return false;
+        if(Schema::hasColumn(self::CPTS, 'use_comment') == false) return false;
     }
 
 
@@ -69,142 +135,22 @@ class Migrations
      */
     public function update($installedVersion = null)
     {
-        if(Schema::hasColumn('df_cpts', 'use_comment') == false){
-            Schema::table('df_cpts', function (Blueprint $table) {
+        if(Schema::hasColumn(self::CPTS, 'use_comment') == false){
+            Schema::table(self::CPTS, function (Blueprint $table) {
                 $table->string('use_comment',1)->nullable()->default('N');
                 $table->string('show_admin_comment',1)->nullable()->default('N');
             });
         }
     }
 
-    protected function checkExistCptTable()
-    {
-        return Schema::hasTable(self::CPT_TABLE_NAME);
-    }
-
-    protected function checkExistCategoryExtraTable()
-    {
-        return Schema::hasTable(self::CATEGORY_EXTRA_TABLE_NAME);
-    }
-
-    protected function checkExistCptTaxTable()
-    {
-        return Schema::hasTable(self::CPT_TAXONOMY_TABLE_NAME);
-    }
-
-    protected function checkExistCptDocumentTaxTable()
-    {
-        return Schema::hasTable(self::CPT_DOCUMENT_TAXONOMY_TABLE_NAME);
-    }
-
-    protected function checkExistCptDocumentSlugTable()
-    {
-        return Schema::hasTable(self::CPT_DOCUMENT_SLUG_TABLE_NAME);
-    }
-
-    protected function checkExistThumbnailTable()
-    {
-        return Schema::hasTable(self::CPT_THUMBNAIL_TABLE_NAME);
-    }
-
-    protected function createCptTable()
-    {
-        Schema::create(self::CPT_TABLE_NAME, function (Blueprint $table) {
-            $table->engine = "InnoDB";
-
-            $table->bigIncrements('id');
-            $table->string('site_key', 50);
-            $table->string('cpt_id', 36);   //documents 에서 instance_id 로 사용
-            $table->string('cpt_name');
-            $table->string('menu_name');
-            $table->integer('menu_order');
-            $table->string('menu_path');
-            $table->string('description')->nullable();
-            $table->string('use_comment',1)->default('N')->nullable();
-            $table->string('show_admin_comment',1)->default('N')->nullable();
-            $table->text('labels');
-
-            $table->unique('cpt_id');
-        });
-    }
-    protected function createCategoryExtraTable()
-    {
-        Schema::create(self::CATEGORY_EXTRA_TABLE_NAME, function (Blueprint $table) {
-            $table->engine = "InnoDB";
-
-            $table->string('site_key', 50);
-            $table->integer('category_id');
-            $table->string('slug');
-            $table->string('template', 50);
-
-            $table->primary('category_id');
-        });
-    }
-
-    protected function createCptTaxTable()
-    {
-        Schema::create(self::CPT_TAXONOMY_TABLE_NAME, function (Blueprint $table) {
-            $table->engine = "InnoDB";
-
-            $table->string('site_key', 50);
-            $table->string('cpt_id');
-            $table->integer('category_id');
-        });
-    }
-
-    protected function createCptDocumentTaxTable()
-    {
-        Schema::create(self::CPT_DOCUMENT_TAXONOMY_TABLE_NAME, function (Blueprint $table) {
-            $table->engine = "InnoDB";
-
-            $table->increments('id');
-
-            $table->string('target_id', 36);
-            $table->integer('category_id');
-            $table->text('item_ids');
-        });
-    }
-
-    protected function createCptDocumentSlugTable()
-    {
-        Schema::create(self::CPT_DOCUMENT_SLUG_TABLE_NAME, function (Blueprint $table) {
-            $table->engine = "InnoDB";
-
-            $table->increments('id');
-
-            $table->string('target_id', 36);
-            $table->string('instance_id', 36);
-            $table->string('slug');
-            $table->string('title');
-
-            $table->unique('slug');
-            $table->index('title');
-            $table->index('target_id');
-        });
-    }
-
-    protected function createThumbnailTable()
-    {
-        Schema::create(self::CPT_THUMBNAIL_TABLE_NAME, function (Blueprint $table) {
-            $table->engine = "InnoDB";
-
-            $table->string('target_id', 36);
-            $table->string('df_thumbnail_file_id', 255);
-            $table->string('df_thumbnail_external_path', 255);
-            $table->string('df_thumbnail_path', 255);
-
-            $table->primary(array('target_id'));
-        });
-    }
-
     public function dropTables()
     {
-        Schema::drop(self::CPT_TABLE_NAME);
-        Schema::drop(self::CATEGORY_EXTRA_TABLE_NAME);
-        Schema::drop(self::CPT_TAXONOMY_TABLE_NAME);
-        Schema::drop(self::CPT_DOCUMENT_TAXONOMY_TABLE_NAME);
-        Schema::drop(self::CPT_DOCUMENT_SLUG_TABLE_NAME);
-        Schema::drop(self::CPT_THUMBNAIL_TABLE_NAME);
+        Schema::drop(self::CPTS);
+        Schema::drop(self::CATEGORY_EXTRA);
+        Schema::drop(self::CPT_TAXONOMY);
+        Schema::drop(self::TAXONOMY);
+        Schema::drop(self::SLUG);
+        Schema::drop(self::THUMBS);
     }
 
 }
