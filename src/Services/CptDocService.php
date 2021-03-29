@@ -79,6 +79,18 @@ class CptDocService
         return $item;
     }
 
+    public function getItemOnlyId($id)
+    {
+        $temp = CptDocument::find($id);
+        if ($temp === null) {
+            throw new NotFoundDocumentException;
+        }
+
+        $item = CptDocument::division($temp->instance_id)->find($id);
+
+        return $item;
+    }
+
     public function getFieldTypes(ConfigEntity $config)
     {
         $configHandler = app('overcode.df.configHandler');
