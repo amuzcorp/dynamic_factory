@@ -78,7 +78,13 @@
                                     <td>{{ $doc->seq }}</td>
                                     @foreach($config['listColumns'] as $columnName)
                                         @if ($columnName === 'title')
-                                            <td><a href="{{ route('dyFac.setting.'.$cpt->cpt_id, ['type' => 'edit', 'doc_id' => $doc->id]) }}">{{ $doc->title }}</a></td>
+                                            <td>
+                                                @if($doc->title == null)
+                                                    <a href="{{ route('dyFac.setting.'.$cpt->cpt_id, ['type' => 'edit', 'doc_id' => $doc->id]) }}" style="font-style: italic; color:#999;">[제목없음]</a>
+                                                @else
+                                                    <a href="{{ route('dyFac.setting.'.$cpt->cpt_id, ['type' => 'edit', 'doc_id' => $doc->id]) }}">{{ $doc->title }}</a>
+                                                @endif
+                                            </td>
                                         @elseif ($columnName === 'writer')
                                             <td>
                                                 @if ($doc->user !== null)
