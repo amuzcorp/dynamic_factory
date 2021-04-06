@@ -23,3 +23,21 @@ if (function_exists('getMediaImageUrl') === false) {
         return $url_arr;
     }
 }
+
+if (function_exists('df_category') === false) {
+    function df_category(\Overcode\XePlugin\DynamicFactory\Models\DfTaxonomy $dfTaxonomy, $type = null) {
+        $arr = [];
+
+        foreach ($dfTaxonomy->item_ids as $item_id) {
+            $category_item = app('overcode.df.taxonomyHandler')->getCategoryItem($item_id);
+
+            if($type == 'word') {
+                $arr[] = $category_item->word;
+            }else {
+                $arr[] = $category_item;
+            }
+        }
+
+        return $arr;
+    }
+}
