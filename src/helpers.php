@@ -44,6 +44,9 @@ if (function_exists('df_category') === false) {
 
 if (function_exists('get_menu_instance_name') === false) {
     function get_menu_instance_name($instance_id) {
+
+        if($instance_id == null) return '';
+
         $hasSiteKey = \Schema::hasColumn('menu_item', 'site_key');
 
         $menus = [];

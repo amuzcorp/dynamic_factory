@@ -275,11 +275,16 @@ class DynamicFactoryService
         return $doc;
     }
 
-    public function getItemsWhereQuery(array $attributes)
+    public function getItemsWhereQuery(array $attributes, $site_key = null)  // site_key == '*' 일때는 모든 사이트
     {
         $instance_id = $attributes['cpt_id'];
 
         $query = CptDocument::division($instance_id)->where('instance_id', $instance_id);
+
+        if($site_key != '*'){
+            $site_key = $site_key != null ? $site_key : \XeSite::getCurrentSitekey();
+            $query->where('site_key', $site_key);
+        }
 
         $query->visible(); // trash 가 아닌것만
 
