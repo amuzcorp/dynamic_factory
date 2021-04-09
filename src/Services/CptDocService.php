@@ -103,19 +103,21 @@ class CptDocService
      * @param array $cpt_ids
      * @param UserInterface|null $user
      * @param string $author
+     * @param null $site_key * 일때는 모든 사이트
      * @return Collection
      */
-    public function getItemsByCptIds(array $cpt_ids, UserInterface $user = null, $author = 'any')
+    public function getItemsByCptIds(array $cpt_ids, UserInterface $user = null, $author = 'any', $site_key = null)
     {
         $result_items = new Collection();
-        $site_key = \XeSite::getCurrentSiteKey();
+
+        if($site_key != '*') $site_key = $site_key != null ? $site_key : \XeSite::getCurrentSiteKey();
 
         // site_key 컬럼을 가지고 있는지
         $hasSiteKey = \Schema::hasColumn('documents', 'site_key');
 
         foreach($cpt_ids as $cpt_id) {
             $query = CptDocument::division($cpt_id)->where('instance_id', $cpt_id);
-            if($hasSiteKey == true) {
+            if($hasSiteKey == true && $site_key != '*') {
                 $query = $query->where('site_key', $site_key);
             }
             if($author === 'author') {
