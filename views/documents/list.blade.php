@@ -108,7 +108,11 @@
                                                 @if (($fieldType = XeDynamicField::get('documents_'.$cpt->cpt_id, $columnName)) !== null)
                                                     <div class="xe-list-board-list__dynamic-field xe-list-board-list__dynamic-field-{{ $columnName }} xe-list-board-list__mobile-style">
                                                         <span class="sr-only">{{ xe_trans($column_labels[$columnName]) }}</span>
+                                                        @if($fieldType->getId() == 'fieldType/dynamic_field_extend@instance_selector')
+                                                            {{ get_menu_instance_name($fieldType->getSkin()->output($columnName, $doc->getAttributes())) }}
+                                                        @else
                                                         {!! $fieldType->getSkin()->output($columnName, $doc->getAttributes()) !!}
+                                                        @endif
                                                     </div>
                                                 @else
                                                     {!! $doc->{$columnName} !!}

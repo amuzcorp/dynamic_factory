@@ -41,3 +41,25 @@ if (function_exists('df_category') === false) {
         return $arr;
     }
 }
+
+if (function_exists('get_menu_instance_name') === false) {
+    function get_menu_instance_name($instance_id) {
+        $hasSiteKey = \Schema::hasColumn('menu_item', 'site_key');
+
+        $menus = [];
+
+        if($hasSiteKey) {
+            $menu_items = Xpressengine\Menu\Models\MenuItem::where('site_key', \XeSite::getCurrentSiteKey())->orderBy('ordering')->get();
+        }else {
+            $menu_items = Xpressengine\Menu\Models\MenuItem::orderBy('ordering')->get();
+        }
+        foreach ($menu_items as $menu_item) {
+            $menus[$menu_item->id] = $menu_item->title;
+        }
+        if(\XeSite::getCurrentSiteKey() == 'default') {
+            $menus['admin_dashboard'] = '관리자 대시보드';
+        }
+
+        return xe_trans($menus[$instance_id]);
+    }
+}
