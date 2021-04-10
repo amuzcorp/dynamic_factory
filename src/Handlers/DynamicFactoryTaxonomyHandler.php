@@ -94,7 +94,7 @@ class DynamicFactoryTaxonomyHandler
         $df_categories = \XeRegister::get('df_category');
         \XeDB::beginTransaction();
         try {
-            foreach((array)$df_categories as $cate) {
+            foreach((array)$df_categories as $category_id => $cate) {
                 $slug = $cate['slug'];
                 $cate_extra = $this->getCategoryExtraBySlug($slug);
                 if (!isset($cate_extra)) {
@@ -102,7 +102,7 @@ class DynamicFactoryTaxonomyHandler
                     XeLang::save($langKey, 'ko', $cate['name'], false);
 
                     $category = $this->categoryHandler->createCate(['name' => $langKey]);
-                    $category_id = $category->id;
+//                    $category_id = $category->id;
 
                     $this->addCategoryItemForOut($category, $cate['items']);
 
@@ -120,6 +120,15 @@ class DynamicFactoryTaxonomyHandler
                         $cptTaxonomy->category_id = $category_id;
                         $cptTaxonomy->save();
                     }
+                }
+
+                //set dynamic field
+                if(array_get($cate,'dynamic_fields') && count($cate['dynamic_fields']) > 0){
+                    foreach($cate['dynamic_fields'] as $key => $val){
+                        $val['group'] = 'tax_'.$category_id;
+                        $cate['dynamic_fields'][$key] = $val;
+                    }
+                    \XeRegister::push('df_df', $category_id, $cate['dynamic_fields']);
                 }
             }
         } catch (\Exception $e) {

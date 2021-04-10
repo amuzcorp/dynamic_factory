@@ -218,18 +218,15 @@ class DynamicFactoryHandler
             $new_cpt_ids = [];  // DF 추가 감지
 
             $need_lang_configs = ['label','placeholder'];
-            foreach ((array)$df_dfs as $cpt_id => $dfs) {
+            foreach ((array)$df_dfs as $df_key => $dfs) {
                 foreach ((array)$dfs as $df) {
-                    $configName = sprintf('dynamicField.documents_%s.%s', $cpt_id, $df['id']);
-                    if(array_get($df, 'group') != null) {
-                        $cpt_id = str_replace('documents_', '', $df['group']);
-                        $configName = sprintf('dynamicField.%s.%s', $df['group'], $df['id']);
-                    }else {
-                        $df['group'] = 'documents_' . $cpt_id;
+                    if(array_get($df, 'group') == null) {
+                        $df['group'] = 'documents_' . $df_key;
                     }
+                    $configName = sprintf('dynamicField.%s.%s', $df['group'], $df['id']);
 
                     if (XeConfig::get($configName) === null) {
-                        $new_cpt_ids[] = $cpt_id;
+                        $new_cpt_ids[] = $df_key;
 
                         $config = $configHandler->getDefault();
                         foreach ($df as $name => $value) {
@@ -248,6 +245,9 @@ class DynamicFactoryHandler
                 }
             }
 
+            //21.04.10 추가 by xiso
+            //df_key는 항상 cpt_id가 아닐수 있음(taxonomy 때문).
+            //하지만 setCurrentSortFormColumns에서 그것을 체크하기때문에 그냥 보냄
             $new_cpt_ids = array_unique($new_cpt_ids);  // 새로운 DF 가 추가되었으면 DyFac Config 를 Update 한다.
             foreach ($new_cpt_ids as $cpt_id) {
                 app('overcode.df.configHandler')->setCurrentSortFormColumns($cpt_id);
