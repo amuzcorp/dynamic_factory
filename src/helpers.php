@@ -66,3 +66,19 @@ if (function_exists('get_menu_instance_name') === false) {
         return xe_trans($menus[$instance_id]);
     }
 }
+
+if (function_exists('relate_cpt_title') === false) {
+    function relate_cpt_title($json_text, $type = 'single')
+    {
+        if(empty($json_text) || $json_text == '"null"') return '';
+
+        $ids = json_decode($json_text);
+
+        if ($type == 'multi') {
+            return $ids;
+        }else {
+            $item = \Overcode\XePlugin\DynamicFactory\Models\CptDocument::find($ids[0]);
+            return $item->title;
+        }
+    }
+}
