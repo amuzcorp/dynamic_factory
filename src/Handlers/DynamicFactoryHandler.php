@@ -4,7 +4,10 @@ namespace Overcode\XePlugin\DynamicFactory\Handlers;
 
 use App\Http\Sections\DynamicFieldSection;
 use Illuminate\Database\Eloquent\Collection;
+use Overcode\XePlugin\DynamicFactory\Exceptions\AlreadyExistFavoriteHttpException;
+use Overcode\XePlugin\DynamicFactory\Exceptions\NotFoundFavoriteHttpException;
 use Overcode\XePlugin\DynamicFactory\Models\Cpt;
+use Overcode\XePlugin\DynamicFactory\Models\DfFavorite;
 use Overcode\XePlugin\DynamicFactory\Plugin;
 use XeConfig;
 use XeDB;
@@ -288,5 +291,53 @@ class DynamicFactoryHandler
         $siteKey = XeSite::getCurrentSiteKey();
 
         XeDB::table('df_cpts')->where('cpt_id', $cpt_id)->where('site_key', $siteKey)->delete();
+    }
+
+
+    /**
+     * check has favorite
+     *
+     * @param string $boardId board id
+     * @param string $userId  user id
+     * @return bool
+     */
+    public function hasFavorite($DocId, $userId)
+    {
+        return DfFavorite::where('target_id', $DocId)->where('user_id', $userId)->exists();
+    }
+
+    /**
+     * add favorite
+     * @param string $df Id board id
+     * @param string $userId  user id
+     */
+    public function addFavorite($DocId, $userId)
+    {
+        if ($this->hasFavorite($DocId, $userId) === true) {
+            throw new AlreadyExistFavoriteHttpException;
+        }
+
+        $favorite = new DfFavorite;
+        $favorite->target_id = $DocId;
+        $favorite->user_id = $userId;
+        $favorite->save();
+
+        return $favorite;
+    }
+
+    /**
+     * remove favorite
+     *
+     * @param string $boardId board id
+     * @param string $userId  user id
+     * @return void
+     */
+    public function removeFavorite($DocId, $userId)
+    {
+        if ($this->hasFavorite($DocId, $userId) === false) {
+            throw new NotFoundFavoriteHttpException;
+        }
+
+        DfFavorite::where('target_id', $DocId)->where('user_id', $userId)->delete();
     }
 }

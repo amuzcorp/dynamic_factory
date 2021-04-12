@@ -2,6 +2,7 @@
 namespace Overcode\XePlugin\DynamicFactory\Controllers;
 
 use App\Http\Controllers\Controller;
+use Overcode\XePlugin\DynamicFactory\Handlers\DynamicFactoryHandler;
 use Overcode\XePlugin\DynamicFactory\Handlers\DynamicFactoryTaxonomyHandler;
 use Overcode\XePlugin\DynamicFactory\Models\CptDocument;
 use XePresenter;
@@ -15,11 +16,15 @@ class DynamicFactoryController extends Controller
 {
     public $taxonomyHandler;
 
+    protected $dfHandler;
+
     public function __construct(
-        DynamicFactoryTaxonomyHandler $taxonomyHandler
+        DynamicFactoryTaxonomyHandler $taxonomyHandler,
+        DynamicFactoryHandler $dfHandler
     )
     {
         $this->taxonomyHandler = $taxonomyHandler;
+        $this->dfHandler = $dfHandler;
     }
 
     /**
@@ -51,65 +56,19 @@ class DynamicFactoryController extends Controller
         if (Auth::check() === false) {
             throw new AccessDeniedHttpException;
         }
-        $item = CptDocument::division('tour')->find($id);
+        $item = app('overcode.doc.service')->getItemOnlyId($id);
 
         $userId = Auth::user()->getId();
         $favorite = false;
-        if ($this->hasFavorite($item->id, $userId) === false) {
-            $this->addFavorite($item->id, $userId);
+        if ($this->dfHandler->hasFavorite($item->id, $userId) === false) {
+            $this->dfHandler->addFavorite($item->id, $userId);
             $favorite = true;
         } else {
-            $this->removeFavorite($item->id, $userId);
+            $this->dfHandler->removeFavorite($item->id, $userId);
         }
 
         return \XePresenter::makeApi(['favorite' => $favorite]);
     }
 
-    /**
-     * check has favorite
-     *
-     * @param string $boardId board id
-     * @param string $userId  user id
-     * @return bool
-     */
-    public function hasFavorite($DocId, $userId)
-    {
-        return DfFavorite::where('target_id', $DocId)->where('user_id', $userId)->exists();
-    }
-
-    /**
-     * add favorite
-     * @param string $df Id board id
-     * @param string $userId  user id
-     */
-    public function addFavorite($DocId, $userId)
-    {
-        if ($this->hasFavorite($DocId, $userId) === true) {
-            throw new AlreadyExistFavoriteHttpException;
-        }
-
-        $favorite = new DfFavorite;
-        $favorite->target_id = $DocId;
-        $favorite->user_id = $userId;
-        $favorite->save();
-
-        return $favorite;
-    }
-
-    /**
-     * remove favorite
-     *
-     * @param string $boardId board id
-     * @param string $userId  user id
-     * @return void
-     */
-    public function removeFavorite($DocId, $userId)
-    {
-        if ($this->hasFavorite($DocId, $userId) === false) {
-            throw new NotFoundFavoriteHttpException;
-        }
-
-        DfFavorite::where('target_id', $DocId)->where('user_id', $userId)->delete();
-    }
 
 }
