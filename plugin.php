@@ -379,6 +379,15 @@ class Plugin extends AbstractPlugin
             });
         });
 
+        Route::fixed('', function() {
+            Route::group([
+                'namespace' => 'Overcode\XePlugin\DynamicFactory\Controllers',
+                'as' => 'dyFac.document.'
+            ], function () {
+                Route::post('/favorite/{id}', ['as' => 'favorite', 'uses' => 'DynamicFactoryController@favorite']);
+            });
+        });
+
         Route::settings(static::getId(), function() {
             Route::get('/hasSlug/{cpt_id}', ['as' => 'dyFac.setting.hasSlug' , 'uses' => 'DynamicFactorySettingController@hasSlug']);
         },['namespace' => 'Overcode\XePlugin\DynamicFactory\Controllers']);

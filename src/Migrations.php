@@ -14,6 +14,7 @@ class Migrations
     const TAXONOMY = 'df_taxonomy';             // CPT 에서 생성한 Document 의 Category 를 저장
     const SLUG = 'df_slug';                     // CPT 에성 생성한 Document 의 Slug 를 저장
     const THUMBS = 'df_thumbs';                 // CPT 에서 생성한 Document 의 Thumbnail 를 저장
+    const FAVORITES = 'df_favorites';                 // CPT 에서 생성한 Document 의 Thumbnail 를 저장
 
     public function checkInstalled()
     {
@@ -23,6 +24,7 @@ class Migrations
         if (Schema::hasTable(self::TAXONOMY) === false) return false;
         if (Schema::hasTable(self::SLUG) === false) return false;
         if (Schema::hasTable(self::THUMBS) === false) return false;
+        if (Schema::hasTable(self::FAVORITES) === false) return false;
     }
 
     public function install()
@@ -107,6 +109,18 @@ class Migrations
                 $table->string('df_thumbnail_file_id', 255);
                 $table->string('df_thumbnail_external_path', 255);
                 $table->string('df_thumbnail_path', 255);
+
+                $table->primary(array('target_id'));
+            });
+        }
+
+        if (Schema::hasTable(self::FAVORITES) === false) {
+            Schema::create(self::FAVORITES, function (Blueprint $table) {
+                $table->engine = "InnoDB";
+
+                $table->bigIncrements('favorite_id')->comment('favorite 아이디');
+                $table->string('target_id', 36)->comment('대상 아이디');
+                $table->string('user_id', 36)->comment('유저 아이디');
 
                 $table->primary(array('target_id'));
             });
