@@ -386,12 +386,20 @@ class DynamicFactorySettingController extends BaseController
         $config = $this->configHandler->getConfig($cpt->cpt_id);
         $column_labels = $this->configHandler->getColumnLabels($config);
 
+        $searchTargetWord = $request->get('search_target');
+        if ($request->get('search_target') == 'pure_content') {
+            $searchTargetWord = 'content';
+        } elseif ($request->get('search_target') == 'title_pure_content') {
+            $searchTargetWord = 'titleAndContent';
+        }
+
         return $this->presenter->make($cpt->blades['list'],[
             'cpt' => $cpt,
             'current_route_name' => $request->current_route_name,
             'cptDocs' => $cptDocs,
             'config' => $config,
-            'column_labels' => $column_labels
+            'column_labels' => $column_labels,
+            'searchTargetWord' => $searchTargetWord
         ]);
     }
 
@@ -491,7 +499,7 @@ class DynamicFactorySettingController extends BaseController
             'cpt_id' => $cpt_id
         ]));
 
-        // TODO 검색 조건 설정
+        $cptDocQuery = $this->makeWhere($cptDocQuery, $request);
 
         $cptDocQuery = $cptDocQuery->orderBy('created_at','desc');
         //$cptDocQuery = $this->dfService->getItemsOrderQuery($cptDocQuery, $request->all());
@@ -668,5 +676,79 @@ class DynamicFactorySettingController extends BaseController
         Session::flash('alert', ['type' => 'success', 'message' => xe_trans('xe::processed')]);
 
         return $this->presenter->makeApi([]);
+    }
+
+    protected function makeWhere($query, $request)
+    {
+        //기간 검색
+        if ($startDate = $request->get('start_date')) {
+            $query = $query->where('created_at', '>=', $startDate . ' 00:00:00');
+        }
+        if ($endDate = $request->get('end_date')) {
+            $query = $query->where('created_at', '<=', $endDate . ' 23:59:59');
+        }
+
+        //검색어 검색
+        if ($request->get('search_target') == 'title') {
+            $query = $query->where(
+                'title',
+                'like',
+                sprintf('%%%s%%', implode('%', explode(' ', $request->get('search_keyword'))))
+            );
+        }
+        if ($request->get('search_target') == 'pure_content') {
+            $query = $query->where(
+                'pure_content',
+                'like',
+                sprintf('%%%s%%', implode('%', explode(' ', $request->get('search_keyword'))))
+            );
+        }
+        if ($request->get('search_target') == 'title_pure_content') {
+            $query = $query->whereNested(function ($query) use ($request) {
+                $query->where(
+                    'title',
+                    'like',
+                    sprintf('%%%s%%', implode('%', explode(' ', $request->get('search_keyword'))))
+                )->orWhere(
+                    'pure_content',
+                    'like',
+                    sprintf('%%%s%%', implode('%', explode(' ', $request->get('search_keyword'))))
+                );
+            });
+        }
+
+        if ($request->get('search_target') == 'writer') {
+            $query = $query->where('writer', 'like', sprintf('%%%s%%', $request->get('search_keyword')));
+        }
+
+        //작성자 ID 검색
+        if ($request->get('search_target') == 'writerId') {
+            $writers = \XeUser::where(
+                'email',
+                'like',
+                '%' . $request->get('search_keyword') . '%'
+            )->selectRaw('id')->get();
+
+            $writerIds = [];
+            foreach ($writers as $writer) {
+                $writerIds[] = $writer['id'];
+            }
+
+            $query = $query->whereIn('user_id', $writerIds);
+        }
+
+        //필터 검색
+        /*if ($state = $request->get('search_state')) {
+            list($searchField, $searchValue) = explode('|', $state);
+
+            $query->where($searchField, $searchValue);
+        }*/
+
+        //게시판 검색
+        /*if ($targetBoard = $request->get('search_board')) {
+            $query->where('instance_id', $targetBoard);
+        }*/
+
+        return $query;
     }
 }
