@@ -159,12 +159,12 @@ class Migrations
 
     public function dropTables()
     {
-        Schema::drop(self::CPTS);
-        Schema::drop(self::CATEGORY_EXTRA);
-        Schema::drop(self::CPT_TAXONOMY);
-        Schema::drop(self::TAXONOMY);
-        Schema::drop(self::SLUG);
-        Schema::drop(self::THUMBS);
+        Schema::dropIfExists(self::CPTS);
+        Schema::dropIfExists(self::CATEGORY_EXTRA);
+        Schema::dropIfExists(self::CPT_TAXONOMY);
+        Schema::dropIfExists(self::TAXONOMY);
+        Schema::dropIfExists(self::SLUG);
+        Schema::dropIfExists(self::THUMBS);
     }
 
 }
