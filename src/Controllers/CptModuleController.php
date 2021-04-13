@@ -132,7 +132,9 @@ class CptModuleController extends Controller
             $dynamicFieldsById[$fieldType->get('id')] = $fieldType;
         }
 
-        return XePresenter::make('show', compact('item','fieldTypes','dynamicFieldsById','cpt'));
+        $select_category_items = $this->taxonomyHandler->getItemOnlyTargetId($id);
+
+        return XePresenter::make('show', compact('item','fieldTypes','dynamicFieldsById','cpt', 'select_category_items'));
     }
 
     /**

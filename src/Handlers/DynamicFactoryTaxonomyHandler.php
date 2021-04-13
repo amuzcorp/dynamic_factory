@@ -3,6 +3,7 @@
 namespace Overcode\XePlugin\DynamicFactory\Handlers;
 
 use XeLang;
+use XeDB;
 use App\Facades\XeCategory;
 use Overcode\XePlugin\DynamicFactory\Models\CategoryExtra;
 use Overcode\XePlugin\DynamicFactory\Models\CptTaxonomy;
@@ -33,7 +34,7 @@ class DynamicFactoryTaxonomyHandler
 
     public function createTaxonomy($inputs)
     {
-        \XeDB::beginTransaction();
+        XeDB::beginTransaction();
         try {
             $category_id = $inputs['category_id'];
 
@@ -76,11 +77,11 @@ class DynamicFactoryTaxonomyHandler
                 }
             }
         } catch (\Exception $e) {
-            \XeDB::rollback();
+            XeDB::rollback();
 
             throw $e;
         }
-        \XeDB::commit();
+        XeDB::commit();
 
         return $taxonomyItem->id;
     }
@@ -92,7 +93,7 @@ class DynamicFactoryTaxonomyHandler
     public function createCategoryForOut()
     {
         $df_categories = \XeRegister::get('df_category');
-        \XeDB::beginTransaction();
+        XeDB::beginTransaction();
         try {
             foreach((array)$df_categories as $cate) {
                 $slug = $cate['slug'];
@@ -132,11 +133,11 @@ class DynamicFactoryTaxonomyHandler
                 }
             }
         } catch (\Exception $e) {
-            \XeDB::rollback();
+            XeDB::rollback();
 
             throw $e;
         }
-        \XeDB::commit();
+        XeDB::commit();
     }
 
     public function addCategoryItemForOut($category, $arr, $parent_id = null)
@@ -379,19 +380,19 @@ class DynamicFactoryTaxonomyHandler
 
     public function deleteCategory($category_id)
     {
-        \XeDB::beginTransaction();
+        XeDB::beginTransaction();
         try {
             $category = $this->categoryHandler->cates()->find($category_id);
             XeCategory::deleteCate($category);
             CategoryExtra::where('category_id', $category_id)->delete();
             CptTaxonomy::where('category_id', $category_id)->delete();
         } catch (\Exception $e) {
-            \XeDB::rollback();
+            XeDB::rollback();
 
             //throw $e;
             return false;
         }
-        \XeDB::commit();
+        XeDB::commit();
 
         return true;
     }
@@ -450,7 +451,7 @@ class DynamicFactoryTaxonomyHandler
                     ];
 
                     // target_id 로 해당 Dynamic Field Table 에서 get 한다.
-                    $die = \XeDB::table($tableName)->where($param)->first();
+                    $die = XeDB::table($tableName)->where($param)->first();
                     if($die === null) {
                         $item->{$name} = null;
                     }else {
@@ -492,7 +493,7 @@ class DynamicFactoryTaxonomyHandler
                     ];
 
                     // target_id 로 해당 Dynamic Field Table 에서 get 한다.
-                    $die = \XeDB::table($tableName)->where($param)->first();
+                    $die = XeDB::table($tableName)->where($param)->first();
                     if($die === null){
                         $dfs[] = $this->df_create($group, $dfKey, []);
                     }else{
@@ -572,5 +573,23 @@ class DynamicFactoryTaxonomyHandler
                 return $item;
             }
         }
+    }
+
+    public function getItemOnlyTargetId($target_id)
+    {
+
+        $df_taxonomies = XeDB::table('df_taxonomy')->where('target_id', $target_id)->get();
+
+        $poi = [];
+
+        foreach($df_taxonomies as $df_taxonomy){
+            foreach (json_decode($df_taxonomy->item_ids) as $jd){
+                array_push($poi, $jd);
+            }
+        }
+
+        $items = XeDB::table('category_item')->whereIn('id', $poi)->get();
+
+        return $items;
     }
 }

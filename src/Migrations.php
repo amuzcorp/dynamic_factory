@@ -118,11 +118,11 @@ class Migrations
             Schema::create(self::FAVORITES, function (Blueprint $table) {
                 $table->engine = "InnoDB";
 
-                $table->bigIncrements('favorite_id')->comment('favorite 아이디');
-                $table->string('target_id', 36)->comment('대상 아이디');
-                $table->string('user_id', 36)->comment('유저 아이디');
+                $table->bigIncrements('favorite_id');
+                $table->string('target_id', 36);
+                $table->string('user_id', 36);
 
-                $table->primary(array('target_id'));
+                $table->index(array('target_id', 'user_id'));
             });
         }
     }
