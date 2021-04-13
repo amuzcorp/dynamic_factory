@@ -4,7 +4,10 @@ namespace Overcode\XePlugin\DynamicFactory\Handlers;
 
 use Illuminate\Http\Request;
 use Overcode\XePlugin\DynamicFactory\Components\Modules\Cpt\CptModule;
+use Overcode\XePlugin\DynamicFactory\Exceptions\AlreadyExistFavoriteHttpException;
+use Overcode\XePlugin\DynamicFactory\Exceptions\NotFoundFavoriteHttpException;
 use Overcode\XePlugin\DynamicFactory\Models\CptDocument;
+use Overcode\XePlugin\DynamicFactory\Models\DfFavorite;
 use Overcode\XePlugin\DynamicFactory\Models\DfThumb;
 use Xpressengine\Category\Models\CategoryItem;
 use Xpressengine\Config\ConfigEntity;
@@ -305,6 +308,54 @@ class DynamicFactoryDocumentHandler
             'df_thumbnail_path' => $thumbnailPath,
         ]);
         $model->save();
+    }
+
+
+    /**
+     * check has favorite
+     *
+     * @param string $boardId board id
+     * @param string $userId  user id
+     * @return bool
+     */
+    public function hasFavorite($DocId, $userId)
+    {
+        return DfFavorite::where('target_id', $DocId)->where('user_id', $userId)->exists();
+    }
+
+    /**
+     * add favorite
+     * @param string $df Id board id
+     * @param string $userId  user id
+     */
+    public function addFavorite($DocId, $userId)
+    {
+        if ($this->hasFavorite($DocId, $userId) === true) {
+            throw new AlreadyExistFavoriteHttpException;
+        }
+
+        $favorite = new DfFavorite;
+        $favorite->target_id = $DocId;
+        $favorite->user_id = $userId;
+        $favorite->save();
+
+        return $favorite;
+    }
+
+    /**
+     * remove favorite
+     *
+     * @param string $boardId board id
+     * @param string $userId  user id
+     * @return void
+     */
+    public function removeFavorite($DocId, $userId)
+    {
+        if ($this->hasFavorite($DocId, $userId) === false) {
+            throw new NotFoundFavoriteHttpException;
+        }
+
+        DfFavorite::where('target_id', $DocId)->where('user_id', $userId)->delete();
     }
 
 }
