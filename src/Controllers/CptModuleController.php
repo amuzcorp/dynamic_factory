@@ -395,4 +395,24 @@ class CptModuleController extends Controller
 
         return $title;
     }
+
+    public function favorite(Request $request)
+    {
+        $id = $request->id;
+        if (Auth::check() === false) {
+            throw new AccessDeniedHttpException;
+        }
+        $item = app('overcode.doc.service')->getItemOnlyId($id);
+
+        $userId = Auth::user()->getId();
+        $favorite = false;
+        if ($this->dfDocHandler->hasFavorite($item->id, $userId) === false) {
+            $this->dfDocHandler->addFavorite($item->id, $userId);
+            $favorite = true;
+        } else {
+            $this->dfDocHandler->removeFavorite($item->id, $userId);
+        }
+
+        return \XePresenter::makeApi(['favorite' => $favorite]);
+    }
 }
