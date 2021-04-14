@@ -564,6 +564,9 @@ class DynamicFactoryTaxonomyHandler
     public function getCategoryItem($item_id)
     {
         $category_item = CategoryItem::find($item_id);
+
+        if($category_item == null) return null;
+
         $category_id = $category_item->category_id;
 
         $items = $this->getCategoryItemAttributes($category_id);

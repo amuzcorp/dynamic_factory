@@ -30,11 +30,12 @@ if (function_exists('df_category') === false) {
 
         foreach ($dfTaxonomy->item_ids as $item_id) {
             $category_item = app('overcode.df.taxonomyHandler')->getCategoryItem($item_id);
-
-            if($type == 'word') {
-                $arr[] = $category_item->word;
-            }else {
-                $arr[] = $category_item;
+            if($category_item != null) {
+                if ($type == 'word') {
+                    $arr[] = $category_item->word;
+                } else {
+                    $arr[] = $category_item;
+                }
             }
         }
 
