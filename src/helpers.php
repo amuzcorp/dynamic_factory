@@ -83,3 +83,13 @@ if (function_exists('relate_cpt_title') === false) {
         }
     }
 }
+
+if (function_exists('get_cpt_title') === false) {
+    function get_cpt_title($id)
+    {
+        $item = \Overcode\XePlugin\DynamicFactory\Models\CptDocument::find($id);
+        if($item == null) return '';
+
+        return $item->title;
+    }
+}
