@@ -28,7 +28,7 @@ class CptDocService
      */
     public function getItems(Request $request, ConfigEntity $config, $site_key = null)
     {
-        $model = CptDocument::division($config->get('cpt_id'));
+        $model = CptDocument::division($config->get('cpt_id'), $site_key);
 
         $query = $model->where('instance_id', $config->get('cpt_id'));
 

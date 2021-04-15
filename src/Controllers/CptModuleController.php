@@ -93,7 +93,7 @@ class CptModuleController extends Controller
 
         foreach($taxonomies as $taxonomy) {
             $categories[$taxonomy->id]['group'] = $this->taxonomyHandler->getTaxFieldGroup($taxonomy->id);
-            $categories[$taxonomy->id]['items'] = $this->taxonomyHandler->getCategoryItemAttributes($taxonomy->id);
+            $categories[$taxonomy->id]['items'] = $this->taxonomyHandler->getCategoryItemAttributes($taxonomy->id,$categories[$taxonomy->id]['group']);
         }
 
         $paginate = $service->getItems($request, $this->config);

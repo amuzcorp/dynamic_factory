@@ -2,13 +2,13 @@
 
 namespace Overcode\XePlugin\DynamicFactory\Handlers;
 
+use Illuminate\Support\Collection;
 use XeLang;
 use App\Facades\XeCategory;
 use Overcode\XePlugin\DynamicFactory\Models\CategoryExtra;
 use Overcode\XePlugin\DynamicFactory\Models\CptTaxonomy;
 use Overcode\XePlugin\DynamicFactory\Models\DfTaxonomy;
 use Symfony\Component\HttpKernel\Exception\HttpException;
-use Xpressengine\Category\Models\Category;
 use Xpressengine\Category\Models\CategoryItem;
 
 class DynamicFactoryTaxonomyHandler
@@ -424,43 +424,17 @@ class DynamicFactoryTaxonomyHandler
     /**
      * category_id 로 item 리스트를 만들고 확장 변수 view 에 필요한 변수들을 붙여서 반환
      */
-    public function getCategoryItemAttributes($category_id)
+    public function getCategoryItemAttributes($category_id, $group = null)
     {
-        $group = $this->getTaxFieldGroup($category_id);
-
-        $categoryItems = XeCategory::cates()->find($category_id)->items;
+        $group = ($group == null) ? $this->getTaxFieldGroup($category_id) : $group;
 
         $dynamicFieldHandler = app('xe.dynamicField');
         $dynamicFields = $dynamicFieldHandler->gets($group);
 
-        foreach ($categoryItems as $item) {
-            $dfs = [];
-
-            foreach ($dynamicFields as $key => $val) {
-                $fieldType = df($group, $key);
-                $tableName = $fieldType->getTableName();
-
-                foreach ($fieldType->getColumns() as $column) {
-                    $name = $key . '_' . $column->name;
-
-                    $param = [
-                        'field_id' => $key,
-                        'target_id' => $item->id,
-                        'group' => $group
-                    ];
-
-                    // target_id 로 해당 Dynamic Field Table 에서 get 한다.
-                    $die = \XeDB::table($tableName)->where($param)->first();
-                    if($die === null) {
-                        $item->{$name} = null;
-                    }else {
-                        $item->{$name} = $die->{$column->name};
-                    }
-                }
-            }
-        }
-
-        return $categoryItems;
+        $collection = CategoryItem::newBaseQueryBuilder()->where('category_id',$category_id);
+        foreach($dynamicFields as $field_name => $field)
+            $collection = df($group, $field_name)->get($collection);
+        return $collection->get();
     }
 
     /**
