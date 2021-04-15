@@ -14,6 +14,7 @@ class Migrations
     const TAXONOMY = 'df_taxonomy';             // CPT 에서 생성한 Document 의 Category 를 저장
     const SLUG = 'df_slug';                     // CPT 에성 생성한 Document 의 Slug 를 저장
     const THUMBS = 'df_thumbs';                 // CPT 에서 생성한 Document 의 Thumbnail 를 저장
+    const FAVORITES = 'df_favorites';                 // CPT 에서 생성한 Document 의 Thumbnail 를 저장
 
     public function checkInstalled()
     {
@@ -23,6 +24,7 @@ class Migrations
         if (Schema::hasTable(self::TAXONOMY) === false) return false;
         if (Schema::hasTable(self::SLUG) === false) return false;
         if (Schema::hasTable(self::THUMBS) === false) return false;
+        if (Schema::hasTable(self::FAVORITES) === false) return false;
     }
 
     public function install()
@@ -111,6 +113,18 @@ class Migrations
                 $table->primary(array('target_id'));
             });
         }
+
+        if (Schema::hasTable(self::FAVORITES) === false) {
+            Schema::create(self::FAVORITES, function (Blueprint $table) {
+                $table->engine = "InnoDB";
+
+                $table->bigIncrements('favorite_id');
+                $table->string('target_id', 36);
+                $table->string('user_id', 36);
+
+                $table->index(array('target_id', 'user_id'));
+            });
+        }
     }
 
     /**
@@ -145,12 +159,12 @@ class Migrations
 
     public function dropTables()
     {
-        Schema::drop(self::CPTS);
-        Schema::drop(self::CATEGORY_EXTRA);
-        Schema::drop(self::CPT_TAXONOMY);
-        Schema::drop(self::TAXONOMY);
-        Schema::drop(self::SLUG);
-        Schema::drop(self::THUMBS);
+        Schema::dropIfExists(self::CPTS);
+        Schema::dropIfExists(self::CATEGORY_EXTRA);
+        Schema::dropIfExists(self::CPT_TAXONOMY);
+        Schema::dropIfExists(self::TAXONOMY);
+        Schema::dropIfExists(self::SLUG);
+        Schema::dropIfExists(self::THUMBS);
     }
 
 }

@@ -172,6 +172,16 @@
 
             eval('actions.' + mode + '($f)');
         });
+
+        $('.__xe_btn_search_target .dropdown-menu a').click(function (e) {
+            e.preventDefault();
+
+            $('[name="search_target"]').val($(this).attr('value'));
+            $('.__xe_btn_search_target .__xe_text').text($(this).text());
+
+            $(this).closest('.dropdown-menu').find('li').removeClass('active');
+            $(this).closest('li').addClass('active');
+        });
     });
 
     var actions = {

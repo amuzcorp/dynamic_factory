@@ -2,8 +2,8 @@
 
 namespace Overcode\XePlugin\DynamicFactory\Handlers;
 
-use Illuminate\Support\Collection;
 use XeLang;
+use XeDB;
 use App\Facades\XeCategory;
 use Overcode\XePlugin\DynamicFactory\Models\CategoryExtra;
 use Overcode\XePlugin\DynamicFactory\Models\CptTaxonomy;
@@ -33,7 +33,7 @@ class DynamicFactoryTaxonomyHandler
 
     public function createTaxonomy($inputs)
     {
-        \XeDB::beginTransaction();
+        XeDB::beginTransaction();
         try {
             $category_id = $inputs['category_id'];
 
@@ -76,11 +76,11 @@ class DynamicFactoryTaxonomyHandler
                 }
             }
         } catch (\Exception $e) {
-            \XeDB::rollback();
+            XeDB::rollback();
 
             throw $e;
         }
-        \XeDB::commit();
+        XeDB::commit();
 
         return $taxonomyItem->id;
     }
@@ -92,7 +92,7 @@ class DynamicFactoryTaxonomyHandler
     public function createCategoryForOut()
     {
         $df_categories = \XeRegister::get('df_category');
-        \XeDB::beginTransaction();
+        XeDB::beginTransaction();
         try {
             foreach((array)$df_categories as $cate) {
                 $slug = $cate['slug'];
@@ -132,11 +132,11 @@ class DynamicFactoryTaxonomyHandler
                 }
             }
         } catch (\Exception $e) {
-            \XeDB::rollback();
+            XeDB::rollback();
 
             throw $e;
         }
-        \XeDB::commit();
+        XeDB::commit();
     }
 
     public function addCategoryItemForOut($category, $arr, $parent_id = null)
@@ -379,19 +379,19 @@ class DynamicFactoryTaxonomyHandler
 
     public function deleteCategory($category_id)
     {
-        \XeDB::beginTransaction();
+        XeDB::beginTransaction();
         try {
             $category = $this->categoryHandler->cates()->find($category_id);
             XeCategory::deleteCate($category);
             CategoryExtra::where('category_id', $category_id)->delete();
             CptTaxonomy::where('category_id', $category_id)->delete();
         } catch (\Exception $e) {
-            \XeDB::rollback();
+            XeDB::rollback();
 
             //throw $e;
             return false;
         }
-        \XeDB::commit();
+        XeDB::commit();
 
         return true;
     }
@@ -424,17 +424,18 @@ class DynamicFactoryTaxonomyHandler
     /**
      * category_id 로 item 리스트를 만들고 확장 변수 view 에 필요한 변수들을 붙여서 반환
      */
-    public function getCategoryItemAttributes($category_id, $group = null)
+    public function getCategoryItemAttributes($category_id)
     {
-        $group = ($group == null) ? $this->getTaxFieldGroup($category_id) : $group;
+        $group = $this->getTaxFieldGroup($category_id);
 
         $dynamicFieldHandler = app('xe.dynamicField');
         $dynamicFields = $dynamicFieldHandler->gets($group);
 
-        $collection = CategoryItem::newBaseQueryBuilder()->where('category_id',$category_id);
+        $query = CategoryItem::newBaseQueryBuilder()->where('category_id',$category_id);
         foreach($dynamicFields as $field_name => $field)
-            $collection = df($group, $field_name)->get($collection);
-        return $collection->get();
+            $query = df($group, $field_name)->get($query);
+
+        return $query->get();
     }
 
     /**
@@ -466,7 +467,7 @@ class DynamicFactoryTaxonomyHandler
                     ];
 
                     // target_id 로 해당 Dynamic Field Table 에서 get 한다.
-                    $die = \XeDB::table($tableName)->where($param)->first();
+                    $die = XeDB::table($tableName)->where($param)->first();
                     if($die === null){
                         $dfs[] = $this->df_create($group, $dfKey, []);
                     }else{
@@ -537,8 +538,9 @@ class DynamicFactoryTaxonomyHandler
     public function getCategoryItem($item_id)
     {
         $category_item = CategoryItem::find($item_id);
-        $category_id = $category_item->category_id;
+        if($category_item == null) return null;
 
+        $category_id = $category_item->category_id;
         $items = $this->getCategoryItemAttributes($category_id);
 
         foreach ($items as $item){
@@ -546,5 +548,20 @@ class DynamicFactoryTaxonomyHandler
                 return $item;
             }
         }
+    }
+
+    public function getItemOnlyTargetId($target_id)
+    {
+        $df_taxonomies = XeDB::table('df_taxonomy')->where('target_id', $target_id)->get();
+        $poi = [];
+
+        foreach($df_taxonomies as $df_taxonomy){
+            foreach (json_decode($df_taxonomy->item_ids) as $jd){
+                array_push($poi, $jd);
+            }
+        }
+
+        $items = XeDB::table('category_item')->whereIn('id', $poi)->get();
+        return $items;
     }
 }

@@ -4,7 +4,10 @@ namespace Overcode\XePlugin\DynamicFactory\Handlers;
 
 use App\Http\Sections\DynamicFieldSection;
 use Illuminate\Database\Eloquent\Collection;
+use Overcode\XePlugin\DynamicFactory\Exceptions\AlreadyExistFavoriteHttpException;
+use Overcode\XePlugin\DynamicFactory\Exceptions\NotFoundFavoriteHttpException;
 use Overcode\XePlugin\DynamicFactory\Models\Cpt;
+use Overcode\XePlugin\DynamicFactory\Models\DfFavorite;
 use Overcode\XePlugin\DynamicFactory\Plugin;
 use XeConfig;
 use XeDB;
@@ -289,4 +292,5 @@ class DynamicFactoryHandler
 
         XeDB::table('df_cpts')->where('cpt_id', $cpt_id)->where('site_key', $siteKey)->delete();
     }
+
 }

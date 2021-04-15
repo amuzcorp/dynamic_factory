@@ -110,10 +110,18 @@ class CptModuleController extends Controller
     public function show(
         CptDocService $service,
         Request $request,
+        CptPermissionHandler $cptPermissionHandler,
         $menuUrl,
         $id
     )
     {
+        if (Gate::denies(
+            CptPermissionHandler::ACTION_READ,
+            new Instance($cptPermissionHandler->name($this->instanceId))
+        )) {
+            throw new AccessDeniedHttpException;
+        }
+
         $user = Auth::user();
 
         $cpt = $this->dfService->getItem($this->config->get('cpt_id'));
@@ -132,7 +140,9 @@ class CptModuleController extends Controller
             $dynamicFieldsById[$fieldType->get('id')] = $fieldType;
         }
 
-        return XePresenter::make('show', compact('item','fieldTypes','dynamicFieldsById','cpt'));
+        $select_category_items = $this->taxonomyHandler->getItemOnlyTargetId($id);
+
+        return XePresenter::make('show', compact('item','fieldTypes','dynamicFieldsById','cpt', 'select_category_items'));
     }
 
     /**
@@ -151,7 +161,12 @@ class CptModuleController extends Controller
         ]);
     }
 
-    public function slug(CptDocService $service, Request $request, $menuUrl, $strSlug)
+    public function slug(
+        CptDocService $service,
+        Request $request,
+        CptPermissionHandler $cptPermissionHandler,
+        $menuUrl,
+        $strSlug)
     {
         $cpt_id = $this->config->get('cpt_id');
 
@@ -161,7 +176,7 @@ class CptModuleController extends Controller
             throw new NotFoundDocumentException;
         }
 
-        return $this->show($service, $request, $menuUrl, $slug->target_id);
+        return $this->show($service, $request, $cptPermissionHandler, $menuUrl, $slug->target_id);
     }
 
     public function create(
@@ -394,5 +409,25 @@ class CptModuleController extends Controller
         $title = strip_tags(html_entity_decode($title));
 
         return $title;
+    }
+
+    public function favorite(Request $request)
+    {
+        $id = $request->id;
+        if (Auth::check() === false) {
+            throw new AccessDeniedHttpException;
+        }
+        $item = app('overcode.doc.service')->getItemOnlyId($id);
+
+        $userId = Auth::user()->getId();
+        $favorite = false;
+        if ($this->dfDocHandler->hasFavorite($item->id, $userId) === false) {
+            $this->dfDocHandler->addFavorite($item->id, $userId);
+            $favorite = true;
+        } else {
+            $this->dfDocHandler->removeFavorite($item->id, $userId);
+        }
+
+        return \XePresenter::makeApi(['favorite' => $favorite]);
     }
 }

@@ -5,7 +5,7 @@ use App\Http\Controllers\Controller;
 use Overcode\XePlugin\DynamicFactory\Handlers\DynamicFactoryTaxonomyHandler;
 use XePresenter;
 use Xpressengine\Http\Request;
-
+use Auth;
 class DynamicFactoryController extends Controller
 {
     public $taxonomyHandler;
@@ -40,4 +40,5 @@ class DynamicFactoryController extends Controller
             'categories' => $categories
         ]);
     }
+
 }

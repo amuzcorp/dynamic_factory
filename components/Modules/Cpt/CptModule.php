@@ -75,6 +75,8 @@ class CptModule extends AbstractModule
 
             Route::delete('/destroy/{id}', ['as' => 'destroy', 'uses' => 'CptModuleController@destroy']);
 
+            Route::post('/favorite/{id}', ['as' => 'favorite', 'uses' => 'CptModuleController@favorite']);
+
             Route::get('/{slug}', ['as' => 'slug', 'uses' => 'CptModuleController@slug']);
         }, ['namespace' => 'Overcode\XePlugin\DynamicFactory\Controllers']);
 

@@ -14,6 +14,7 @@ use Overcode\XePlugin\DynamicFactory\Plugin;
 use XeDB;
 use XeSite;
 use XeEditor;
+use Schema;
 use Overcode\XePlugin\DynamicFactory\Handlers\DynamicFactoryHandler;
 use Xpressengine\Category\Models\CategoryItem;
 use Xpressengine\Config\ConfigEntity;
@@ -281,7 +282,7 @@ class DynamicFactoryService
 
         $query = CptDocument::division($instance_id)->where('instance_id', $instance_id);
 
-        if($site_key != '*'){
+        if($site_key != '*' && Schema::hasColumn('documents', 'site_key')){
             $site_key = $site_key != null ? $site_key : \XeSite::getCurrentSitekey();
             $query->where('site_key', $site_key);
         }

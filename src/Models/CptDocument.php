@@ -4,7 +4,6 @@ namespace Overcode\XePlugin\DynamicFactory\Models;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Xpressengine\Document\Models\Document;
-use Xpressengine\Plugins\Board\Models\Board;
 use Xpressengine\Plugins\Comment\CommentUsable;
 use Xpressengine\Routing\InstanceRoute;
 use Xpressengine\Seo\SeoUsable;
@@ -156,6 +155,11 @@ class CptDocument extends Document implements CommentUsable, SeoUsable
     public function thumb()
     {
         return $this->belongsTo(DfThumb::class, 'id', 'target_id');
+    }
+
+    public function favorite()
+    {
+        return $this->belongsTo(DfFavorite::class, 'id', 'target_id');
     }
 
     public function slug()

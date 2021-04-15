@@ -30,11 +30,12 @@ if (function_exists('df_category') === false) {
 
         foreach ($dfTaxonomy->item_ids as $item_id) {
             $category_item = app('overcode.df.taxonomyHandler')->getCategoryItem($item_id);
-
-            if($type == 'word') {
-                $arr[] = $category_item->word;
-            }else {
-                $arr[] = $category_item;
+            if($category_item != null) {
+                if ($type == 'word') {
+                    $arr[] = $category_item->word;
+                } else {
+                    $arr[] = $category_item;
+                }
             }
         }
 
@@ -64,5 +65,31 @@ if (function_exists('get_menu_instance_name') === false) {
         }
 
         return xe_trans($menus[$instance_id]);
+    }
+}
+
+if (function_exists('relate_cpt_title') === false) {
+    function relate_cpt_title($json_text, $type = 'single')
+    {
+        if(empty($json_text) || $json_text == '"null"') return '';
+
+        $ids = json_decode($json_text);
+
+        if ($type == 'multi') {
+            return $ids;
+        }else {
+            $item = \Overcode\XePlugin\DynamicFactory\Models\CptDocument::find($ids[0]);
+            return $item->title;
+        }
+    }
+}
+
+if (function_exists('get_cpt_title') === false) {
+    function get_cpt_title($id)
+    {
+        $item = \Overcode\XePlugin\DynamicFactory\Models\CptDocument::find($id);
+        if($item == null) return '';
+
+        return $item->title;
     }
 }
