@@ -33,6 +33,14 @@ class CptModule extends AbstractModule
         Route::settings(self::getId(), function () {
             // global
             Route::get(
+                '/global/config',
+                ['as' => 'settings.cpt.cpt.global.config', 'uses' => 'CptModuleSettingController@editGlobalConfig']
+            );
+            Route::post(
+                '/global/config/update',
+                ['as' => 'settings.cpt.cpt.global.config.update', 'uses' => 'CptModuleSettingController@updateGlobalConfig']
+            );
+            Route::get(
                 '/global/permission',
                 ['as' => 'settings.cpt.cpt.global.permission', 'uses' => 'CptModuleSettingController@editGlobalPermission']
             );

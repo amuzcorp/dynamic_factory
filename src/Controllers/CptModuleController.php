@@ -44,11 +44,14 @@ class CptModuleController extends Controller
 
     protected $dfService;
 
+    protected $identifyManager;
+
     public function __construct(
         CptModuleConfigHandler $configHandler,
         CptUrlHandler $cptUrlHandler,
         DynamicFactoryDocumentHandler $dfDocHandler,
-        DynamicFactoryService $dynamicFactoryService
+        DynamicFactoryService $dynamicFactoryService,
+        IdentifyManager $identifyManager
     )
     {
         $instanceConfig = InstanceConfig::instance();
@@ -64,6 +67,7 @@ class CptModuleController extends Controller
         }
         $this->taxonomyHandler = app('overcode.df.taxonomyHandler');
         $this->dfService = $dynamicFactoryService;
+        $this->identifyManager = $identifyManager;
 
         XePresenter::setSkinTargetId(CptModule::getId());
         XePresenter::share('configHandler', $configHandler);
@@ -126,6 +130,12 @@ class CptModuleController extends Controller
 
         $cpt = $this->dfService->getItem($this->config->get('cpt_id'));
         $item = $service->getItem($id, $user, $this->config);
+
+        if ($this->config->get('useConsultation') === true
+            && $service->hasItemPerm($item, $user, $this->identifyManager, $this->isManager()) == false
+        ) {
+            throw new AccessDeniedHttpException;
+        }
 
         // 글 조회수 증가
         if ($item->display == CptDocument::DISPLAY_VISIBLE) {

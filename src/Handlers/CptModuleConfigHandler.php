@@ -64,6 +64,28 @@ class CptModuleConfigHandler
     }
 
     /**
+     * 기본 인스턴스 설정 등록
+     *
+     * @param array $args config arguments
+     * @return ConfigEntity
+     */
+    public function addDefault(array $args)
+    {
+        return $this->configManager->add(static::CONFIG_NAME, $args);
+    }
+
+    /**
+     * 기본 인스턴스 설정 수정
+     *
+     * @param array $args config arguments
+     * @return ConfigEntity
+     */
+    public function putDefault(array $args)
+    {
+        return $this->configManager->put(static::CONFIG_NAME, $args);
+    }
+
+    /**
      * get config Entity
      * $instanceId 가 없을 경우 default config 반환
      *

@@ -9,7 +9,9 @@ use Overcode\XePlugin\DynamicFactory\Models\Cpt;
 use Overcode\XePlugin\DynamicFactory\Models\CptDocument;
 use Xpressengine\Config\ConfigEntity;
 use Xpressengine\Http\Request;
+use Xpressengine\Permission\Instance;
 use Xpressengine\User\UserInterface;
+use Gate;
 
 class CptDocService
 {
@@ -46,6 +48,17 @@ class CptDocService
         }
 
         $query->visible();
+
+        if ($config->get('useConsultation') === true){
+            $cptPermission = app('overcode.df.permission');
+            $isManager = Gate::allows(
+                $cptPermission::ACTION_MANAGE,
+                new Instance($cptPermission->name($config->get('instanceId')))
+            ) ? true : false;
+            if ($isManager == false) {
+                $query->where('user_id', Auth::user()->getId());
+            }
+        }
 
         $this->handler->makeWhere($query, $request, $config);
         $this->handler->makeOrder($query, $request, $config);
