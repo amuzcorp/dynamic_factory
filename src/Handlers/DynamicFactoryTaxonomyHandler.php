@@ -2,6 +2,7 @@
 
 namespace Overcode\XePlugin\DynamicFactory\Handlers;
 
+use Illuminate\Database\Eloquent\Collection;
 use XeLang;
 use XeDB;
 use App\Facades\XeCategory;
@@ -424,9 +425,9 @@ class DynamicFactoryTaxonomyHandler
     /**
      * category_id 로 item 리스트를 만들고 확장 변수 view 에 필요한 변수들을 붙여서 반환
      */
-    public function getCategoryItemAttributes($category_id)
+    public function getCategoryItemAttributes($category_id, $group = null)
     {
-        $group = $this->getTaxFieldGroup($category_id);
+        $group = ($group == null) ? $this->getTaxFieldGroup($category_id) : $group;
 
         $dynamicFieldHandler = app('xe.dynamicField');
         $dynamicFields = $dynamicFieldHandler->gets($group);
@@ -435,7 +436,18 @@ class DynamicFactoryTaxonomyHandler
         foreach($dynamicFields as $field_name => $field)
             $query = df($group, $field_name)->get($query);
 
-        return $query->get();
+        $collections = $query->get();
+
+        foreach ($collections as $key => $collection) {
+            $category_item = new CategoryItem();
+            foreach($collection as $k => $v) {
+                $category_item->setAttribute($k, $v);
+
+            }
+            $collections[$key] = $category_item;
+        }
+
+        return $collections;
     }
 
     /**
