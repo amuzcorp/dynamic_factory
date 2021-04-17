@@ -3,9 +3,11 @@ namespace Overcode\XePlugin\DynamicFactory\Controllers;
 
 use App\Http\Controllers\Controller;
 use Overcode\XePlugin\DynamicFactory\Handlers\DynamicFactoryTaxonomyHandler;
+use Overcode\XePlugin\DynamicFactory\Models\DfSlug;
 use XePresenter;
 use Xpressengine\Http\Request;
 use Auth;
+
 class DynamicFactoryController extends Controller
 {
     public $taxonomyHandler;
@@ -38,6 +40,22 @@ class DynamicFactoryController extends Controller
 
         return XePresenter::makeApi([
             'categories' => $categories
+        ]);
+    }
+
+    /**
+     * 문자열을 넘겨 slug 반환
+     *
+     * @param Request $request request
+     * @return mixed
+     */
+    public function hasSlug(Request $request)
+    {
+        $slugText = DfSlug::convert('', $request->get('slug'));
+        $slug = DfSlug::make($slugText, $request->get('id'));
+
+        return XePresenter::makeApi([
+            'slug' => $slug,
         ]);
     }
 

@@ -57,7 +57,7 @@
                     slug = $container.find('.__xe_slug_edit input').val(),
                     cpt_id = '{{ $cpt_id }}';
                 XE.ajax({
-                    url: '{{ route('dyFac.setting.hasSlug', ['cpt_id' => $cpt_id]) }}',
+                    url: '{{ route('dyFac.hasSlug', ['cpt_id' => $cpt_id]) }}',
                     data: {id: id, slug: slug},
                     type: 'get',
                     dataType: 'json',

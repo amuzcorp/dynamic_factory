@@ -388,9 +388,7 @@ class Plugin extends AbstractPlugin
             });
         });
 
-        Route::settings(static::getId(), function() {
-            Route::get('/hasSlug/{cpt_id}', ['as' => 'dyFac.setting.hasSlug' , 'uses' => 'DynamicFactorySettingController@hasSlug']);
-        },['namespace' => 'Overcode\XePlugin\DynamicFactory\Controllers']);
+        Route::get('/hasSlug/{cpt_id}', ['as' => 'dyFac.hasSlug' , 'uses' => 'Overcode\XePlugin\DynamicFactory\Controllers\DynamicFactoryController@hasSlug']);
     }
 
     protected function registerCategoryRoute()
