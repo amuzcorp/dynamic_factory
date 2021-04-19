@@ -31,21 +31,14 @@ use Xpressengine\Support\PurifierModules\Html5;
 class CptModuleController extends Controller
 {
     protected $instanceId;
-
     public $cptUrlHandler;
-
     public $configHandler;
-
     public $dfDocHandler;
-
     public $config;
     public $cpt;
-
-    protected $taxonomyHandler;
-
-    protected $dfService;
-
-    protected $identifyManager;
+    public $taxonomyHandler;
+    public $dfService;
+    public $identifyManager;
 
     public function __construct(
         CptModuleConfigHandler $configHandler,

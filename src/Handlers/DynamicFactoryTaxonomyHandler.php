@@ -432,22 +432,11 @@ class DynamicFactoryTaxonomyHandler
         $dynamicFieldHandler = app('xe.dynamicField');
         $dynamicFields = $dynamicFieldHandler->gets($group);
 
-        $query = CategoryItem::newBaseQueryBuilder()->where('category_id',$category_id);
+        $query = CategoryItem::getQuery()->where('category_id',$category_id);
         foreach($dynamicFields as $field_name => $field)
             $query = df($group, $field_name)->get($query);
 
-        $collections = $query->get();
-
-        foreach ($collections as $key => $collection) {
-            $category_item = new CategoryItem();
-            foreach($collection as $k => $v) {
-                $category_item->setAttribute($k, $v);
-
-            }
-            $collections[$key] = $category_item;
-        }
-
-        return $collections;
+        return CategoryItem::setQuery($query)->get();
     }
 
     /**

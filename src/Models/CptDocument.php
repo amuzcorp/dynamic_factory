@@ -198,6 +198,10 @@ class CptDocument extends Document implements CommentUsable, SeoUsable
         return $this->hasMany(DfTaxonomy::class, 'target_id', 'id');
     }
 
+    public function getTaxonomies(){
+        return $this->taxonomy()->join('df_category_extra','df_category_extra.category_id','=','df_taxonomy.category_id')->get()->keyBy('slug');
+    }
+
     /**
      * get users
      *
