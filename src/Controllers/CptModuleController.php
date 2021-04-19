@@ -39,6 +39,7 @@ class CptModuleController extends Controller
     public $dfDocHandler;
 
     public $config;
+    public $cpt;
 
     protected $taxonomyHandler;
 
@@ -69,9 +70,11 @@ class CptModuleController extends Controller
         $this->dfService = $dynamicFactoryService;
         $this->identifyManager = $identifyManager;
 
-        XePresenter::setSkinTargetId(CptModule::getId());
-
+        $this->cpt = $this->dfService->getItem($this->config->get('cpt_id'));
         $current_route = app('request')->route();
+
+        XePresenter::setSkinTargetId(CptModule::getId());
+        XePresenter::share('cpt', $this->cpt);
         XePresenter::share('current_instance_route', ($current_route != null) ? $current_route->getName() : null);
         XePresenter::share('configHandler', $configHandler);
         XePresenter::share('cptUrlHandler', $cptUrlHandler);
@@ -130,8 +133,6 @@ class CptModuleController extends Controller
         }
 
         $user = Auth::user();
-
-        $cpt = $this->dfService->getItem($this->config->get('cpt_id'));
         $item = $service->getItem($id, $user, $this->config);
 
         if ($this->config->get('useConsultation') === true
@@ -155,7 +156,7 @@ class CptModuleController extends Controller
 
         $select_category_items = $this->taxonomyHandler->getItemOnlyTargetId($id);
 
-        return XePresenter::make('show', compact('item','fieldTypes','dynamicFieldsById','cpt', 'select_category_items'));
+        return XePresenter::make('show', compact('item','fieldTypes','dynamicFieldsById', 'select_category_items'));
     }
 
     /**
