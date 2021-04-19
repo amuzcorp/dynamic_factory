@@ -70,6 +70,9 @@ class CptModuleController extends Controller
         $this->identifyManager = $identifyManager;
 
         XePresenter::setSkinTargetId(CptModule::getId());
+
+        $current_route = app('request')->route();
+        XePresenter::share('current_instance_route', ($current_route != null) ? $current_route->getName() : null);
         XePresenter::share('configHandler', $configHandler);
         XePresenter::share('cptUrlHandler', $cptUrlHandler);
         XePresenter::share('instanceId', $this->instanceId);
@@ -408,7 +411,7 @@ class CptModuleController extends Controller
      *
      * @return string
      */
-    private function getSiteTitle()
+    public function getSiteTitle()
     {
         $siteTitle = \XeFrontend::output('title');
 
