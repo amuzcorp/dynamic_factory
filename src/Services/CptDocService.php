@@ -56,7 +56,7 @@ class CptDocService
                 new Instance($cptPermission->name($config->get('instanceId')))
             ) ? true : false;
             if ($isManager == false) {
-                $query->where('user_id', Auth::user()->getId());
+                $query->where('user_id', auth()->user()->getId());
             }
         }
 
