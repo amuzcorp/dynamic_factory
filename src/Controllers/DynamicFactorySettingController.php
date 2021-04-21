@@ -13,6 +13,7 @@ use Overcode\XePlugin\DynamicFactory\Models\CategoryExtra;
 use Overcode\XePlugin\DynamicFactory\Models\Cpt;
 use Overcode\XePlugin\DynamicFactory\Models\CptDocument;
 use Overcode\XePlugin\DynamicFactory\Models\CptTaxonomy;
+use Overcode\XePlugin\DynamicFactory\Plugin;
 use Overcode\XePlugin\DynamicFactory\Services\CptDocService;
 use Overcode\XePlugin\DynamicFactory\Services\DynamicFactoryService;
 use App\Http\Sections\EditorSection;
@@ -411,6 +412,10 @@ class DynamicFactorySettingController extends BaseController
             $dynamicFieldsById[$dyField->getConfig()->get('id')] = $dyField->getConfig();
         }
         $cptConfig = $this->dfService->getCptConfig($cpt->cpt_id);
+
+        XeFrontend::js(Plugin::asset('/assets/datetimepicker/jquery.datetimepicker.full.min.js'))->load();
+        XeFrontend::js('assets/vendor/jqueryui/jquery-ui.min.js')->load();
+        XeFrontend::css(Plugin::asset('/assets/datetimepicker/jquery.datetimepicker.min.css'))->load();
 
         return $this->presenter->make($cpt->blades['create'],[
             'cpt' => $cpt,

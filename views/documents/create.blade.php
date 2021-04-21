@@ -8,7 +8,7 @@
     {!! csrf_field() !!}
     <input type="hidden" name="cpt_id" value="{{ $cpt->cpt_id }}" />
     <div class="row">
-        <div class="{{ (count($taxonomies) > 0) ? 'col-sm-8 col-md-9 col-lg-10' : 'col-sm-12'}}">
+        <div class="col-sm-8 col-md-9 col-lg-10">
             <div class="panel">
                 <div class="panel-body">
                 @foreach($cptConfig['formColumns'] as $columnName)
@@ -53,6 +53,30 @@
             <button type="submit" class="btn btn-primary"><i class="xi-download"></i>저장</button>
         </div>
 
+        <div class="col-sm-4 col-md-3 col-lg-2">
+            <div class="panel">
+                <div class="panel-heading"><h4>고급설정</h4></div>
+                <div class="panel-body">
+                    <div class="form-group">
+                        <label>공개 속성</label>
+                        <select class="form-control">
+                            <option value="public">발행</option>
+                            <option value="private">비공개</option>
+                            <option value="temp">임시글</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>발행시각</label>
+                        <input id="datetimepicker" type="text" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label>작성자</label>
+                        {!! uio('uiobject/df@user_select', []) !!}
+                    </div>
+                </div>
+            </div>
+        </div>
+
         @if(count($taxonomies) > 0)
         <div class="col-sm-4 col-md-3 col-lg-2">
             <div class="panel">
@@ -84,4 +108,10 @@
         @endif
     </div>
 </form>
-{{ XeFrontend::js('assets/vendor/jqueryui/jquery-ui.min.js')->load() }}
+
+<script>
+    $(document).ready(function() {
+        $('#datetimepicker').datetimepicker();
+    });
+</script>
+

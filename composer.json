@@ -85,6 +85,11 @@
                     "name": "Document Title UIO",
                     "description": "Document Title UIObject"
                 },
+                "uiobject/df@user_select": {
+                    "class": "Overcode\\XePlugin\\DynamicFactory\\Components\\UIObjects\\UserSelect\\UserSelectUIObject",
+                    "name": "User Select UIO",
+                    "description": "User Select UIObject"
+                },
                 "fieldType/dynamic_factory@RelateCpt": {
                     "name": "RelateCpt fieldType",
                     "description": "The fieldType supported by Dynamic_factory plugin.",

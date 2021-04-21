@@ -59,6 +59,33 @@
             </div>
         </div>
 
+        <div class="col-sm-4 col-md-3 col-lg-2">
+            <div class="panel">
+                <div class="panel-heading"><h4>고급설정</h4></div>
+                <div class="panel-body">
+                    <div class="form-group">
+                        <label>공개 속성</label>
+                        <select class="form-control">
+                            <option value="public">발행</option>
+                            <option value="private">비공개</option>
+                            <option value="temp">임시글</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>발행시각</label>
+                        <input id="datetimepicker" type="text" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label>작성자</label>
+                        {!! uio('uiobject/df@user_select', [
+                            'display_name' => $item->writer,
+                            'login_id' => get_user_login_id($item->getUserId())
+                        ]) !!}
+                    </div>
+                </div>
+            </div>
+        </div>
+
         @if(count($taxonomies) > 0)
         <div class="col-sm-4">
             <div class="panel">

@@ -93,3 +93,12 @@ if (function_exists('get_cpt_title') === false) {
         return $item->title;
     }
 }
+
+if (function_exists('get_user_login_id') === false) {
+    function get_user_login_id($id)
+    {
+        $user = \Xpressengine\User\Models\User::find($id);
+
+        return $user != null ? $user->login_id : '';
+    }
+}
