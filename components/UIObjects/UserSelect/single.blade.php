@@ -1,4 +1,4 @@
-<a href="#" id="user_chg_btn_{{ $seq }}">reset</a>
+<a href="#" id="user_chg_btn_{{ $seq }}"><i class="xi-refresh xi-border"></i></a>
 <input id="us_user_id_{{ $seq }}" type="hidden" name="user_id" />
 <input id="us_writer_{{ $seq }}" type="hidden" name="writer" />
 <div id="us_autocomplete_{{ $seq }}"></div>
