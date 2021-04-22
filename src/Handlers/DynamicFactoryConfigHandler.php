@@ -18,15 +18,15 @@ class DynamicFactoryConfigHandler
 
     // id 에 따른 text 는 여기에 저장
     const COLUMN_LABELS = [
-        'title' => '제목', 'content' => '내용', 'writer' => '작성자', 'read_count' => '읽음', 'created_at' => '작성일', 'updated_at' => '수정일', 'assent_count' => '추천', 'dissent_count' => '비추천',
+        'title' => '제목', 'content' => '내용', 'writer' => '작성자', 'read_count' => '읽음', 'created_at' => '작성일', 'updated_at' => '수정일', 'published_at' => '발행일', 'assent_count' => '추천', 'dissent_count' => '비추천',
     ];
 
     const DEFAULT_LIST_COLUMNS = [
-        'title', 'writer', 'read_count', 'created_at', 'updated_at', 'assent_count', 'dissent_count',
+        'title', 'writer', 'read_count', 'created_at', 'updated_at', 'published_at', 'assent_count', 'dissent_count',
     ];
 
     const DEFAULT_SELECTED_LIST_COLUMNS = [
-        'title', 'writer',  'assent_count', 'read_count', 'created_at',
+        'title', 'writer', 'published_at', 'read_count'
     ];
 
     const DEFAULT_FORM_COLUMNS = [

@@ -59,15 +59,15 @@
                 <div class="panel-body">
                     <div class="form-group">
                         <label>공개 속성</label>
-                        <select class="form-control">
-                            <option value="public">발행</option>
+                        <select class="form-control" name="cpt_status">
+                            <option value="public">공개</option>
                             <option value="private">비공개</option>
                             <option value="temp">임시글</option>
                         </select>
                     </div>
                     <div class="form-group">
                         <label>발행시각</label>
-                        <input id="datetimepicker" type="text" class="form-control">
+                        {!! uio('uiobject/df@datetime_picker', []) !!}
                     </div>
                     <div class="form-group">
                         <label>작성자</label>
@@ -108,10 +108,3 @@
         @endif
     </div>
 </form>
-
-<script>
-    $(document).ready(function() {
-        $('#datetimepicker').datetimepicker();
-    });
-</script>
-

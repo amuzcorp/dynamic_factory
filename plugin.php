@@ -228,15 +228,24 @@ class Plugin extends AbstractPlugin
 
             //set routes
             Route::settings(static::getId(), function () use ($cpt){
+//                Route::get(sprintf('/%s', $cpt->cpt_id), [
+//                    'as' => sprintf('dyFac.setting.%s', $cpt->cpt_id),
+//                    'uses' => 'DynamicFactorySettingController@documentList',
+//                    'settings_menu' => sprintf('%s%s.articles', $cpt->menu_path, $cpt->cpt_id)
+//                ]);
+//                Route::get(sprintf('/%s/create', $cpt->cpt_id), [
+//                    'as' => sprintf('dyFac.setting.%s.create', $cpt->cpt_id),
+//                    'uses' => 'DynamicFactorySettingController@documentCreate'
+//                ]);
                 Route::get('/'.$cpt->cpt_id. '/{type?}', [
                     'as' => 'dyFac.setting.'.$cpt->cpt_id,
                     'uses' => 'DynamicFactorySettingController@cptDocument',
-                    'settings_menu' => $cpt->menu_path . $cpt->cpt_id . '.articles'
+                    'settings_menu' => sprintf('%s%s.articles', $cpt->menu_path , $cpt->cpt_id)
                 ]);
                 Route::get('/trash/' . $cpt->cpt_id, [
                     'as' => 'dyFac.setting.'.$cpt->cpt_id.'.trash',
                     'uses' => 'DynamicFactorySettingController@trashAlias',
-                    'settings_menu' => $cpt->menu_path . $cpt->cpt_id . '.trash'
+                    'settings_menu' => sprintf('%s%s.trash', $cpt->menu_path , $cpt->cpt_id)
                 ]);
             },['namespace' => 'Overcode\XePlugin\DynamicFactory\Controllers']);
 

@@ -102,3 +102,13 @@ if (function_exists('get_user_login_id') === false) {
         return $user != null ? $user->login_id : '';
     }
 }
+
+/*if (function_exists('get_last_explode') === false) {
+    function get_last_explode($delimiter, $array)
+    {
+        $route_names = explode($delimiter, $array);
+        $end_name = end($route_names);
+
+        return $end_name;
+    }
+}*/

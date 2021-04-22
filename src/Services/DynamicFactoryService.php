@@ -249,6 +249,13 @@ class DynamicFactoryService
                 $inputs['cpt_id'] = $cpt_id;
             }
 
+            if(array_get($inputs, 'writer') == ''){
+                unset($inputs['writer']);
+            }
+            if(array_get($inputs, 'user_id') == ''){
+                unset($inputs['user_id']);
+            }
+
             $doc = CptDocument::division($cpt_id)->find($request->get('doc_id'));
 
             $editor = XeEditor::get($cpt_id);
@@ -287,7 +294,7 @@ class DynamicFactoryService
             $query->where('site_key', $site_key);
         }
 
-        $query->visible(); // trash 가 아닌것만
+//        $query->visible(); // trash 가 아닌것만
 
         foreach ($this->handlers as $handler) {
             if ($handler instanceof Searchable) {

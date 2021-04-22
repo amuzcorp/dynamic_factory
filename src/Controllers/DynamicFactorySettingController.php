@@ -364,22 +364,30 @@ class DynamicFactorySettingController extends BaseController
 
         $cpt = $this->dfService->getItem($cpt_id);
 
-        if($type == 'create'){
-            return $this->documentCreate($cpt, $request);
-        }
-        else if($type == 'edit'){
-            return $this->documentEdit($cpt, $request);
-        }
-        /*else if($type == 'delete'){
-            return $this->documentDelete($cpt, $request);
-        }*/
+        if($type == 'create') return $this->documentCreate($cpt, $request);
+        else if($type == 'edit') return $this->documentEdit($cpt, $request);
 
         return $this->documentList($cpt, $request);
     }
 
+    /**
+     * CPT 관리자 문서 리스트
+     *
+     * @param Cpt $cpt
+     * @param Request $request
+     * @return mixed
+     */
     public function documentList(Cpt $cpt, Request $request)
     {
         $cptDocs = $this->getCptDocuments($request, $cpt);
+
+        $stateTypeCounts = [
+            'all' => CptDocument::cpt($cpt->cpt_id)->count(),
+            'published' => CptDocument::cpt($cpt->cpt_id)->published()->public()->count(),
+            'publishReserved' => CptDocument::cpt($cpt->cpt_id)->publishReserved()->public()->count(),
+            'tempBlog' => CptDocument::cpt($cpt->cpt_id)->temp()->count(),
+            'private' => CptDocument::cpt($cpt->cpt_id)->private()->count()
+        ];
 
         $config = $this->configHandler->getConfig($cpt->cpt_id);
         $column_labels = $this->configHandler->getColumnLabels($config);
@@ -397,7 +405,8 @@ class DynamicFactorySettingController extends BaseController
             'cptDocs' => $cptDocs,
             'config' => $config,
             'column_labels' => $column_labels,
-            'searchTargetWord' => $searchTargetWord
+            'searchTargetWord' => $searchTargetWord,
+            'stateTypeCounts' => $stateTypeCounts
         ]);
     }
 
@@ -413,9 +422,7 @@ class DynamicFactorySettingController extends BaseController
         }
         $cptConfig = $this->dfService->getCptConfig($cpt->cpt_id);
 
-        XeFrontend::js(Plugin::asset('/assets/datetimepicker/jquery.datetimepicker.full.min.js'))->load();
         XeFrontend::js('assets/vendor/jqueryui/jquery-ui.min.js')->load();
-        XeFrontend::css(Plugin::asset('/assets/datetimepicker/jquery.datetimepicker.min.css'))->load();
 
         return $this->presenter->make($cpt->blades['create'],[
             'cpt' => $cpt,
@@ -483,8 +490,6 @@ class DynamicFactorySettingController extends BaseController
 
     public function updateCptDocument(Request $request)
     {
-        //$cptId =$request->get('cpt_id');
-
         $this->dfService->updateCptDocument($request);
 
         return redirect()->route('dyFac.setting.'.$request->cpt_id, ['type' => 'edit', 'doc_id' => $request->doc_id]);
@@ -494,11 +499,9 @@ class DynamicFactorySettingController extends BaseController
     {
         $perPage = $request->get('perPage', 20);
 
-        $cpt_id = $cpt->cpt_id;
-
         $cptDocQuery = $this->dfService->getItemsWhereQuery(array_merge($request->all(), [
             'force' => true,
-            'cpt_id' => $cpt_id
+            'cpt_id' => $cpt->cpt_id
         ]));
 
         $cptDocQuery = $this->makeWhere($cptDocQuery, $request);
@@ -672,6 +675,33 @@ class DynamicFactorySettingController extends BaseController
         }
         if ($endDate = $request->get('end_date')) {
             $query = $query->where('created_at', '<=', $endDate . ' 23:59:59');
+        }
+
+        $stateType = $request->get('stateType', 'all');
+        switch ($stateType) {
+            case 'all':
+//                $query = $query->withTrashed();
+                break;
+
+            case 'published':
+                $query = $query->public()->published();
+                break;
+
+            case 'publishReserved':
+                $query = $query->public()->publishReserved();
+                break;
+
+            case 'tempBlog':
+                $query = $query->temp();
+                break;
+
+            case 'private':
+                $query = $query->private();
+                break;
+
+            case 'trash':
+                $query = $query->onlyTrashed();
+                break;
         }
 
         //검색어 검색

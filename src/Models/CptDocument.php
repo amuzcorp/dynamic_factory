@@ -13,6 +13,10 @@ use Xpressengine\User\Models\User;
 
 class CptDocument extends Document implements CommentUsable, SeoUsable
 {
+    protected $casts = [
+        'published_at' => 'datetime'
+    ];
+
     use SoftDeletes;
 
     /**
@@ -37,22 +41,124 @@ class CptDocument extends Document implements CommentUsable, SeoUsable
         return $userId;
     }
 
+    public function scopeCpt($query, $cpt_id)
+    {
+        return $query->where('type', $cpt_id);
+    }
+
+    public function scopePublic($query)
+    {
+        return $query->where('status', self::STATUS_PUBLIC)
+            ->where('approved', self::APPROVED_APPROVED)
+            ->where('display', self::DISPLAY_VISIBLE);
+    }
+
+    public function isPublic()
+    {
+        return $this->status === self::STATUS_PUBLIC &&
+            $this->approved === self::APPROVED_APPROVED &&
+            $this->display === self::DISPLAY_VISIBLE;
+    }
+
+    public function setPublic()
+    {
+        $this->status = self::STATUS_PUBLIC;
+        $this->approved = self::APPROVED_APPROVED;
+        $this->display = self::DISPLAY_VISIBLE;
+
+        $this->save();
+    }
+
+    public function scopePrivate($query)
+    {
+        return $query->where('status', self::STATUS_PRIVATE)
+            ->where('approved', self::APPROVED_APPROVED)
+            ->where('display', self::DISPLAY_SECRET);
+    }
+
+    public function isPrivate()
+    {
+        return $this->status === self::STATUS_PRIVATE &&
+            $this->approved === self::APPROVED_APPROVED &&
+            $this->display === self::DISPLAY_SECRET;
+    }
+
+    public function setPrivate()
+    {
+        $this->status = self::STATUS_PRIVATE;
+        $this->approved = self::APPROVED_APPROVED;
+        $this->display = self::DISPLAY_SECRET;
+
+        $this->save();
+    }
+
+    public function scopeTemp($query)
+    {
+        return $query->where('status', self::STATUS_TEMP)
+            ->where('approved', self::APPROVED_WAITING)
+            ->where('display', self::DISPLAY_HIDDEN);
+    }
+
+    public function isTemp()
+    {
+        return $this->status === self::STATUS_TEMP &&
+            $this->approved === self::APPROVED_WAITING &&
+            $this->display === self::DISPLAY_HIDDEN;
+    }
+
+    public function setTemp()
+    {
+        $this->status = self::STATUS_TEMP;
+        $this->approved = self::APPROVED_WAITING;
+        $this->display = self::DISPLAY_HIDDEN;
+
+        $this->save();
+    }
+
+    public function scopePublishReserved($query)
+    {
+        return $query->where('published_at', '>', date('Y-m-d H:i:s'));
+    }
+
+    public function isPublishReserved()
+    {
+        return $this->published_at > date('Y-m-d H:i:s');
+    }
+
+    public function scopePublished($query)
+    {
+        return $query->where('published_at', '<=', date('Y-m-d H:i:s'));
+    }
+
+    public function isPublished()
+    {
+        return $this->published_at <= date('Y-m-d H:i:s');
+    }
+
+    public function scopeVisible($query)
+    {
+        return $query->where('status', static::STATUS_PUBLIC)
+            ->where('display', '<>', static::DISPLAY_HIDDEN)
+            ->where('approved', static::APPROVED_APPROVED)
+            ->where('published_at', '<=', date('Y-m-d H:i:s'));
+    }
+
     /**
      * visible
      *
      * @param Builder $query query
      * @return $this
      */
-    public function scopeVisible(Builder $query)
-    {
-        $query->where('status', static::STATUS_PUBLIC)
-            ->whereIn('display', [static::DISPLAY_VISIBLE, static::DISPLAY_SECRET])
-            ->where('published', static::PUBLISHED_PUBLISHED)
-            ->where(function($query){
-                $query->where('approved',static::APPROVED_APPROVED)
-                    ->orWhere($this->getTable().'.user_id',auth()->id());
-            });
-    }
+//    public function scopeVisible(Builder $query)
+//    {
+//        $query->where('status', static::STATUS_PUBLIC)
+//            ->whereIn('display', [static::DISPLAY_VISIBLE, static::DISPLAY_SECRET])
+//            ->where('published', static::PUBLISHED_PUBLISHED)
+//            ->where(function($query){
+//                $query->where('approved',static::APPROVED_APPROVED)
+//                    ->orWhere($this->getTable().'.user_id',auth()->id());
+//            });
+//    }
 
     /**
      * notice
@@ -60,12 +166,12 @@ class CptDocument extends Document implements CommentUsable, SeoUsable
      * @param Builder $query query
      * @return $this
      */
-    public function scopeNotice(Builder $query)
-    {
-        $query->where('status', static::STATUS_NOTICE)
-            ->whereIn('display', [static::DISPLAY_VISIBLE, static::DISPLAY_SECRET])
-            ->where('published', static::PUBLISHED_PUBLISHED);
-    }
+//    public function scopeNotice(Builder $query)
+//    {
+//        $query->where('status', static::STATUS_NOTICE)
+//            ->whereIn('display', [static::DISPLAY_VISIBLE, static::DISPLAY_SECRET])
+//            ->where('published', static::PUBLISHED_PUBLISHED);
+//    }
 
     /**
      * visible with notice
@@ -73,12 +179,12 @@ class CptDocument extends Document implements CommentUsable, SeoUsable
      * @param Builder $query query
      * @return void
      */
-    public function scopeVisibleWithNotice(Builder $query)
-    {
-        $query->whereIn('status', [static::STATUS_PUBLIC, static::STATUS_NOTICE])
-            ->whereIn('display', [static::DISPLAY_VISIBLE, static::DISPLAY_SECRET])
-            ->where('published', static::PUBLISHED_PUBLISHED);
-    }
+//    public function scopeVisibleWithNotice(Builder $query)
+//    {
+//        $query->whereIn('status', [static::STATUS_PUBLIC, static::STATUS_NOTICE])
+//            ->whereIn('display', [static::DISPLAY_VISIBLE, static::DISPLAY_SECRET])
+//            ->where('published', static::PUBLISHED_PUBLISHED);
+//    }
 
     public function getTitle()
     {

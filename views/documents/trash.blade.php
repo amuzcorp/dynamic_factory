@@ -79,7 +79,9 @@
 
                                         @foreach($listColumns as $columnName)
                                             @if ($columnName === 'title')
-                                                <td><a href="{{ route('dyFac.setting.'.$doc->type, ['type' => 'edit', 'doc_id' => $doc->id]) }}">{{ $doc->title }}</a></td>
+                                                {{-- soft delete 를 하기 때문에 해당 문서를 못가져옴? --}}
+                                                {{--<td><a href="{{ route('dyFac.setting.'.$doc->type, ['type' => 'edit', 'doc_id' => $doc->id]) }}">{{ $doc->title }}</a></td>--}}
+                                                <td>{!! $doc->title == null ? '<span style="font-style: italic; color:#999;">[제목없음]</span>' : $doc->title !!}</td>
                                             @elseif ($columnName === 'writer')
                                                 <td>
                                                     @if ($doc->user !== null)
@@ -100,7 +102,7 @@
                                                 <td>{{ $doc->updated_at->format('Y-m-d H:i:s') }}</td>
                                             @else
                                                 <td>
-                                                    @if (($fieldType = XeDynamicField::get('documents_'.$cpt->cpt_id, $columnName)) !== null)
+                                                    @if (($fieldType = XeDynamicField::get('documents_'.$cpt_id, $columnName)) !== null)
                                                         <div class="xe-list-board-list__dynamic-field xe-list-board-list__dynamic-field-{{ $columnName }} xe-list-board-list__mobile-style">
                                                             <span class="sr-only">{{ xe_trans($column_labels[$columnName]) }}</span>
                                                             {!! $fieldType->getSkin()->output($columnName, $doc->getAttributes()) !!}

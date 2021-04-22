@@ -2,6 +2,7 @@
 
 namespace Overcode\XePlugin\DynamicFactory\Handlers;
 
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Overcode\XePlugin\DynamicFactory\Components\Modules\Cpt\CptModule;
 use Overcode\XePlugin\DynamicFactory\Exceptions\AlreadyExistFavoriteHttpException;
@@ -62,6 +63,38 @@ class DynamicFactoryDocumentHandler
         $attributes['instance_id'] = $cpt_id;
         $attributes['type'] = $cpt_id;
 
+
+        // 발행시각 정규식 검사
+        $published_at = array_get($attributes, 'published_at', '');
+
+        $pattern = "/([0-9]{4})\-(0[1-9]|1[0-2])\-(0[1-9]|[1-2][0-9]|3[0-1])\s(2[0-3]|[01][0-9])\:([0-5][0-9])\:([0-5][0-9])/";
+        if (!preg_match($pattern, $published_at)) {
+            // 빈값이거나 잘못된 형식일 경우 현재 시각으로
+            array_set($attributes, 'published_at', date('Y-m-d H:i:s'));
+        }
+
+        if (isset($attributes['cpt_status']) === true) {
+            switch ($attributes['cpt_status']) {
+                case 'public':
+                    $attributes['status'] = CptDocument::STATUS_PUBLIC;
+                    $attributes['approved'] = CptDocument::APPROVED_APPROVED;
+                    $attributes['display'] = CptDocument::DISPLAY_VISIBLE;
+                    break;
+
+                case 'private':
+                    $attributes['status'] = CptDocument::STATUS_PRIVATE;
+                    $attributes['approved'] = CptDocument::APPROVED_APPROVED;
+                    $attributes['display'] = CptDocument::DISPLAY_SECRET;
+                    break;
+
+                case 'temp':
+                    $attributes['status'] = CptDocument::STATUS_TEMP;
+                    $attributes['approved'] = CptDocument::APPROVED_WAITING;
+                    $attributes['display'] = CptDocument::DISPLAY_HIDDEN;
+                    break;
+            }
+        }
+
         $doc = $this->documentHandler->add($attributes);
 
         $cptDoc = CptDocument::division($cpt_id)->find($doc->id);
@@ -72,9 +105,34 @@ class DynamicFactoryDocumentHandler
         return $cptDoc;
     }
 
-    public function update($doc, $inputs)
+    public function update(CptDocument $doc, $inputs)
     {
         $attributes = $doc->getAttributes();
+
+        if (isset($inputs['cpt_status']) === true) {
+            switch ($inputs['cpt_status']) {
+                case 'public':
+                    $doc->setPublic();
+                    break;
+
+                case 'private':
+                    $doc->setPrivate();
+                    break;
+
+                case 'temp':
+                    $doc->setTemp();
+                    break;
+            }
+        }
+
+        // 발행시각 정규식 검사
+        $published_at = array_get($inputs, 'published_at', '');
+
+        $pattern = "/([0-9]{4})\-(0[1-9]|1[0-2])\-(0[1-9]|[1-2][0-9]|3[0-1])\s(2[0-3]|[01][0-9])\:([0-5][0-9])\:([0-5][0-9])/";
+        if (!preg_match($pattern, $published_at)) {
+            // 빈값이거나 잘못된 형식일 경우 현재 시각으로 unset
+            unset($inputs['published_at']);
+        }
 
         foreach ($inputs as $name => $value) {
             if (array_key_exists($name, $attributes)) {

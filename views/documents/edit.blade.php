@@ -65,15 +65,15 @@
                 <div class="panel-body">
                     <div class="form-group">
                         <label>공개 속성</label>
-                        <select class="form-control">
-                            <option value="public">발행</option>
-                            <option value="private">비공개</option>
-                            <option value="temp">임시글</option>
+                        <select class="form-control" name="cpt_status">
+                            <option value="public" @if ($item->isPublic() === true) selected @endif>공개</option>
+                            <option value="private" @if ($item->isPrivate() === true) selected @endif>비공개</option>
+                            <option value="temp" @if ($item->isTemp() === true) selected @endif>임시</option>
                         </select>
                     </div>
                     <div class="form-group">
                         <label>발행시각</label>
-                        <input id="datetimepicker" type="text" class="form-control">
+                        {!! uio('uiobject/df@datetime_picker', ['published_at' => $item->published_at]) !!}
                     </div>
                     <div class="form-group">
                         <label>작성자</label>

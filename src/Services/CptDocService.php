@@ -160,7 +160,7 @@ class CptDocService
         $query = CptDocument::whereIn('instance_id', $cpt_ids);
 
         if($type == 'trash') {
-            $query = $query->whereIn('status', [CptDocument::STATUS_TRASH, CptDocument::STATUS_TRASH_NOTICE]);
+            $query = $query->onlyTrashed();
         }
 
         // 검색조건 붙을 부분
@@ -191,7 +191,8 @@ class CptDocService
     {
         $items = CptDocument::find($documentIds);
         foreach ($items as $item) {
-            $item->setTrash()->save();
+//            $item->setTrash()->save();
+            $item->delete();    //soft delete
         }
     }
 
@@ -203,9 +204,10 @@ class CptDocService
 
     public function restore($documentIds)
     {
-        $items = CptDocument::find($documentIds);
+        $items = CptDocument::onlyTrashed()->find($documentIds);
         foreach ($items as $item) {
-            $item->setRestore()->save();
+//            $item->setRestore()->save();
+            $item->restore();
         }
     }
 
@@ -216,9 +218,10 @@ class CptDocService
      */
     public function remove($documentIds)
     {
-        $items = CptDocument::find($documentIds);
+        $items = CptDocument::withTrashed()->find($documentIds);
         foreach ($items as $item) {
-            app('xe.document')->remove($item);
+//            app('xe.document')->remove($item);
+            $item->forceDelete();
         }
     }
 

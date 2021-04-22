@@ -8,6 +8,15 @@
 
 <div class="row">
     <div class="col-sm-12">
+        <div class="admin-tab-info">
+            <ul class="admin-tab-info-list">
+                @foreach ($stateTypeCounts as $stateType => $count)
+                    <li @if (Request::get('stateType', 'all') === $stateType) class="on" @endif>
+                        <a href="{{ route($current_route_name, ['type' => 'list', 'stateType' => $stateType]) }}" class="__plugin-install-link admin-tab-info-list__link">{{ xe_trans('xe_blog::' . $stateType) }} <span class="admin-tab-info-list__count">{{ $count }}</span></a>
+                    </li>
+                @endforeach
+            </ul>
+        </div>
         <div class="panel-group">
             <div class="panel">
                 <div class="panel-heading">
@@ -63,12 +72,13 @@
                                     <th>{{ xe_trans($column_labels[$columnName]) }}</th>
                                 @endif
                             @endforeach
+                                <th>상태</th>
                             </tr>
                             </thead>
                             <tbody>
                             @if ($cptDocs->count() == 0)
                                 <tr>
-                                    <td colspan="{{ count($config['listColumns']) + 2 }}" style="padding:40px 0; text-align: center;">게시물이 없습니다.</td>
+                                    <td colspan="{{ count($config['listColumns']) + 3 }}" style="padding:40px 0; text-align: center;">게시물이 없습니다.</td>
                                 </tr>
                             @endif
                             @if ($cptDocs->count() > 0)
@@ -79,11 +89,9 @@
                                     @foreach($config['listColumns'] as $columnName)
                                         @if ($columnName === 'title')
                                             <td>
-                                                @if($doc->title == null)
-                                                    <a href="{{ route('dyFac.setting.'.$cpt->cpt_id, ['type' => 'edit', 'doc_id' => $doc->id]) }}" style="font-style: italic; color:#999;">[제목없음]</a>
-                                                @else
-                                                    <a href="{{ route('dyFac.setting.'.$cpt->cpt_id, ['type' => 'edit', 'doc_id' => $doc->id]) }}">{{ $doc->title }}</a>
-                                                @endif
+                                                <a href="{{ route('dyFac.setting.'.$cpt->cpt_id, ['type' => 'edit', 'doc_id' => $doc->id]) }}">
+                                                    {!! $doc->title == null ? '<span style="font-style: italic; color:#999;">[제목없음]</span>' : $doc->title !!}
+                                                </a>
                                             </td>
                                         @elseif ($columnName === 'writer')
                                             <td>
@@ -120,6 +128,14 @@
                                             </td>
                                         @endif
                                     @endforeach
+                                    <td>
+                                        @if($doc->isTemp() === true)<span class="xe-badge xe-warning">임시</span>
+                                        @elseif($doc->isPrivate() === true)<span class="xe-badge xe-black">비공개</span>
+                                        @elseif($doc->isPublic() === true && $doc->isPublished() === true)<span class="xe-badge xe-success">발행</span>
+                                        @elseif($doc->isPublic() === true && $doc->isPublishReserved() === true)<span class="xe-badge xe-primary">예약</span>
+                                        @endif
+
+                                    </td>
                                 </tr>
                                 @endforeach
                             @endif

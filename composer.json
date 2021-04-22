@@ -90,6 +90,11 @@
                     "name": "User Select UIO",
                     "description": "User Select UIObject"
                 },
+                "uiobject/df@datetime_picker": {
+                    "class": "Overcode\\XePlugin\\DynamicFactory\\Components\\UIObjects\\DatetimePicker\\DatetimePickerUIObject",
+                    "name": "Datetime Picker UIO",
+                    "description": "Datetime Picker UIObject"
+                },
                 "fieldType/dynamic_factory@RelateCpt": {
                     "name": "RelateCpt fieldType",
                     "description": "The fieldType supported by Dynamic_factory plugin.",
