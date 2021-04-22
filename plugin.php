@@ -167,12 +167,6 @@ class Plugin extends AbstractPlugin
         $this->registerCategoryRoute();
 
         $this->interceptDynamicField();
-
-
-
-        // lang put
-        $trans = app('xe.translator');
-        $trans->putFromLangDataSource('dyFac', base_path('plugins/dynamic_factory/langs/lang.php'));
     }
 
     protected function loadCpts()
