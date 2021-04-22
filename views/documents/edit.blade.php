@@ -9,7 +9,7 @@
     <input type="hidden" name="cpt_id" value="{{ $cpt->cpt_id }}" />
     <input type="hidden" name="doc_id" value="{{ $item->id }}" />
     <div class="row">
-        <div class="col-sm-8">
+        <div class="col-sm-8 col-md-9 col-lg-10">
             <div class="panel">
                 <div class="panel-body">
                     @foreach($cptConfig['formColumns'] as $columnName)
@@ -87,7 +87,7 @@
         </div>
 
         @if(count($taxonomies) > 0)
-        <div class="col-sm-4">
+        <div class="col-sm-4 col-md-3 col-lg-2">
             <div class="panel">
                 <div class="panel-heading"><h4>카테고리</h4></div>
                 <div class="panel-body">
