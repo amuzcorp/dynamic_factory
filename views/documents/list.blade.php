@@ -12,7 +12,7 @@
             <ul class="admin-tab-info-list">
                 @foreach ($stateTypeCounts as $stateType => $count)
                     <li @if (Request::get('stateType', 'all') === $stateType) class="on" @endif>
-                        <a href="{{ route($current_route_name, ['type' => 'list', 'stateType' => $stateType]) }}" class="__plugin-install-link admin-tab-info-list__link">{{ xe_trans('dynamic_factory::' . $stateType) }} <span class="admin-tab-info-list__count">{{ $count }}</span></a>
+                        <a href="{{ route($current_route_name, ['type' => 'list', 'stateType' => $stateType]) }}" class="__plugin-install-link admin-tab-info-list__link">{{ xe_trans('dyFac::' . $stateType) }} <span class="admin-tab-info-list__count">{{ $count }}</span></a>
                     </li>
                 @endforeach
             </ul>
