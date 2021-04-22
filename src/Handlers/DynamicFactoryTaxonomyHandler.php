@@ -36,7 +36,7 @@ class DynamicFactoryTaxonomyHandler
     {
         XeDB::beginTransaction();
         try {
-            $category_id = $inputs['category_id'];
+            $category_id = array_get($inputs, 'category_id');
 
             // menu item slug 중복 체크
             $slugUrl = isset($inputs['slug']) === true ? $inputs['slug'] : null;
@@ -48,13 +48,13 @@ class DynamicFactoryTaxonomyHandler
 
             $cateExtra = new CategoryExtra();
 
-            if (!$category_id) {
+            if ($category_id == null) {
                 $taxonomyItem = $this->categoryHandler->createCate($inputs);
                 $cateExtra->category_id = $taxonomyItem->id;
 
             } else {
                 $category = $this->categoryHandler->cates()->find($category_id);
-                $category->name = $inputs['name'];
+                $category->name = $inputs['category_name'];
                 $taxonomyItem = $this->categoryHandler->updateCate($category);
 
                 $cateExtra = $this->getCategoryExtra($category_id);
