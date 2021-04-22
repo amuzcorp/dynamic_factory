@@ -245,7 +245,7 @@ class Plugin extends AbstractPlugin
             foreach($taxonomies as $taxonomy){
                 \XeRegister::push('settings/menu', $cpt->menu_path . $cpt->cpt_id . '.' . $taxonomy->category_id, [
                     'title' => xe_trans($taxonomy->category->name),
-                    'display' => true,
+                    'display' => $display,
                     'ordering' => 500 + (int) $taxonomy->category_id
                 ]);
 
