@@ -192,12 +192,11 @@ class DynamicFactoryService
     public function storeCptDocument(Request $request)
     {
         $inputs = $request->originExcept('_token');
-
-        if (isset($inputs['user_id']) === false) {
+        if (isset($inputs['user_id']) === false || empty($inputs['user_id'])) {
             $inputs['user_id'] = auth()->user()->getId();
         }
 
-        if (isset($inputs['writer']) === false) {
+        if (isset($inputs['writer']) === false || empty($inputs['writer'])) {
             $inputs['writer'] = auth()->user()->getDisplayName();
         }
 
@@ -249,10 +248,10 @@ class DynamicFactoryService
                 $inputs['cpt_id'] = $cpt_id;
             }
 
-            if(array_get($inputs, 'writer') == ''){
+            if(array_get($inputs, 'writer', '') == ''){
                 unset($inputs['writer']);
             }
-            if(array_get($inputs, 'user_id') == ''){
+            if(array_get($inputs, 'user_id', '') == ''){
                 unset($inputs['user_id']);
             }
 
