@@ -14,7 +14,7 @@
                         <div class="form-group row">
                             <label class="col-sm-2 col-form-label">ID (필수)</label>
                             <div class="col-sm-5">
-                                <input type="text" class="form-control" name="cpt_id" maxlength="36">
+                                <input type="text" class="form-control" name="cpt_id" maxlength="36" placeholder="첫글자는 영문으로 시작하며 영문, 숫자, -, _ 외는 입력 할 수 없습니다.">
                             </div>
                         </div>
                         <div class="form-group row">
