@@ -9,7 +9,7 @@
     <input type="hidden" name="cpt_id" value="{{ $cpt->cpt_id }}" />
     <input type="hidden" name="doc_id" value="{{ $item->id }}" />
     <div class="row">
-        <div class="col-sm-8 col-md-9 col-lg-10">
+        <div class="col-sm-8 col-md-8 col-lg-9 col-xl-10">
             <div class="panel">
                 <div class="panel-body">
                     @foreach($cptConfig['formColumns'] as $columnName)
@@ -59,7 +59,7 @@
             </div>
         </div>
 
-        <div class="col-sm-4 col-md-3 col-lg-2">
+        <div class="col-sm-4 col-md-4 col-lg-3 col-xl-2">
             <div class="panel">
                 <div class="panel-heading"><h4>고급설정</h4></div>
                 <div class="panel-body">
@@ -84,38 +84,36 @@
                     </div>
                 </div>
             </div>
-        </div>
 
-        @if(count($taxonomies) > 0)
-        <div class="col-sm-4 col-md-3 col-lg-2">
-            <div class="panel">
-                <div class="panel-heading"><h4>카테고리</h4></div>
-                <div class="panel-body">
-                    <div class="components-base-control">
-                        <div class="components-base-control__field">
-                            @foreach ($taxonomies as $taxonomy)
-                                <label class="components-base-control__label">
-                                    {{ xe_trans($taxonomy->name) }}
-                                </label>
-                                <div class="__taxonomy-field">
-                                    <div class="components-base-control__field" data-required-title="{{ xe_trans($taxonomy->name) }}">
-                                        {!! uio('uiobject/df@taxo_select', [
-                                            'name' => app('overcode.df.taxonomyHandler')->getTaxonomyItemAttributeName($taxonomy->id),
-                                            'label' => xe_trans($taxonomy->name),
-                                            'template' => $taxonomy->extra->template,
-                                            'items' => app('overcode.df.taxonomyHandler')->getCategoryItemsTree($taxonomy->id),
-                                            'value' => isset($category_items[$taxonomy->id]) ? $category_items[$taxonomy->id] : ''
-                                        ]) !!}
+            @if(count($taxonomies) > 0)
+                <div class="panel">
+                    <div class="panel-heading"><h4>카테고리</h4></div>
+                    <div class="panel-body">
+                        <div class="components-base-control">
+                            <div class="components-base-control__field">
+                                @foreach ($taxonomies as $taxonomy)
+                                    <label class="components-base-control__label">
+                                        {{ xe_trans($taxonomy->name) }}
+                                    </label>
+                                    <div class="__taxonomy-field">
+                                        <div class="components-base-control__field" data-required-title="{{ xe_trans($taxonomy->name) }}">
+                                            {!! uio('uiobject/df@taxo_select', [
+                                                'name' => app('overcode.df.taxonomyHandler')->getTaxonomyItemAttributeName($taxonomy->id),
+                                                'label' => xe_trans($taxonomy->name),
+                                                'template' => $taxonomy->extra->template,
+                                                'items' => app('overcode.df.taxonomyHandler')->getCategoryItemsTree($taxonomy->id),
+                                                'value' => isset($category_items[$taxonomy->id]) ? $category_items[$taxonomy->id] : ''
+                                            ]) !!}
+                                        </div>
                                     </div>
-                                </div>
-                                <br>
-                            @endforeach
+                                    <br>
+                                @endforeach
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
+            @endif
         </div>
-        @endif
     </div>
 </form>
 
