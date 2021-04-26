@@ -2,11 +2,14 @@
 
 namespace Overcode\XePlugin\DynamicFactory\Components\Modules\Cpt;
 
+use Overcode\XePlugin\DynamicFactory\Models\CptDocument;
 use Overcode\XePlugin\DynamicFactory\Models\DfSlug;
 use Route;
 use XeSkin;
 use View;
+use Xpressengine\Plugins\Comment\Handler as CommentHandler;
 use Xpressengine\Menu\AbstractModule;
+use Xpressengine\Plugins\Comment\Models\Comment;
 
 class CptModule extends AbstractModule
 {
@@ -21,6 +24,7 @@ class CptModule extends AbstractModule
     {
         self::registerSettingsRoute();
         self::registerInstanceRoute();
+        self::registerCommentCountIntercept();
     }
 
     /**
@@ -93,6 +97,107 @@ class CptModule extends AbstractModule
             'trash', 'certify', 'update', 'vote', 'manageMenus', 'comment', 'file', 'suggestion', 'slug', 'hasSlug',
             'favorite'
         ]);
+    }
+
+    /**
+     * register intercept for comment count
+     *
+     * @return void
+     */
+    public static function registerCommentCountIntercept()
+    {
+        intercept(
+            sprintf('%s@create', CommentHandler::class),
+            static::class.'-comment-create',
+            function ($func, array $inputs, $user = null) {
+                $comment = $func($inputs, $user);
+
+                self::setCptCommentCount($comment->target->target_id);
+
+                return $comment;
+            }
+        );
+
+        intercept(
+            sprintf('%s@trash', CommentHandler::class),
+            static::class.'-comment-trash',
+            function ($func, Comment $comment) {
+                $result = $func($comment);
+
+                self::setCptCommentCount($comment->target->target_id);
+
+                return $result;
+            }
+        );
+
+        intercept(
+            sprintf('%s@remove', CommentHandler::class),
+            static::class.'-comment-remove',
+            function ($func, Comment $comment) {
+                $result = $func($comment);
+
+                self::setCptCommentCount($comment->target->target_id);
+
+                return $result;
+            }
+        );
+
+        intercept(
+            sprintf('%s@restore', CommentHandler::class),
+            static::class.'-comment-restore',
+            function ($func, Comment $comment) {
+                $result = $func($comment);
+
+                self::setCptCommentCount($comment->target->target_id);
+
+                return $result;
+            }
+        );
+
+        intercept(
+            sprintf('%s@approve', CommentHandler::class),
+            static::class.'-comment-approve',
+            function ($func, Comment $comment) {
+                $result = $func($comment);
+
+                self::setCptCommentCount($comment->target->target_id);
+
+                return $result;
+            }
+        );
+
+        intercept(
+            sprintf('%s@reject', CommentHandler::class),
+            static::class.'-comment-reject',
+            function ($func, Comment $comment) {
+                $result = $func($comment);
+
+                self::setCptCommentCount($comment->target->target_id);
+
+                return $result;
+            }
+        );
+    }
+
+    protected static function setCptCommentCount($id)
+    {
+        if ($document = CptDocument::find($id)) {
+            if ($document == null) {
+                return;
+            }
+//            if ($document->type != static::getId()) {
+//                return;
+//            }
+
+            $commentCount = $document->comments()
+                ->where('approved', Comment::APPROVED_APPROVED)
+                ->where('status', '<>', Comment::STATUS_TRASH)
+                ->where('display', '<>', Comment::DISPLAY_HIDDEN)
+                ->count();
+
+            $document->comment_count = $commentCount;
+            $document->save();
+        }
     }
 
     /**
@@ -216,6 +321,12 @@ class CptModule extends AbstractModule
      */
     public function getTypeItem($id)
     {
-        // TODO: Implement getTypeItem() method.
+        static $items = [];
+
+        if (!isset($items[$id])) {
+            $items[$id] = \Overcode\XePlugin\DynamicFactory\Models\CptDocument::find($id);
+        }
+
+        return $items[$id];
     }
 }

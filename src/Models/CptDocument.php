@@ -5,6 +5,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Xpressengine\Document\Models\Document;
 use Xpressengine\Plugins\Comment\CommentUsable;
+use Xpressengine\Plugins\Comment\Models\Comment;
 use Xpressengine\Routing\InstanceRoute;
 use Xpressengine\Seo\SeoUsable;
 use Xpressengine\User\Models\Guest;
@@ -276,6 +277,11 @@ class CptDocument extends Document implements CommentUsable, SeoUsable
     public function dfSlug()
     {
         return $this->hasOne(DfSlug::class, 'target_id');
+    }
+
+    public function comments()
+    {
+        return $this->belongsToMany(Comment::class, 'comment_target', 'target_id', 'doc_id');
     }
 
     public function getSlug()
