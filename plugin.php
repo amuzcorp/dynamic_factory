@@ -337,6 +337,8 @@ class Plugin extends AbstractPlugin
             'middleware' => ['web']
         ], function() {
             Route::get('/categories', ['as' => 'categories', 'uses' => 'DynamicFactoryController@getCategories']);
+            Route::post('/favorite/{id}', ['as' => 'document.favorite', 'uses' => 'DynamicFactoryController@favorite']);
+            Route::get('/docSearch/{keyword?}', ['as' => 'document.search', 'uses' => 'DynamicFactoryController@docSearch']);
         });
 
         Route::settings(static::getId() . "/taxonomy", function() {
@@ -388,16 +390,7 @@ class Plugin extends AbstractPlugin
             });
         });
 
-        Route::fixed('', function() {
-            Route::group([
-                'namespace' => 'Overcode\XePlugin\DynamicFactory\Controllers',
-                'as' => 'dyFac.document.'
-            ], function () {
-                Route::post('/favorite/{id}', ['as' => 'favorite', 'uses' => 'DynamicFactoryController@favorite']);
-            });
-        });
-
-        Route::get('/hasSlug/{cpt_id}', ['as' => 'dyFac.hasSlug' , 'uses' => 'Overcode\XePlugin\DynamicFactory\Controllers\DynamicFactoryController@hasSlug']);
+        Route::get('/dynamic_factory/hasSlug/{cpt_id}', ['as' => 'dyFac.hasSlug' , 'uses' => 'Overcode\XePlugin\DynamicFactory\Controllers\DynamicFactoryController@hasSlug']);
     }
 
     protected function registerCategoryRoute()

@@ -3,6 +3,7 @@ namespace Overcode\XePlugin\DynamicFactory\Controllers;
 
 use App\Http\Controllers\Controller;
 use Overcode\XePlugin\DynamicFactory\Handlers\DynamicFactoryTaxonomyHandler;
+use Overcode\XePlugin\DynamicFactory\Models\CptDocument;
 use Overcode\XePlugin\DynamicFactory\Models\DfSlug;
 use XePresenter;
 use Xpressengine\Http\Request;
@@ -57,6 +58,36 @@ class DynamicFactoryController extends Controller
         return XePresenter::makeApi([
             'slug' => $slug,
         ]);
+    }
+
+    /**
+     * Search Document
+     *
+     * @param string\null $keyword keyword
+     * @return \Xpressengine\Presenter\Presentable
+     */
+    public function docSearch($keyword = null, Request $request)
+    {
+        if ($keyword === null) {
+            return XePresenter::makeApi([]);
+        }
+
+        $query = CptDocument::where('title', 'like', '%'.$keyword.'%');
+        if($request->get('cn') !== null) {
+            $field_config = app('xe.config')->get($request->get('cn'));
+            if($field_config !== null) {
+                // 선택한 타입들의 글만 표시
+                if($field_config->get('r_instance_id')) $query->where('instance_id', $field_config->get('r_instance_id'));
+
+                // 자신이 작성한 글만 옵션 선택시
+                $user_id = auth()->user()->getId();
+                if($field_config->get('author') == 'author' && $user_id != null) $query->where('user_id',$user_id);
+            }
+        }
+
+        $matchedDocumentList = $query->paginate(null, ['id','title'])->items();
+
+        return XePresenter::makeApi($matchedDocumentList);
     }
 
 }

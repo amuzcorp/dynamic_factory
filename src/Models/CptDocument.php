@@ -3,6 +3,7 @@ namespace Overcode\XePlugin\DynamicFactory\Models;
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Xpressengine\Document\DocumentHandler;
 use Xpressengine\Document\Models\Document;
 use Xpressengine\Plugins\Comment\CommentUsable;
 use Xpressengine\Plugins\Comment\Models\Comment;
@@ -303,6 +304,40 @@ class CptDocument extends Document implements CommentUsable, SeoUsable
             $ids[] = $file->id;
         }
         return $ids;
+    }
+
+    /**
+     * 현재 문서의 관련 문서를 불러온다 (use_dynamic = true 일 경우 DF 도 붙여서 불러옴)
+     *
+     * @param $field_id
+     * @param bool $use_dynamic
+     * @return \Illuminate\Database\Eloquent\Collection
+     */
+    public function relateDocument($field_id, $use_dynamic = true)
+    {
+        $query = $this->belongsToMany(CptDocument::class, 'field_dynamic_factory_relate_document', 'target_id', 'r_id')->where('field_dynamic_factory_relate_document.field_id', $field_id);
+        if($use_dynamic){
+            $group = sprintf('documents_%s', $this->instance_id);
+            $r_group = RelateDocument::Where('field_id', $field_id)->where('target_id', $this->id)->where('group', $group)->pluck('r_group')->first();
+
+            $query->setProxyOption(['group'=>$r_group,'table'=>'documents'], false);
+        }
+
+        return $query->get();
+    }
+
+    /**
+     * 현재 문서를 관련 문서로 가지고 있는 문서를 불러온다 (반대관계에서는 다이나믹을 달지 않는다)
+     *
+     * @param null $field_id
+     * @return \Illuminate\Database\Eloquent\Collection
+     */
+    public function relatedDocument($field_id = null)
+    {
+        $query = $this->belongsToMany(CptDocument::class, 'field_dynamic_factory_relate_document', 'r_id', 'target_id')->withPivot('r_id');
+        if($field_id != null) $query->where('field_id',$field_id);
+
+        return $query->get();
     }
 
     public function taxonomy()

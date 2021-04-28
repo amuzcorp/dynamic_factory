@@ -379,7 +379,11 @@ class DynamicFactorySettingController extends BaseController
      */
     public function documentList(Cpt $cpt, Request $request)
     {
+
+//        \DB::connection()->enableQueryLog();
         $cptDocs = $this->getCptDocuments($request, $cpt);
+//        $queries = \DB::getQueryLog();
+//        dd($queries);
 
         $stateTypeCounts = [
             'all' => CptDocument::cpt($cpt->cpt_id)->count(),

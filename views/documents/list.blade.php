@@ -116,11 +116,19 @@
                                                 @if (($fieldType = XeDynamicField::get('documents_'.$cpt->cpt_id, $columnName)) !== null)
                                                     <div class="xe-list-board-list__dynamic-field xe-list-board-list__dynamic-field-{{ $columnName }} xe-list-board-list__mobile-style">
                                                         <span class="sr-only">{{ xe_trans($column_labels[$columnName]) }}</span>
-                                                        @if($fieldType->getId() == 'fieldType/dynamic_field_extend@instance_selector')
-                                                            {{ get_menu_instance_name($fieldType->getSkin()->output($columnName, $doc->getAttributes())) }}
-                                                        @else
-                                                        {!! $fieldType->getSkin()->output($columnName, $doc->getAttributes()) !!}
-                                                        @endif
+                                                        @switch($fieldType->getId())
+                                                            @case('fieldType/dynamic_field_extend@instance_selector')
+                                                                {{ get_menu_instance_name($fieldType->getSkin()->output($columnName, $doc->getAttributes())) }}
+                                                                @break
+                                                            @case('fieldType/dynamic_factory@RelateDocument')
+                                                                @foreach($doc->relateDocument($columnName,false) as $relateDoc)
+                                                                    <span class="xe-badge xe-btn-secondary">{{ $relateDoc->title }}</span>
+                                                                @endforeach
+                                                                @break
+                                                            @default
+                                                                {!! $fieldType->getSkin()->output($columnName, $doc->getAttributes()) !!}
+                                                                @break
+                                                        @endswitch
                                                     </div>
                                                 @else
                                                     {!! $doc->{$columnName} !!}
