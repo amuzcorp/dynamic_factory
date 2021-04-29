@@ -18,8 +18,6 @@
             </div>
         </div>
     </div>
-    <input type="text" name="{{ $key['r_id'] }}" value="a" />
-    <input type="text" name="{{ $key['r_group'] }}" value="b" />
 </div>
 
 <script>

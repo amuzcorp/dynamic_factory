@@ -42,16 +42,11 @@ class CommonSkin extends AbstractSkin
 
     protected function appendScript()
     {
-//        XeFrontend::css([
-//            Plugin::asset('/assets/multiSelect2/multiSelect2.css'),
-//            '/assets/core/permission/permission.css'
-//        ])->load();
-//        XeFrontend::js(Plugin::asset('/assets/multiSelect2/multiSelect2.min.js'))->appendTo('head')->load();
         XeFrontend::css([
-            '/assets/core/permission/permission.css',
+            Plugin::asset('/components/DynamicFields/RelateDocument/Skins/Common/assets/style.css'),
         ])->load();
         XeFrontend::js([
-            Plugin::asset('/assets/DocList.js'),
+            Plugin::asset('/components/DynamicFields/RelateDocument/Skins/Common/assets/DocList.js'),
         ])->appendTo('head')->load();
     }
 
