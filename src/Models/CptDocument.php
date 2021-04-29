@@ -327,15 +327,18 @@ class CptDocument extends Document implements CommentUsable, SeoUsable
     }
 
     /**
-     * 현재 문서를 관련 문서로 가지고 있는 문서를 불러온다 (반대관계에서는 다이나믹을 달지 않는다)
+     * 현재 문서를 관련 문서로 가지고 있는 문서를 불러온다 (반대관계에서는 다이나믹을 기본적으로는 달지 않는다)
      *
      * @param null $field_id
      * @return \Illuminate\Database\Eloquent\Collection
      */
-    public function relatedDocument($field_id = null)
+    public function relatedDocument($field_id = null,$r_group = null)
     {
         $query = $this->belongsToMany(CptDocument::class, 'field_dynamic_factory_relate_document', 'r_id', 'target_id')->withPivot('r_id');
-        if($field_id != null) $query->where('field_id',$field_id);
+        if($field_id != null){
+            $query->where('field_id',$field_id);
+            if($r_group != null) $query->setProxyOption(['group' => $r_group, 'table'=>'documents'], false);
+        }
 
         return $query->get();
     }
