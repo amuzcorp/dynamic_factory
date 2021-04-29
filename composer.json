@@ -124,6 +124,16 @@
                     "name": "RelateDocument Default fieldSkin",
                     "description": "The fieldSkin supported by Dynamic_factory plugin.",
                     "class": "Overcode\\XePlugin\\DynamicFactory\\Components\\DynamicFields\\RelateDocument\\Skins\\Common\\CommonSkin"
+                },
+                "fieldType/dynamic_factory@RelateMember": {
+                    "name": "RelateMember fieldType",
+                    "description": "The fieldType supported by Dynamic_factory plugin.",
+                    "class": "Overcode\\XePlugin\\DynamicFactory\\Components\\DynamicFields\\RelateMember\\RelateMemberField"
+                },
+                "fieldType/dynamic_factory@RelateMember/fieldSkin/dynamic_factory@common": {
+                    "name": "RelateMember Default fieldSkin",
+                    "description": "The fieldSkin supported by Dynamic_factory plugin.",
+                    "class": "Overcode\\XePlugin\\DynamicFactory\\Components\\DynamicFields\\RelateMember\\Skins\\Common\\CommonSkin"
                 }
             }
         }

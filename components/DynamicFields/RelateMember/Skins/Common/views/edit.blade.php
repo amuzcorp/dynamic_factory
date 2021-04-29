@@ -4,7 +4,7 @@
         <div class="ReactTags__tags">
             <div class="ReactTags__selected">
                 @foreach($items as $item)
-                <span class="ReactTags__tag">{{ $item->title }}<a class="ReactTags__remove btnRemoveTag" data-id="{{ $item->doc_id }}">x</a></span>
+                    <span class="ReactTags__tag">{{ $item->mem_name }}<a class="ReactTags__remove btnRemoveTag" data-id="{{ $item->mem_id }}">x</a></span>
                 @endforeach
             </div>
             <div class="ReactTags__tagInput">
@@ -13,7 +13,7 @@
             </div>
             <div class="input_hidden">
                 @foreach($items as $item)
-                    <input type="hidden" name="hidden_{{ $config->get('id') }}[]" value="{{ $item->doc_id }}" />
+                    <input type="hidden" name="hidden_{{ $config->get('id') }}[]" value="{{ $item->mem_id }}" />
                 @endforeach
             </div>
         </div>
@@ -21,10 +21,10 @@
 </div>
 
 <script>
-    var p_{{ $config->get('id') }} = new DocList({
+    var p_{{ $config->get('id') }} = new MemberList({
         wrapper_id: 'autocomplete_{{ $config->get('id') }}',
         $wrapper: $('#autocomplete_{{ $config->get('id') }}'),
-        searchUrl: '{{ route('dyFac.document.search') }}',
+        searchUrl: '{{ route('dyFac.user.search') }}',
         field_name: 'hidden_{{ $config->get('id') }}',
         config_name: '{{ $config->name }}'
     });

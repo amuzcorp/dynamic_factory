@@ -3,7 +3,6 @@
 namespace Overcode\XePlugin\DynamicFactory\Components\DynamicFields\RelateDocument;
 
 use Illuminate\Database\Query\Builder;
-use Illuminate\Database\Query\JoinClause;
 use Overcode\XePlugin\DynamicFactory\Models\RelateDocument;
 use Xpressengine\Config\ConfigEntity;
 use Xpressengine\Database\DynamicQuery;
@@ -180,25 +179,7 @@ class RelateDocumentField extends AbstractType
      */
     public function delete(array $wheres)
     {
-        $config = $this->config;
-        $type = $this->handler->getRegisterHandler()->getType($this->handler, $config->get('typeId'));
-        $where = $this->getWhere($wheres, $config);
-
-        if (isset($where['target_id']) === false) {
-            throw new Exceptions\RequiredDynamicFieldException;
-        }
-
-        // event fire
-        $this->handler->getRegisterHandler()->fireEvent(
-            sprintf('dynamicField.%s.%s.before_delete', $config->get('group'), $config->get('id'))
-        );
-
-        $this->handler->connection()->table($type->getTableName())->where($where)->delete();
-
-        // event fire
-        $this->handler->getRegisterHandler()->fireEvent(
-            sprintf('dynamicField.%s.%s.after_delete', $config->get('group'), $config->get('id'))
-        );
+        // update 시 delete 후 insert
     }
 
     /**
@@ -229,10 +210,14 @@ class RelateDocumentField extends AbstractType
             return $query;
         }
 
-        $type = $this->handler->getRegisterHandler()->getType($this->handler, $config->get('typeId'));
+        $baseTable = $query->from;
 
+        $type = $this->handler->getRegisterHandler()->getType($this->handler, $config->get('typeId'));
+        $tablePrefix = $this->handler->connection()->getTablePrefix();
+
+        $rawString = sprintf('%s.*', $tablePrefix . $baseTable);
         // doc 에 filed_id 가 있어야 update 가능
-        $rawString = sprintf('*, 1 as hidden_%s', $config->get('id'));
+        $rawString .= sprintf(', 1 as hidden_%s', $config->get('id'));
 
         foreach ($type->getColumns() as $key => $column) {
             $key = $config->get('id') . '_' . $column->name;

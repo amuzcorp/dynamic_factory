@@ -19,7 +19,7 @@ class RelateCptField extends AbstractType
      */
     public function name()
     {
-        return 'RelateCpt - 관련 사용자 문서';
+        return '(deprecated)RelateCpt - 관련 사용자 문서';
     }
 
     /**

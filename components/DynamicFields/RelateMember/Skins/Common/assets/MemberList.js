@@ -1,4 +1,4 @@
-class DocList {
+class MemberList {
   constructor ({ wrapper_id, $wrapper, searchUrl, field_name, config_name }) {
     this.wrapper_id = wrapper_id
     this.$wrapper = $wrapper
@@ -55,7 +55,7 @@ class DocList {
       if (!bSameWord) {
         $input_hidden.append(`<input type="hidden" name="${_this.field_name}[]" value="${tag.id}">`)
         $ul.closest('.ReactTags__tags').find('.ReactTags__selected')
-          .append(`<span class="ReactTags__tag">${(tag.title || tag.id)}<a class="ReactTags__remove btnRemoveTag" data-id="${tag.id}">x</a></span>`)
+          .append(`<span class="ReactTags__tag">${(tag.display_name || tag.name)}<a class="ReactTags__remove btnRemoveTag" data-id="${tag.id}">x</a></span>`)
       }
 
       $ul.remove()
@@ -102,9 +102,10 @@ class DocList {
   }
 
   makeIt (item, query) {
+    // console.log(item, query);
     var escapedRegex = query.trim().replace(/[-\\^$*+?.()|[\]{}]/g, '\\$&')
     var r = RegExp(escapedRegex, 'gi')
-    var itemName = item.title || item.writer
+    var itemName = item.display_name || item.name
 
     return itemName.replace(r, '<mark>$&</mark>')
   }

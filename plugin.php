@@ -340,6 +340,7 @@ class Plugin extends AbstractPlugin
             Route::post('/favorite/{id}', ['as' => 'document.favorite', 'uses' => 'DynamicFactoryController@favorite']);
             Route::get('/docSearch/{keyword?}', ['as' => 'document.search', 'uses' => 'DynamicFactoryController@docSearch']);
         });
+        Route::get('/userSearch/{keyword?}', ['as' => 'dyFac.user.search', 'uses' => 'App\Http\Controllers\User\Settings\UserController@search']);
 
         Route::settings(static::getId() . "/taxonomy", function() {
             Route::group([
