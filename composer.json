@@ -134,6 +134,16 @@
                     "name": "RelateMember Default fieldSkin",
                     "description": "The fieldSkin supported by Dynamic_factory plugin.",
                     "class": "Overcode\\XePlugin\\DynamicFactory\\Components\\DynamicFields\\RelateMember\\Skins\\Common\\CommonSkin"
+                },
+                "fieldType/dynamic_factory@SuperRelate": {
+                  "name": "SuperRelate fieldType",
+                  "description": "The fieldType supported by Dynamic_factory plugin.",
+                  "class": "Overcode\\XePlugin\\DynamicFactory\\Components\\DynamicFields\\SuperRelate\\SuperRelateField"
+                },
+                "fieldType/dynamic_factory@SuperRelate/fieldSkin/dynamic_factory@common": {
+                  "name": "SuperRelate Default fieldSkin",
+                  "description": "The fieldSkin supported by Dynamic_factory plugin.",
+                  "class": "Overcode\\XePlugin\\DynamicFactory\\Components\\DynamicFields\\SuperRelate\\Skins\\Common\\CommonSkin"
                 }
             }
         }
