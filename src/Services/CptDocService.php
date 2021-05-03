@@ -5,7 +5,6 @@ use Illuminate\Support\Collection;
 use Overcode\XePlugin\DynamicFactory\Exceptions\NotFoundDocumentException;
 use Overcode\XePlugin\DynamicFactory\Handlers\DynamicFactoryDocumentHandler;
 use Overcode\XePlugin\DynamicFactory\IdentifyManager;
-use Overcode\XePlugin\DynamicFactory\Models\Cpt;
 use Overcode\XePlugin\DynamicFactory\Models\CptDocument;
 use Xpressengine\Config\ConfigEntity;
 use Xpressengine\Http\Request;
@@ -220,9 +219,20 @@ class CptDocService
     {
         $items = CptDocument::withTrashed()->find($documentIds);
         foreach ($items as $item) {
-//            app('xe.document')->remove($item);
+            $item->setProxyOptions($this->proxyOption($item->instance_id));
             $item->forceDelete();
         }
+    }
+
+    public function proxyOption($cpt_id = null)
+    {
+        $options =[];
+        if ($cpt_id != null) {
+            $options['table'] = CptDocument::TABLE_NAME;
+            $options['id'] = $cpt_id;
+        }
+
+        return $options;
     }
 
     /**
