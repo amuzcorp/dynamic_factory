@@ -46,14 +46,14 @@ class CptDocument extends Document implements CommentUsable, SeoUsable
 
     public function scopeCpt($query, $cpt_id)
     {
-        return $query->where('type', $cpt_id);
+        return $query->where('documents.type', $cpt_id);
     }
 
     public function scopePublic($query)
     {
-        return $query->where('status', self::STATUS_PUBLIC)
-            ->where('approved', self::APPROVED_APPROVED)
-            ->where('display', self::DISPLAY_VISIBLE);
+        return $query->where('documents.status', self::STATUS_PUBLIC)
+            ->where('documents.approved', self::APPROVED_APPROVED)
+            ->where('documents.display', self::DISPLAY_VISIBLE);
     }
 
     public function isPublic()
@@ -74,9 +74,9 @@ class CptDocument extends Document implements CommentUsable, SeoUsable
 
     public function scopePrivate($query)
     {
-        return $query->where('status', self::STATUS_PRIVATE)
-            ->where('approved', self::APPROVED_APPROVED)
-            ->where('display', self::DISPLAY_SECRET);
+        return $query->where('documents.status', self::STATUS_PRIVATE)
+            ->where('documents.approved', self::APPROVED_APPROVED)
+            ->where('documents.display', self::DISPLAY_SECRET);
     }
 
     public function isPrivate()
@@ -97,9 +97,9 @@ class CptDocument extends Document implements CommentUsable, SeoUsable
 
     public function scopeTemp($query)
     {
-        return $query->where('status', self::STATUS_TEMP)
-            ->where('approved', self::APPROVED_WAITING)
-            ->where('display', self::DISPLAY_HIDDEN);
+        return $query->where('documents.status', self::STATUS_TEMP)
+            ->where('documents.approved', self::APPROVED_WAITING)
+            ->where('documents.display', self::DISPLAY_HIDDEN);
     }
 
     public function isTemp()
@@ -120,7 +120,7 @@ class CptDocument extends Document implements CommentUsable, SeoUsable
 
     public function scopePublishReserved($query)
     {
-        return $query->where('published_at', '>', date('Y-m-d H:i:s'));
+        return $query->where('documents.published_at', '>', date('Y-m-d H:i:s'));
     }
 
     public function isPublishReserved()
@@ -130,7 +130,7 @@ class CptDocument extends Document implements CommentUsable, SeoUsable
 
     public function scopePublished($query)
     {
-        return $query->where('published_at', '<=', date('Y-m-d H:i:s'));
+        return $query->where('documents.published_at', '<=', date('Y-m-d H:i:s'));
     }
 
     public function isPublished()
@@ -140,10 +140,10 @@ class CptDocument extends Document implements CommentUsable, SeoUsable
 
     public function scopeVisible($query)
     {
-        return $query->where('status', static::STATUS_PUBLIC)
-            ->where('display', '<>', static::DISPLAY_HIDDEN)
-            ->where('approved', static::APPROVED_APPROVED)
-            ->where('published_at', '<=', date('Y-m-d H:i:s'));
+        return $query->where('documents.status', static::STATUS_PUBLIC)
+            ->where('documents.display', '<>', static::DISPLAY_HIDDEN)
+            ->where('documents.approved', static::APPROVED_APPROVED)
+            ->where('documents.published_at', '<=', date('Y-m-d H:i:s'));
     }
 
     /**
