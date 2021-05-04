@@ -1,12 +1,12 @@
 <div class="form-group">
-    <label>CPT ID</label>
-    <input type="text" name="cpt_id" class="form-control" value="{{array_get($args, 'cpt_id')}}" />
-</div>
-<div class="form-group">
     <label>Field ID</label>
     <input type="text" name="field_id" class="form-control" value="{{array_get($args, 'field_id')}}" />
 </div>
 <div class="form-group">
-    <label>Document ID</label>
-    <input type="text" name="document_id" class="form-control" value="{{array_get($args, 'document_id')}}" />
+    <label>Source Group</label>
+    <input type="text" name="s_group" class="form-control" value="{{array_get($args, 's_group')}}" />
+</div>
+<div class="form-group">
+    <label>Target ID</label>
+    <input type="text" name="t_id" class="form-control" value="{{array_get($args, 't_id')}}" />
 </div>

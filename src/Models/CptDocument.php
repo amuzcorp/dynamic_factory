@@ -321,7 +321,7 @@ class CptDocument extends Document implements CommentUsable, SeoUsable
         $query = $this->belongsToMany(CptDocument::class, $tableName, 's_id', 't_id')->where($tableName.'.field_id', $field_id);
         if($use_dynamic){
             $group = sprintf('documents_%s', $this->instance_id);
-            $target_group = SuperRelate::Where('field_id', $field_id)->where('s_id', $this->id)->where('s_group', $group)->pluck('t_group')->first();
+            $target_group = SuperRelate::Where($tableName.'.field_id', $field_id)->where('s_id', $this->id)->where('s_group', $group)->pluck('t_group')->first();
 
             $query->setProxyOption(['group' => $target_group, 'table' => 'documents'], false);
         }
@@ -333,17 +333,21 @@ class CptDocument extends Document implements CommentUsable, SeoUsable
      * 현재 문서를 관련 문서로 가지고 있는 문서를 불러온다 (반대관계에서는 다이나믹을 기본적으로는 달지 않는다)
      *
      * @param null $field_id
+     * @param null $source_group
      * @param null $target_group
      * @return \Illuminate\Database\Eloquent\Collection
      */
-    public function belongDocument($field_id = null, $target_group = null)
+    public function belongDocument($field_id = null, $source_group = null)
     {
         $tableName = SuperRelateField::TABLE_NAME;
 
         $query = $this->belongsToMany(CptDocument::class, $tableName, 't_id', 's_id')->withPivot('t_id');
         if($field_id != null){
-            $query->where('field_id', $field_id);
-            if($target_group != null) $query->setProxyOption(['group' => $target_group, 'table'=>'documents'], false);
+            $query->where(sprintf('%s.field_id', $tableName), $field_id);
+            if($source_group != null) {
+                $query->where(sprintf('%s.s_group', $tableName), $source_group);
+                $query->setProxyOption(['group' => $source_group, 'table'=>'documents'], false);
+            }
         }
 
         return $query->get();

@@ -21,14 +21,13 @@ class RelateCptWidget extends AbstractWidget
 
         $title = $widgetConfig['@attributes']['title'];
 
-        $cpt_id = $widgetConfig['cpt_id'];
         $field_id = $widgetConfig['field_id'];
-        $document_id = $widgetConfig['document_id'];
+        $s_group = $widgetConfig['s_group'];
+        $t_id = $widgetConfig['t_id'];
 
-        $handler = app('overcode.df.handler');
-        $document_ids = $handler->getRelateCpts($field_id, 'documents_'.$cpt_id, $document_id);
+        $source_document = CptDocument::find($t_id);
 
-        $cpts = CptDocument::division($cpt_id)->whereIn('id', $document_ids)->get();
+        $cpts = $source_document->belongDocument($field_id, $s_group);
 
         return $this->renderSkin([
             'widgetConfig' => $widgetConfig,
