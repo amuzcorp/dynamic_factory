@@ -171,7 +171,9 @@ class SuperRelateField extends AbstractType
         $insertParam['s_id'] = $where['target_id'];
         $insertParam['s_group'] = $where['group'];
 
-        $this->handler->connection()->table(self::TABLE_NAME)->where($insertParam)->delete();    // all delete
+        if(array_get($args,'login_at') == null && array_get($args,'remember_token') == null) {
+            $this->handler->connection()->table(self::TABLE_NAME)->where($insertParam)->delete();    // all delete
+        }
 
         $insertParam['s_type'] = (strpos($config->get('group'), 'documents_') !== false) ? 'document' : 'user';
         $insertParam['t_group'] = $is_user ? 'user' : sprintf('documents_%s', $config->get('r_instance_id'));
