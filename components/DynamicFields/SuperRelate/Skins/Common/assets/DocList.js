@@ -45,6 +45,7 @@ class DocList {
       var $input_hidden = $this.closest('.ReactTags__tags').find('.input_hidden')
       var name = _this.type
       var bSameWord = false
+      var wrapper_id = _this.wrapper_id
 
       $('#'+_this.wrapper_id).find('.input_hidden input[type=hidden]').each(function() {
         if($(this).val() == tag.id) {
@@ -53,6 +54,9 @@ class DocList {
       })
 
       if (!bSameWord) {
+        // 값이 변경되었음
+        $('#'+wrapper_id + ' input[name=srf_chg]').val('1')
+
         $input_hidden.append(`<input type="hidden" name="${_this.field_name}[]" value="${tag.id}">`)
         $ul.closest('.ReactTags__tags').find('.ReactTags__selected')
           .append(`<span class="ReactTags__tag">${(tag.title || tag.id)}<a class="ReactTags__remove btnRemoveTag" data-id="${tag.id}">x</a></span>`)
@@ -89,6 +93,9 @@ class DocList {
       var id = $(this).data('id')
       var field_id = _this.field_name
       var wrapper_id = _this.wrapper_id
+
+      // 값이 변경되었음
+      $('#'+wrapper_id + ' input[name=srf_chg]').val('1')
 
       $(this).closest('span').remove()
 

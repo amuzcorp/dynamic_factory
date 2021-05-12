@@ -144,6 +144,9 @@ class SuperRelateField extends AbstractType
      */
     public function update(array $args, array $wheres)
     {
+        $is_changed = array_get($args, 'srf_chg', 0);
+        if($is_changed == false) return;
+
         $config = $this->config;
         $type = $this->handler->getRegisterHandler()->getType($this->handler, $config->get('typeId'));
 
@@ -171,9 +174,7 @@ class SuperRelateField extends AbstractType
         $insertParam['s_id'] = $where['target_id'];
         $insertParam['s_group'] = $where['group'];
 
-        if(array_get($args,'login_at') == null && array_get($args,'remember_token') == null) {
-            $this->handler->connection()->table(self::TABLE_NAME)->where($insertParam)->delete();    // all delete
-        }
+        $this->handler->connection()->table(self::TABLE_NAME)->where($insertParam)->delete();    // all delete
 
         $insertParam['s_type'] = (strpos($config->get('group'), 'documents_') !== false) ? 'document' : 'user';
         $insertParam['t_group'] = $is_user ? 'user' : sprintf('documents_%s', $config->get('r_instance_id'));
@@ -238,11 +239,11 @@ class SuperRelateField extends AbstractType
 
         $rawString = sprintf('%s.*', $tablePrefix . $baseTable);
         // doc 에 filed_id 가 있어야 update 가능
-        $rawString .= sprintf(', 1 as hidden_%s', $config->get('id'));
+        $rawString .= sprintf(', null as hidden_%s', $config->get('id'));
 
         foreach ($type->getColumns() as $key => $column) {
             $key = $config->get('id') . '_' . $column->name;
-            $rawString .= sprintf(' ,1 as %s', $key);
+            $rawString .= sprintf(' ,null as %s', $key);
         }
 
         $query->addSelect(\DB::raw($rawString));
