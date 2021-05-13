@@ -239,7 +239,7 @@ class SuperRelateField extends AbstractType
 
         $rawString = sprintf('%s.*', $tablePrefix . $baseTable);
         // doc 에 filed_id 가 있어야 update 가능
-        $rawString .= sprintf(', null as hidden_%s', $config->get('id'));
+        $rawString .= sprintf(', null as srf_chg, null as hidden_%s', $config->get('id'));
 
         foreach ($type->getColumns() as $key => $column) {
             $key = $config->get('id') . '_' . $column->name;
