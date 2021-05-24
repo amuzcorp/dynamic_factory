@@ -101,13 +101,21 @@ class CommonSkin extends AbstractSkin
     protected function getRelateItems($args) {
         $tableName = SuperRelateField::TABLE_NAME;
 
-        $source_is_user = (array_get($args, 'instance_id') == null);
         $target_is_user = ($this->config->get('r_instance_id') == 'user');
+
+        if(array_get($args, 'instance_id') == null){
+            $s_group = 'user';
+            if(array_get($args, 'group_id') != null) {
+                $s_group = array_get($args, 'group_id');
+            }
+        }else{
+            $s_group = sprintf('documents_%s', array_get($args, 'instance_id'));
+        }
 
         $params = [
             'field_id' => $this->config->get('id'),
             's_id' => $args['id'],
-            's_group' => $source_is_user ? 'user' : sprintf('documents_%s', array_get($args, 'instance_id'))
+            's_group' => $s_group
         ];
 
         if($target_is_user) {
