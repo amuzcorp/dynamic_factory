@@ -62,7 +62,7 @@ class CptDocService
         $this->handler->makeWhere($query, $request, $config);
         $this->handler->makeOrder($query, $request, $config);
 
-        $perPage = 10;
+        $perPage = $config->get('perPage') ?: '10';
 
         $paginate = $query->paginate($perPage)->appends($request->except('page'));
 

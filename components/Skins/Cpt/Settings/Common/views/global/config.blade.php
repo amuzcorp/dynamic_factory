@@ -30,6 +30,16 @@
                                         <div class="col-sm-6">
                                             <div class="form-group">
                                                 <div class="clearfix">
+                                                    <label>{{xe_trans('board::perPage')}} <small>{{xe_trans('board::perPageDescription')}} </small></label>
+                                                </div>
+                                                <input type="text" id="" name="perPage" class="form-control" value="{{Request::old('perPage', $config->get('perPage'))}}"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-sm-6">
+                                            <div class="form-group">
+                                                <div class="clearfix">
                                                     <label>{{xe_trans('board::useConsultation')}} <small>{{xe_trans('board::useConsultationDescription')}} </small></label>
                                                 </div>
                                                 <select id="" name="useConsultation" class="form-control">

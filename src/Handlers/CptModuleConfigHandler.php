@@ -33,7 +33,9 @@ class CptModuleConfigHandler
     /**
      * @var array
      */
-    protected $defaultConfig = [];
+    protected $defaultConfig = [
+        'perPage' => 10,
+    ];
 
     public function __construct(
         ConfigManager $configManager,
