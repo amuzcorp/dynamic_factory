@@ -205,22 +205,32 @@ class DynamicFactoryDocumentHandler
             );
         }
 
-        foreach($category_items as $item_id) {
-            $categoryItem = CategoryItem::find($data);
-            if ($categoryItem !== null) {
-                $query = $query->where('df_taxonomy.item_ids', 'like', '%"'. $item_id .'"%');
+        if(array_get($data, 'taxOr') == 'Y') {
+            $query->where(function ($q) use ($category_items, $data) {
+                foreach($category_items as $item_id) {
+                    $categoryItem = CategoryItem::find($data);
+                    if ($categoryItem !== null) {
+                        $q->orWhere('df_taxonomy.item_ids', 'like', '%"' . $item_id . '"%');
+                    }
+                }
+            });
+        }else {
+            foreach($category_items as $item_id) {
+                $categoryItem = CategoryItem::find($data);
+                if ($categoryItem !== null) {
+                    $query = $query->where('df_taxonomy.item_ids', 'like', '%"' . $item_id . '"%');
+                }
             }
-
         }
 
-        if ($request->get('category_item_id') !== null && $request->get('category_item_id') !== '') {
+        /*if ($request->get('category_item_id') !== null && $request->get('category_item_id') !== '') {
             $categoryItem = CategoryItem::find($request->get('category_item_id'));
             if ($categoryItem !== null) {
                 $targetCategoryItemIds = $categoryItem->descendants(false)->get()->pluck('id');
 
                 $query = $query->whereIn('board_category.item_id', $targetCategoryItemIds);
             }
-        }
+        }*/
 
         if ($request->get('start_created_at') != null && $request->get('start_created_at') !== '') {
             $query = $query->where('created_at', '>=', $request->get('start_created_at') . ' 00:00:00');
