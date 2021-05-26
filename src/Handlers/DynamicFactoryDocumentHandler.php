@@ -94,7 +94,7 @@ class DynamicFactoryDocumentHandler
                     break;
             }
         }
-
+//        dd($attributes, 1);
         $doc = $this->documentHandler->add($attributes);
 
         $cptDoc = CptDocument::division($cpt_id)->find($doc->id);
@@ -137,8 +137,12 @@ class DynamicFactoryDocumentHandler
         foreach ($inputs as $name => $value) {
             if (array_key_exists($name, $attributes)) {
                 $doc->{$name} = $value;
+            } else if($name == '_hashTags' || $name == '_tags'){
+                $doc->{$name} = $value;
             }
         }
+        $doc->doc_id = $doc->id;
+        $doc->cpt_id = $doc->instance_id;
 
         $this->documentHandler->put($doc);
 
