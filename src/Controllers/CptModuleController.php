@@ -2,6 +2,7 @@
 
 namespace Overcode\XePlugin\DynamicFactory\Controllers;
 
+use Overcode\XePlugin\DynamicFactory\Plugin;
 use Overcode\XePlugin\DynamicFactory\Components\Modules\Cpt\CptModule;
 use Overcode\XePlugin\DynamicFactory\Exceptions\NotFoundDocumentException;
 use Overcode\XePlugin\DynamicFactory\Handlers\CptPermissionHandler;
@@ -22,6 +23,8 @@ use Overcode\XePlugin\DynamicFactory\Handlers\CptModuleConfigHandler;
 use Overcode\XePlugin\DynamicFactory\Handlers\CptUrlHandler;
 use Xpressengine\Editor\PurifierModules\EditorContent;
 use Xpressengine\Http\Request;
+use Xpressengine\Media\MediaManager;
+use Xpressengine\Media\Models\Media;
 use Xpressengine\Permission\Instance;
 use Xpressengine\Routing\InstanceConfig;
 use Xpressengine\Support\Exceptions\AccessDeniedHttpException;
@@ -69,10 +72,14 @@ class CptModuleController extends Controller
         XePresenter::setSkinTargetId(CptModule::getId());
         XePresenter::share('cpt', $this->cpt);
         XePresenter::share('current_instance_route', ($current_route != null) ? $current_route->getName() : null);
+        XePresenter::share('documentHandler', $dfDocHandler);
         XePresenter::share('configHandler', $configHandler);
         XePresenter::share('cptUrlHandler', $cptUrlHandler);
         XePresenter::share('instanceId', $this->instanceId);
         XePresenter::share('config', $this->config);
+
+        //공용으로 쓰이는 js 모음
+        app('xe.frontend')->js([Plugin::asset('assets/cpt_module_common.js')])->load();
     }
 
     public function index(CptDocService $service, Request $request, CptPermissionHandler $cptPermissionHandler)
@@ -101,12 +108,18 @@ class CptModuleController extends Controller
 
         $paginate = $service->getItems($request, $this->config);
 
+        //미디어 라이브러리 추가 (미디어 필드가 있는경우에 사용해야함)
+        /** @var MediaManager $mediaManager */
+        $mediaManager = app('xe.media');
+        $imageHandler = $mediaManager->getHandler(Media::TYPE_IMAGE);
+
         return XePresenter::makeAll('index', [
             'paginate' => $paginate,
             'dfConfig' => $dfConfig,
             'column_labels' => $column_labels,
             'taxonomies' => $taxonomies,
-            'categories' => $categories
+            'categories' => $categories,
+            'imageHandler' => $imageHandler
         ]);
     }
 
@@ -149,7 +162,12 @@ class CptModuleController extends Controller
 
         $select_category_items = $this->taxonomyHandler->getItemOnlyTargetId($id);
 
-        return XePresenter::make('show', compact('item','fieldTypes','dynamicFieldsById', 'select_category_items'));
+        //미디어 라이브러리 추가 (미디어 필드가 있는경우에 사용해야함)
+        /** @var MediaManager $mediaManager */
+        $mediaManager = app('xe.media');
+        $imageHandler = $mediaManager->getHandler(Media::TYPE_IMAGE);
+
+        return XePresenter::make('show', compact('item','fieldTypes','dynamicFieldsById', 'select_category_items', 'imageHandler'));
     }
 
     /**

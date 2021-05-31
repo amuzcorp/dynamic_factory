@@ -390,8 +390,9 @@ class DynamicFactoryDocumentHandler
      * @param string $userId  user id
      * @return bool
      */
-    public function hasFavorite($DocId, $userId)
+    public function hasFavorite($DocId, $userId = null)
     {
+        if($userId == null) $userId = auth()->user()->getId();
         return DfFavorite::where('target_id', $DocId)->where('user_id', $userId)->exists();
     }
 
@@ -400,8 +401,9 @@ class DynamicFactoryDocumentHandler
      * @param string $df Id board id
      * @param string $userId  user id
      */
-    public function addFavorite($DocId, $userId)
+    public function addFavorite($DocId, $userId = null)
     {
+        if($userId == null) $userId = auth()->user()->getId();
         if ($this->hasFavorite($DocId, $userId) === true) {
             throw new AlreadyExistFavoriteHttpException;
         }
@@ -421,8 +423,9 @@ class DynamicFactoryDocumentHandler
      * @param string $userId  user id
      * @return void
      */
-    public function removeFavorite($DocId, $userId)
+    public function removeFavorite($DocId, $userId = null)
     {
+        if($userId == null) $userId = auth()->user()->getId();
         if ($this->hasFavorite($DocId, $userId) === false) {
             throw new NotFoundFavoriteHttpException;
         }
