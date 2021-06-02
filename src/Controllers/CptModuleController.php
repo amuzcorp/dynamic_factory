@@ -79,6 +79,14 @@ class CptModuleController extends Controller
         XePresenter::share('config', $this->config);
 
         //공용으로 쓰이는 js 모음
+        app('xe.frontend')->js('assets/core/xe-ui-component/js/xe-form.js')->load();
+        app('xe.frontend')->js('assets/core/xe-ui-component/js/xe-page.js')->load();
+        app('xe.frontend')->js('assets/core/plugin/js/plugin-index.js')->before(
+            [
+                'assets/core/xe-ui-component/js/xe-page.js',
+                'assets/core/xe-ui-component/js/xe-form.js'
+            ]
+        )->load();
         app('xe.frontend')->js([Plugin::asset('assets/cpt_module_common.js')])->load();
     }
 
