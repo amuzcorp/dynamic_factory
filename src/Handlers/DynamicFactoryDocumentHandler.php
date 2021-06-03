@@ -56,6 +56,32 @@ class DynamicFactoryDocumentHandler
         $this->voteCounter = $voteCounter;
     }
 
+    /**
+     * get read counter
+     *
+     * @return Counter
+     */
+    public function getReadCounter()
+    {
+        return $this->readCounter;
+    }
+
+    /**
+     * get vote counter
+     *
+     * @return Counter
+     */
+    public function getVoteCounter()
+    {
+        return $this->voteCounter;
+    }
+
+    /**
+     * 글 등록
+     *
+     * @param $attributes
+     * @return CptDocument
+     */
     public function store($attributes)
     {
         $cpt_id = $attributes['cpt_id'];
@@ -94,7 +120,7 @@ class DynamicFactoryDocumentHandler
                     break;
             }
         }
-//        dd($attributes, 1);
+
         $doc = $this->documentHandler->add($attributes);
 
         $cptDoc = CptDocument::division($cpt_id)->find($doc->id);
@@ -105,6 +131,13 @@ class DynamicFactoryDocumentHandler
         return $cptDoc;
     }
 
+    /**
+     * 글 수정
+     *
+     * @param CptDocument $doc
+     * @param $inputs
+     * @return CptDocument
+     */
     public function update(CptDocument $doc, $inputs)
     {
         $attributes = $doc->getAttributes();
@@ -152,6 +185,13 @@ class DynamicFactoryDocumentHandler
         return $doc->find($doc->id);
     }
 
+    /**
+     * increment read count
+     *
+     * @param CptDocument $doc
+     * @param UserInterface $user
+     * @return void
+     */
     public function incrementReadCount(CptDocument $doc, UserInterface $user)
     {
         if ($this->readCounter->has($doc->id, $user) === false) {
@@ -440,6 +480,76 @@ class DynamicFactoryDocumentHandler
         }
 
         DfFavorite::where('target_id', $DocId)->where('user_id', $userId)->delete();
+    }
+
+    /**
+     * @param CptDocument   $document
+     * @param UserInterface $user
+     * @param string        $option 'assent' or 'dissent'
+     * @param int           $point  vote point
+     * @return void
+     */
+    public function vote(CptDocument $document, UserInterface $user, $option, $point = 1)
+    {
+        if ($this->voteCounter->has($document->id, $user, $option) === false) {
+            $this->incrementVoteCount($document, $user, $option, $point);
+        } else {
+            $this->decrementVoteCount($document, $user, $option);
+        }
+    }
+
+    /**
+     * increment vote count
+     *
+     * @param CptDocument   $document
+     * @param UserInterface $user   user
+     * @param string        $option 'assent' or 'dissent'
+     * @param int           $point  vote point
+     * @return void
+     */
+    public function incrementVoteCount(CptDocument $document, UserInterface $user, $option, $point = 1)
+    {
+        $this->voteCounter->add($document->id, $user, $option, $point);
+
+        $columnName = 'assent_count';
+        if ($option == 'dissent') {
+            $columnName = 'dissent_count';
+        }
+        $document->{$columnName} = $this->voteCounter->getPoint($document->id, $option);
+        $document->save();
+    }
+
+    /**
+     * decrement vote count
+     *
+     * @param CptDocument   $document
+     * @param UserInterface $user   user
+     * @param string        $option 'assent' or 'dissent'
+     * @return void
+     */
+    public function decrementVoteCount(CptDocument $document, UserInterface $user, $option)
+    {
+        $this->voteCounter->remove($document->id, $user, $option);
+
+        $columnName = 'assent_count';
+        if ($option == 'dissent') {
+            $columnName = 'dissent_count';
+        }
+        $document->{$columnName} = $this->voteCounter->getPoint($document->id, $option);
+        $document->save();
+    }
+
+    /**
+     * has vote
+     *
+     * @param CptDocument   $document
+     * @param UserInterface $user user
+     * @param string        $option 'assent' or 'dissent'
+     * @return bool
+     */
+    public function hasVote(CptDocument $document, $user, $option)
+    {
+        return $this->voteCounter->has($document->id, $user, $option);
     }
 
 }

@@ -87,6 +87,18 @@ class CptModule extends AbstractModule
 
             Route::delete('/destroy/{id}', ['as' => 'destroy', 'uses' => 'CptModuleController@destroy']);
 
+            Route::post('/vote/{option}/{id}', ['as' => 'vote', 'uses' => 'CptModuleController@vote']);
+            Route::get('/vote/show/{id}', ['as' => 'showVote', 'uses' => 'CptModuleController@showVote']);
+            Route::get('/vote/users/{option}/{id}', [
+                'as' => 'votedUsers', 'uses' => 'CptModuleController@votedUsers'
+            ]);
+            Route::get('/vote/modal/{option}/{id}', [
+                'as' => 'votedModal', 'uses' => 'CptModuleController@votedModal'
+            ]);
+            Route::get('/vote/userList/{option}/{id}', [
+                'as' => 'votedUserList', 'uses' => 'CptModuleController@votedUserList'
+            ]);
+
             Route::post('/favorite/{id}', ['as' => 'favorite', 'uses' => 'CptModuleController@favorite']);
 
             Route::get('/{slug}', ['as' => 'slug', 'uses' => 'CptModuleController@slug']);
@@ -309,8 +321,7 @@ class CptModule extends AbstractModule
      */
     public static function getInstanceSettingURI($instanceId)
     {
-//        return route('settings.cpt.cpt.config', $instanceId);
-        return route('settings.cpt.cpt.skin', $instanceId);
+        return route('settings.cpt.cpt.config', $instanceId);
     }
 
     /**
@@ -324,7 +335,7 @@ class CptModule extends AbstractModule
         static $items = [];
 
         if (!isset($items[$id])) {
-            $items[$id] = \Overcode\XePlugin\DynamicFactory\Models\CptDocument::find($id);
+            $items[$id] = CptDocument::find($id);
         }
 
         return $items[$id];

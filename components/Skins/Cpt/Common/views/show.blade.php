@@ -36,6 +36,27 @@
     @endforeach
     <div class="read_footer">
         <div class="bd_function">
+            <div class="bd_function_l">
+                <!-- [D] 클릭시 클래스 on 적용 및 bd_like_more 영역 diplay:block -->
+                @if ($config->get('assent') == true)
+                    <a href="#" data-url="{{ $cptUrlHandler->get('vote', ['option' => 'assent', 'id' => $item->id]) }}" class="bd_ico bd_like @if($documentHandler->hasVote($item, Auth::user(), 'assent') === true) voted @endif"><i class="xi-thumbs-up"></i><span class="xe-sr-only">{{ trans('board::like') }}</span></a>
+                    <a href="#" data-url="{{ $cptUrlHandler->get('votedUsers', ['option' => 'assent', 'id' => $item->id]) }}" class="bd_like_num" data-id="{{$item->id}}">{{$item->assent_count}}</a>
+                @endif
+
+                @if ($config->get('dissent') == true)
+                    <a href="#" data-url="{{ $cptUrlHandler->get('vote', ['option' => 'dissent', 'id' => $item->id]) }}" class="bd_ico bd_like @if($documentHandler->hasVote($item, Auth::user(), 'dissent') === true) voted @endif"><i class="xi-thumbs-down"></i><span class="xe-sr-only">{{ trans('board::hate') }}</span></a>
+                    <a href="#" data-url="{{ $cptUrlHandler->get('votedUsers', ['option' => 'dissent', 'id' => $item->id]) }}" class="bd_like_num bd_hate_num" data-id="{{$item->id}}">{{$item->dissent_count}}</a>
+                @endif
+
+                @if (Auth::check() === true)
+                    <a href="#" data-url="{{$cptUrlHandler->get('favorite', ['id' => $item->id])}}" class="bd_ico bd_favorite @if($item->favorite !== null) on @endif __xe-bd-favorite"><i class="xi-star"></i><span class="xe-sr-only">{{ trans('board::favorite') }}</span></a>
+                @endif
+
+                {!! uio('share', [
+                    'item' => $item,
+                    'url' => Request::url(),
+                ]) !!}
+            </div>
             <div class="bd_function_r">
                 <a href="{{ $cptUrlHandler->get('index', array_merge(Request::all())) }}" class="bd_ico bd_list"><i class="xi-list"></i><span class="xe-sr-only">리스트</span></a>
                 @if($isManager == true || $item->user_id == Auth::user()->getId() || $item->user_type === $item::USER_TYPE_GUEST)
