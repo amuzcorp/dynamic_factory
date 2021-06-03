@@ -142,6 +142,53 @@ class DynamicFactoryConfigHandler
         return $sortListColumns;
     }
 
+    /**
+     * Dynamic Factory Config 정렬 리스트와 라벨을 가져온다
+     *
+     * @param ConfigEntity $config
+     * @return array
+     */
+    public function getOrderListColumns(ConfigEntity $config)
+    {
+        if (empty($config->get('sortListColumns'))) {
+            $sortListColumns = self::DEFAULT_LIST_COLUMNS;
+        } else {
+            $sortListColumns = $config->get('sortListColumns');
+        }
+
+        $columnLabels = self::COLUMN_LABELS;
+
+        $dynamicFields = $this->getDynamicFields($config);
+        $currentDynamicFields = [];
+
+        foreach ($dynamicFields as $dynamicFieldConfig) {
+            if($dynamicFieldConfig->get('use') === true) {
+                $df_id = $dynamicFieldConfig->get('id');
+
+                $type = app('xe.dynamicField')->getType($config->get('documentGroup'), $df_id);
+                foreach ($type->getColumns() as $column) {
+                    $column_name = sprintf('%s_%s', $df_id, $column->get('name'));
+                    $currentDynamicFields[] = $column_name;
+
+                    if (in_array($column_name, $sortListColumns) === false) {
+                        $sortListColumns[] = $column_name;
+                    }
+
+                    $columnLabels[$column_name] = xe_trans($dynamicFieldConfig->get('label'));
+                }
+            }
+        }
+
+        $usableColumns = array_merge(self::DEFAULT_LIST_COLUMNS, $currentDynamicFields);
+        foreach ($sortListColumns as $index => $column) {
+            if (in_array($column, $usableColumns) === false) {
+                unset($sortListColumns[$index]);
+            }
+        }
+
+        return compact('sortListColumns', 'columnLabels');
+    }
+
     public function getSortFormColumns(ConfigEntity $config)
     {
         if (empty($config->get('sortFormColumns'))) {

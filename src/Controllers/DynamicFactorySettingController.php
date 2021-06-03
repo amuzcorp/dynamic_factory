@@ -357,13 +357,12 @@ class DynamicFactorySettingController extends BaseController
 
         $config = $this->configHandler->getConfig($cpt_id);
 
-        $sortListColumns = $this->configHandler->getSortListColumns($config);
-        $columnLabels = $this->configHandler->getColumnLabels($config);
+        $orderList = $this->configHandler->getOrderListColumns($config);
 
         return $this->presenter->make('dynamic_factory::views.settings.edit_orders', [
             'cpt' => $cpt,
-            'sortListColumns' => $sortListColumns,
-            'columnLabels' => $columnLabels,
+            'sortListColumns' => $orderList['sortListColumns'],
+            'columnLabels' => $orderList['columnLabels'],
             'config' => $config
         ]);
     }

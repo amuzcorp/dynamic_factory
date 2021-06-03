@@ -87,7 +87,7 @@
                     <label for="field_id">필드명</label>
                     <select class="form-control" id="field_id" aria-describedby="fieldIdHelp">
                         @foreach($sortListColumns as $column)
-                            <option value="{{ $column }}">{{ xe_trans($columnLabels[$column]) }} ({{ $column }})</option>
+                            <option value="{{ $column }}">{{ array_get($columnLabels, $column) }} ({{ $column }})</option>
                         @endforeach
                     </select>
                     <small id="fieldIdHelp" class="form-text text-muted">정렬할 필드를 선택하세요.</small>
