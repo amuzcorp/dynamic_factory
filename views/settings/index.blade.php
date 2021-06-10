@@ -1,6 +1,3 @@
-@php
-    use Overcode\XePlugin\DynamicFactory\Handlers\DynamicFactoryHandler;
-@endphp
 @section('page_title')
     <h2>사용자 정의 문서 관리</h2>
 @endsection
