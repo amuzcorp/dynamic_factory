@@ -3,7 +3,7 @@
     <select name="category_slug" class="form-control">
         <option value="">출력할 카테고리를 선택해주세요</option>
         @foreach($categoryExtras as $extra)
-            <option value="{{ $extra->slug }}" @if( +array_get($args, 'category_slug') === $extra->slug) selected @endif>{{ xe_trans($extra->category->name) }}</option>
+            <option value="{{ $extra->slug }}" @if( array_get($args, 'category_slug') === (string) $extra->slug) selected @endif>{{ xe_trans($extra->category->name) }}</option>
         @endforeach
     </select>
 </div>

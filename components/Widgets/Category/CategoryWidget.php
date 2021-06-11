@@ -7,6 +7,7 @@ use View;
 use Xpressengine\Widget\AbstractWidget;
 use Xpressengine\Menu\Models\MenuItem;
 use Xpressengine\Routing\InstanceRoute;
+use Overcode\XePlugin\DynamicFactory\Models\DfTaxonomy;
 
 class CategoryWidget extends AbstractWidget
 {
@@ -27,10 +28,13 @@ class CategoryWidget extends AbstractWidget
         // 카테고리
         $dfService = app('overcode.df.service');
         $category = $dfService->getCategoryExtras()->where('slug', $widgetConfig['category_slug'])->first();
-
         // 카테고리 아이템
         $categoryItems = $taxonomyHandler->getCategoryItemAttributes($category->category_id);
         $fieldTypes = $taxonomyHandler->getCategoryFieldTypes($category->category_id);
+
+        foreach($categoryItems as $categoryItem) {
+            $categoryItem->selected_item = DfTaxonomy::where('item_ids', 'like', '%"'.$categoryItem->id.'"%')->count();
+        }
 
         // 선택한 인스턴스 URL
         $instanceUrl = '';
