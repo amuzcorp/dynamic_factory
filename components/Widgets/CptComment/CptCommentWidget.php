@@ -8,6 +8,7 @@ use View;
 use Xpressengine\Category\Models\CategoryItem;
 use Xpressengine\Plugins\Comment\Models\Comment;
 use Xpressengine\Widget\AbstractWidget;
+use Xpressengine\Plugins\Comment\Models\Target;
 
 class CptCommentWidget extends AbstractWidget
 {
@@ -77,6 +78,8 @@ class CptCommentWidget extends AbstractWidget
 
         $comments = $this->getCommentList($targetType, $cpt_id, $instanceId, $widgetConfig, $CPTDocumentIds);
         foreach($comments as $comment) {
+            $target_id = Target::where('doc_id', $comment->id)->value('target_id');
+            $comment->cpt_title = CptDocument::find($target_id)->title;
             $comment->user_profile_image_id = \XeUser::where('id', $comment->user_id)->first()->getProfileImage();
         }
 
