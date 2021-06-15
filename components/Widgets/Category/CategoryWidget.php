@@ -36,6 +36,8 @@ class CategoryWidget extends AbstractWidget
             $categoryItem->selected_item = DfTaxonomy::where('item_ids', 'like', '%"'.$categoryItem->id.'"%')->count();
         }
 
+//        $taxonomies = $this->taxonomyHandler->getTaxonomies($cpt_id);
+
         // 선택한 인스턴스 URL
         $instanceUrl = '';
         if($widgetConfig['instance_id'] !== '') {
