@@ -1,6 +1,3 @@
-@php
-    use Overcode\XePlugin\DynamicFactory\Handlers\DynamicFactoryHandler;
-@endphp
 @section('page_title')
     <h2>사용자 정의 문서 관리</h2>
 @endsection
@@ -22,7 +19,7 @@
                 @foreach($cpts as $cpt)
                     <li class="list-group-item">
                         <div class="left-group">
-                            <span class="plugin-title">{{ $cpt->cpt_name }}</span>
+                            <span class="plugin-title"><a href="{{ route('dyFac.setting.'.$cpt->cpt_id) }}">{{ $cpt->cpt_name }}</a></span>
                             <dl>
                                 <dt class="sr-only">ID</dt>
                                 <dd title="ID">{{ $cpt->cpt_id }}</dd>
@@ -58,7 +55,7 @@
                 @foreach($cpts_fp as $cpt)
                     <li class="list-group-item">
                         <div class="left-group">
-                            <span class="plugin-title">{{ $cpt->cpt_name }}</span>
+                            <span class="plugin-title"><a href="{{ route('dyFac.setting.'.$cpt->cpt_id) }}">{{ $cpt->cpt_name }}</a></span>
                             <dl>
                                 <dt class="sr-only">ID</dt>
                                 <dd title="ID">{{ $cpt->cpt_id }}</dd>

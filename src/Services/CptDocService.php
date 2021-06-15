@@ -59,6 +59,10 @@ class CptDocService
             }
         }
 
+        $dfConfig = app('overcode.df.configHandler')->getConfig($config->get('cpt_id'));
+        $orders = $dfConfig->get('orders', []); // dyFac Config 의 정렬 정보를 가져옴
+        $request->request->add(['orders' => $orders]);
+
         $this->handler->makeWhere($query, $request, $config);
         $this->handler->makeOrder($query, $request, $config);
 

@@ -87,6 +87,18 @@ class CptModule extends AbstractModule
 
             Route::delete('/destroy/{id}', ['as' => 'destroy', 'uses' => 'CptModuleController@destroy']);
 
+            Route::post('/vote/{option}/{id}', ['as' => 'vote', 'uses' => 'CptModuleController@vote']);
+            Route::get('/vote/show/{id}', ['as' => 'showVote', 'uses' => 'CptModuleController@showVote']);
+            Route::get('/vote/users/{option}/{id}', [
+                'as' => 'votedUsers', 'uses' => 'CptModuleController@votedUsers'
+            ]);
+            Route::get('/vote/modal/{option}/{id}', [
+                'as' => 'votedModal', 'uses' => 'CptModuleController@votedModal'
+            ]);
+            Route::get('/vote/userList/{option}/{id}', [
+                'as' => 'votedUserList', 'uses' => 'CptModuleController@votedUserList'
+            ]);
+
             Route::match(['get','post'],'/favorite/{id}', ['as' => 'favorite', 'uses' => 'CptModuleController@favorite']);
 
             Route::match(['get','post'],'/{slug}', ['as' => 'slug', 'uses' => 'CptModuleController@slug']);

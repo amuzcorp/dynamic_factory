@@ -14,7 +14,7 @@
 </div>
 <div class="form-group" id="author_form_group" style="display: none;">
     <label class="xe-form__label--requried">문서 조회 조건</label>
-    <select name="author" class="form-control __xe_skin_id">
+    <select name="author" class="form-control">
         <option value="any" @if($config !== null && $config->get('author') === 'any') selected="selected"@endif>모든 글</option>
         <option value="author" @if($config !== null && $config->get('author') === 'author') selected="selected"@endif>자신이 작성한 글만</option>
     </select>

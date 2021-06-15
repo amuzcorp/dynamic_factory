@@ -36,6 +36,17 @@
                     </div>
                     <div class="pull-right">
                         <form id="__xe_search_form" class="input-group search-group">
+                            <div class="input-group-btn __xe_btn_order_type">
+                                <input type="hidden" name="order_type" value="{{ Request::get('order_type') }}">
+                                <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false"><span class="__xe_text">{{Request::has('order_type') && Request::get('order_type') != '' ? $orderNames[Request::get('order_type')] : '정렬'}}</span> <span class="caret"></span></button>
+                                <ul class="dropdown-menu" role="menu">
+                                    <li @if(Request::get('order_type') == '') class="active" @endif><a href="#" value="">정렬</a></li>
+                                    <li @if(Request::get('order_type') == 'assent_count') class="active" @endif><a href="#" value="assent_count">{{ $orderNames['assent_count'] }}</a></li>
+                                    <li @if(Request::get('order_type') == 'recently_created') class="active" @endif><a href="#" value="recently_created">{{ $orderNames['recently_created'] }}</a></li>
+                                    <li @if(Request::get('order_type') == 'recently_published') class="active" @endif><a href="#" value="recently_published">{{ $orderNames['recently_published'] }}</a></li>
+                                    <li @if(Request::get('order_type') == 'recently_updated') class="active" @endif><a href="#" value="recently_updated">{{ $orderNames['recently_updated'] }}</a></li>
+                                </ul>
+                            </div>
                             <div class="input-group-btn __xe_btn_search_target">
                                 <input type="hidden" name="search_target" value="{{ Request::get('search_target') }}">
                                 <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false"><span class="__xe_text">{{Request::has('search_target') && Request::get('search_target') != '' ? xe_trans('board::' . $searchTargetWord) : xe_trans('xe::select')}}</span> <span class="caret"></span></button>
@@ -194,6 +205,18 @@
 
             $(this).closest('.dropdown-menu').find('li').removeClass('active');
             $(this).closest('li').addClass('active');
+        });
+
+        $('.__xe_btn_order_type .dropdown-menu a').click(function (e) {
+            e.preventDefault();
+
+            $('[name="order_type"]').val($(this).attr('value'));
+            $('.__xe_btn_order_type .__xe_text').text($(this).text());
+
+            $(this).closest('.dropdown-menu').find('li').removeClass('active');
+            $(this).closest('li').addClass('active');
+
+            $('#__xe_search_form').submit();
         });
     });
 

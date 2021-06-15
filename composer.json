@@ -75,6 +75,29 @@
                     "name": "기본 스킨",
                     "description": "CPT 관련 게시물 리스트 위젯용 기본 스킨"
                 },
+
+                "widget/cpt@category": {
+                  "class": "Overcode\\XePlugin\\DynamicFactory\\Components\\Widgets\\Category\\CategoryWidget",
+                  "name": "카테고리 위젯",
+                  "description": "카테고리 위젯"
+                },
+                "widget/cpt@category/skin/cpt@default": {
+                  "class": "Overcode\\XePlugin\\DynamicFactory\\Components\\Widgets\\Category\\Skins\\Common\\CommonSkin",
+                  "name": "기본 스킨",
+                  "description": "카테고리 위젯 기본 스킨"
+                },
+
+                "widget/cpt@comment": {
+                  "class": "Overcode\\XePlugin\\DynamicFactory\\Components\\Widgets\\CptComment\\CptCommentWidget",
+                  "name": "CPT 댓글 위젯",
+                  "description": "CPT 댓글 위젯"
+                },
+                "widget/cpt@comment/skin/cpt@default": {
+                  "class": "Overcode\\XePlugin\\DynamicFactory\\Components\\Widgets\\CptComment\\Skins\\Common\\CommonSkin",
+                  "name": "CPT 댓글 위젯 기본 스킨",
+                  "description": "CPT 댓글 위젯 기본 스킨"
+                },
+
                 "uiobject/df@taxo_select": {
                     "class": "Overcode\\XePlugin\\DynamicFactory\\Components\\UIObjects\\TaxoSelect\\TaxoSelectUIObject",
                     "name": "Taxonomy select UIO",

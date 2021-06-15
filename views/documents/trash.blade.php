@@ -160,6 +160,8 @@
                 return;
             }
 
+            if(mode == 'destroy' && !confirm('이 동작은 되돌릴 수 없습니다. 계속 하시겠습니까?')) return false;
+
             var $f = $('.__xe_form_list');
             $('<input>').attr('type', 'hidden').attr('name', 'redirect').val(location.href).appendTo($f);
 

@@ -2,6 +2,7 @@
 
 namespace Overcode\XePlugin\DynamicFactory\Controllers;
 
+use Overcode\XePlugin\DynamicFactory\Models\Cpt;
 use Overcode\XePlugin\DynamicFactory\Plugin;
 use Overcode\XePlugin\DynamicFactory\Components\Modules\Cpt\CptModule;
 use Overcode\XePlugin\DynamicFactory\Exceptions\NotFoundDocumentException;
@@ -21,6 +22,7 @@ use XeSEO;
 use App\Http\Controllers\Controller;
 use Overcode\XePlugin\DynamicFactory\Handlers\CptModuleConfigHandler;
 use Overcode\XePlugin\DynamicFactory\Handlers\CptUrlHandler;
+use Xpressengine\Counter\Exceptions\GuestNotSupportException;
 use Xpressengine\Editor\PurifierModules\EditorContent;
 use Xpressengine\Http\Request;
 use Xpressengine\Media\MediaManager;
@@ -30,6 +32,7 @@ use Xpressengine\Routing\InstanceConfig;
 use Xpressengine\Support\Exceptions\AccessDeniedHttpException;
 use Xpressengine\Support\Purifier;
 use Xpressengine\Support\PurifierModules\Html5;
+use Xpressengine\User\Models\User;
 
 class CptModuleController extends Controller
 {
@@ -462,5 +465,175 @@ class CptModuleController extends Controller
         }
 
         return \XePresenter::makeApi(['favorite' => $favorite]);
+    }
+
+    /**
+     * 투표 정보
+     *
+     * @param Request $request request
+     * @param string  $id      document id
+     * @return \Xpressengine\Presenter\Presentable
+     */
+    public function showVote(Request $request, $id)
+    {
+        // display 설정
+        $display =['assent' => true, 'dissent' => true];
+        if ($this->config->get('assent') !== true) {
+            $display['assent'] = false;
+        }
+
+        if ($this->config->get('dissent') !== true) {
+            $display['dissent'] = false;
+        }
+
+        $user = Auth::user();
+
+        $item = CptDocument::division($this->instanceId)->find($id);
+
+        $voteCounter = $this->dfDocHandler->getVoteCounter();
+        $vote = $voteCounter->getByName($id, $user);
+
+        return XePresenter::makeApi([
+            'display' => $display,
+            'id' => $id,
+            'counts' => [
+                'assent' => $item->assent_count,
+                'dissent' => $item->dissent_count,
+            ],
+            'voteAt' => $vote ? $vote->counter_option : null,
+        ]);
+    }
+
+    /**
+     * 좋아요 추가, 삭제
+     *
+     * @param Request $request request
+     * @param string  $menuUrl first segment
+     * @param string  $option  options
+     * @param string  $id      document id
+     * @return \Xpressengine\Presenter\Presentable
+     */
+    public function vote(Request $request, $menuUrl, $option, $id)
+    {
+        $author = Auth::user();
+
+        $item = CptDocument::division($this->instanceId)->find($id);
+
+        try {
+            $this->dfDocHandler->vote($item, $author, $option);
+        } catch (GuestNotSupportException $e) {
+            throw new AccessDeniedHttpException;
+        }
+
+        return $this->showVote($request, $id);
+    }
+
+    /**
+     * get voted user list
+     *
+     * @param Request $request request
+     * @param string  $menuUrl first segment
+     * @param string  $option  options
+     * @param string  $id      document id
+     * @return mixed
+     */
+    public function votedUsers(Request $request, $menuUrl, $option, $id)
+    {
+        $limit = $request->get('limit', 10);
+
+        $item = CptDocument::division($this->instanceId)->find($id);
+
+        $counter = $this->dfDocHandler->getVoteCounter();
+        $logModel = $counter->newModel();
+        $logs = $logModel->where('counter_name', $counter->getName())->where('target_id', $id)
+            ->where('counter_option', $option)->take($limit)->get();
+
+        return api_render('votedUsers', [
+            'urlHandler' => $this->cptUrlHandler,
+            'option' => $option,
+            'item' => $item,
+            'logs' => $logs,
+        ]);
+    }
+
+    /**
+     * get voted user modal
+     *
+     * @param Request $request request
+     * @param string  $menuUrl first segment
+     * @param string  $option  options
+     * @param string  $id      document id
+     * @return mixed
+     */
+    public function votedModal(Request $request, $menuUrl, $option, $id)
+    {
+        $item = CptDocument::division($this->instanceId)->find($id);
+
+        $counter = $this->dfDocHandler->getVoteCounter();
+        $logModel = $counter->newModel();
+        $count = $logModel->where('counter_name', $counter->getName())->where('target_id', $id)
+            ->where('counter_option', $option)->count();
+
+        return api_render('votedModal', [
+            'urlHandler' => $this->cptUrlHandler,
+            'option' => $option,
+            'item' => $item,
+            'count' => $count,
+        ]);
+    }
+
+    /**
+     * get voted user list
+     *
+     * @param Request $request request
+     * @param string  $menuUrl first segment
+     * @param string  $option  options
+     * @param string  $id      document id
+     * @return mixed
+     */
+    public function votedUserList(Request $request, $menuUrl, $option, $id)
+    {
+        $startId = $request->get('startId');
+        $limit = $request->get('limit', 10);
+
+        $item = CptDocument::division($this->instanceId)->find($id);
+
+        $counter = $this->dfDocHandler->getVoteCounter();
+        $logModel = $counter->newModel();
+        $query = $logModel->where('counter_name', $counter->getName())->where('target_id', $id)
+            ->where('counter_option', $option);
+
+        if ($startId != null) {
+            $query->where('id', '<', $startId);
+        }
+
+        $logs = $query->orderBy('id', 'desc')->take($limit)->get();
+        $list = [];
+        foreach ($logs as $log) {
+            /** @var User $user */
+            $user = $log->user;
+            $profilePage = '#';
+            if ($user->getId() != '') {
+                $profilePage = route('user.profile', ['user' => $user->getId()]);
+            }
+            $list[] = [
+                'id' => $user->getId(),
+                'displayName' => $user->getDisplayName(),
+                'profileImage' => $user->getProfileImage(),
+                'createdAt' => (string)$log->created_at,
+                'profilePage' => $profilePage,
+            ];
+        }
+
+        $nextStartId = 0;
+        if (count($logs) == $limit) {
+            $nextStartId = $logs->last()->id;
+        }
+
+        return XePresenter::makeApi([
+            'item' => $item,
+            'list' => $list,
+            'nextStartId' => $nextStartId,
+        ]);
     }
 }

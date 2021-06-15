@@ -164,7 +164,7 @@ class DynamicFactorySettingController extends BaseController
 
         $cpt = $this->dfService->storeCpt($request);
 
-        return redirect()->route('dyFac.setting.index');
+        return redirect()->route('dyFac.setting.index')->with('alert', ['type' => 'success', 'message' => xe_trans('xe::saved')]);;
     }
 
     /**
@@ -197,7 +197,7 @@ class DynamicFactorySettingController extends BaseController
         $this->validate($request, $this->cptValidatorHandler->getUpdateRules());  // CPT 유효성 검사
         $cpt = $this->dfService->updateCpt($request);
 
-        return redirect()->route('dyFac.setting.edit', ['cpt_id' => $request->cpt_id]);
+        return redirect()->back()->with('alert', ['type' => 'success', 'message' => xe_trans('xe::saved')]);
     }
 
     public function cpt_taxonomy(){
@@ -320,8 +320,7 @@ class DynamicFactorySettingController extends BaseController
     {
         $cpt = $this->dfService->getItem($cpt_id);
 
-        $configName = $this->configHandler->getConfigName($cpt_id);
-        $config = $this->configHandler->get($configName);
+        $config = $this->configHandler->getConfig($cpt_id);
 
         $sortListColumns = $this->configHandler->getSortListColumns($config);
         $sortFormColumns = $this->configHandler->getSortFormColumns($config);
@@ -340,9 +339,7 @@ class DynamicFactorySettingController extends BaseController
 
     public function updateColumns($cpt_id, Request $request)
     {
-        $configName = $this->configHandler->getConfigName($cpt_id);
-
-        $config = $this->configHandler->get($configName);
+        $config = $this->configHandler->getConfig($cpt_id);
         $inputs = $request->except('_token');
 
         foreach ($inputs as $key => $val) {
@@ -351,7 +348,42 @@ class DynamicFactorySettingController extends BaseController
 
         $this->configHandler->modifyConfig($config);
 
-        return redirect()->route('dyFac.setting.edit_columns', ['cpt_id' => $cpt_id]);
+        return redirect()->back()->with('alert', ['type' => 'success', 'message' => xe_trans('xe::saved')]);
+    }
+
+    public function editOrders($cpt_id)
+    {
+        $cpt = $this->dfService->getItem($cpt_id);
+
+        $config = $this->configHandler->getConfig($cpt_id);
+
+        $orderList = $this->configHandler->getOrderListColumns($config);
+
+        return $this->presenter->make('dynamic_factory::views.settings.edit_orders', [
+            'cpt' => $cpt,
+            'sortListColumns' => $orderList['sortListColumns'],
+            'columnLabels' => $orderList['columnLabels'],
+            'config' => $config
+        ]);
+    }
+
+    public function updateOrders($cpt_id, Request $request)
+    {
+        $config = $this->configHandler->getConfig($cpt_id);
+        $inputs = $request->except('_token');
+
+        // 모두 삭제 했을 경우에 빈 배열을 저장한다
+        if(!isset($inputs['orders'])) {
+            $inputs['orders'] = [];
+        }
+
+        foreach ($inputs as $key => $val) {
+            $config->set($key, $val);
+        }
+
+        $this->configHandler->modifyConfig($config);
+
+        return redirect()->back()->with('alert', ['type' => 'success', 'message' => xe_trans('xe::saved')]);
     }
 
     public function cptDocument($type = 'list', Request $request)
@@ -379,11 +411,12 @@ class DynamicFactorySettingController extends BaseController
      */
     public function documentList(Cpt $cpt, Request $request)
     {
-
-//        \DB::connection()->enableQueryLog();
-        $cptDocs = $this->getCptDocuments($request, $cpt);
-//        $queries = \DB::getQueryLog();
-//        dd($queries);
+        $orderNames = [
+            'assent_count' => '추천순',
+            'recently_created' => '최신순',
+            'recently_published' => '최근 발행순',
+            'recently_updated' => '최근 수정순',
+        ];
 
         $stateTypeCounts = [
             'all' => CptDocument::cpt($cpt->cpt_id)->count(),
@@ -395,6 +428,8 @@ class DynamicFactorySettingController extends BaseController
 
         $config = $this->configHandler->getConfig($cpt->cpt_id);
         $column_labels = $this->configHandler->getColumnLabels($config);
+
+        $cptDocs = $this->getCptDocuments($request, $cpt, $config);
 
         $searchTargetWord = $request->get('search_target');
         if ($request->get('search_target') == 'pure_content') {
@@ -410,7 +445,8 @@ class DynamicFactorySettingController extends BaseController
             'config' => $config,
             'column_labels' => $column_labels,
             'searchTargetWord' => $searchTargetWord,
-            'stateTypeCounts' => $stateTypeCounts
+            'stateTypeCounts' => $stateTypeCounts,
+            'orderNames' => $orderNames
         ]);
     }
 
@@ -496,24 +532,45 @@ class DynamicFactorySettingController extends BaseController
     {
         $this->dfService->updateCptDocument($request);
 
-        return redirect()->route('dyFac.setting.'.$request->cpt_id, ['type' => 'edit', 'doc_id' => $request->doc_id]);
+//        return redirect()->route('dyFac.setting.'.$request->cpt_id, ['type' => 'edit', 'doc_id' => $request->doc_id]);
+        return redirect()->back()->with('alert', ['type' => 'success', 'message' => xe_trans('xe::saved')]);
     }
 
-    public function getCptDocuments($request, $cpt)
+    public function getCptDocuments($request, $cpt, $config)
     {
         $perPage = $request->get('perPage', 20);
 
-        $cptDocQuery = $this->dfService->getItemsWhereQuery(array_merge($request->all(), [
+        $query = $this->dfService->getItemsWhereQuery(array_merge($request->all(), [
             'force' => true,
             'cpt_id' => $cpt->cpt_id
         ]));
 
-        $cptDocQuery = $this->makeWhere($cptDocQuery, $request);
+        // 검색 조건 추가
+        $query = $this->makeWhere($query, $request);
 
-        $cptDocQuery = $cptDocQuery->orderBy('created_at','desc');
-        //$cptDocQuery = $this->dfService->getItemsOrderQuery($cptDocQuery, $request->all());
+        // 정렬
+        $orderType = $request->get('order_type', '');
 
-        $paginate = $cptDocQuery->paginate($perPage, ['*'], 'page')->appends($request->except('page'));
+        if ($orderType == '') {
+            // order_type 이 없을때만 dyFac Config 의 정렬을 우선 적용한다.
+            $orders = $config->get('orders', []);
+            foreach ($orders as $order) {
+                $arr_order = explode('|@|',$order);
+                $query->orderBy($arr_order[0], $arr_order[1]);
+            }
+
+            $query->orderBy('head', 'desc');
+        } elseif ($orderType == 'assent_count') {
+            $query->orderBy('assent_count', 'desc')->orderBy('head', 'desc');
+        } elseif ($orderType == 'recently_created') {
+            $query->orderBy(CptDocument::CREATED_AT, 'desc')->orderBy('head', 'desc');
+        } elseif ($orderType == 'recently_published') {
+            $query->orderBy('published_at', 'desc')->orderBy('head', 'desc');
+        } elseif ($orderType == 'recently_updated') {
+            $query->orderBy(CptDocument::UPDATED_AT, 'desc')->orderBy('head', 'desc');
+        }
+
+        $paginate = $query->paginate($perPage, ['*'], 'page')->appends($request->except('page'));
 
         $total = $paginate->total();
         $currentPage = $paginate->currentPage();

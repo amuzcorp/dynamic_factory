@@ -56,6 +56,32 @@ class DynamicFactoryDocumentHandler
         $this->voteCounter = $voteCounter;
     }
 
+    /**
+     * get read counter
+     *
+     * @return Counter
+     */
+    public function getReadCounter()
+    {
+        return $this->readCounter;
+    }
+
+    /**
+     * get vote counter
+     *
+     * @return Counter
+     */
+    public function getVoteCounter()
+    {
+        return $this->voteCounter;
+    }
+
+    /**
+     * 글 등록
+     *
+     * @param $attributes
+     * @return CptDocument
+     */
     public function store($attributes)
     {
         $cpt_id = $attributes['cpt_id'];
@@ -94,7 +120,7 @@ class DynamicFactoryDocumentHandler
                     break;
             }
         }
-//        dd($attributes, 1);
+
         $doc = $this->documentHandler->add($attributes);
 
         $cptDoc = CptDocument::division($cpt_id)->find($doc->id);
@@ -105,6 +131,13 @@ class DynamicFactoryDocumentHandler
         return $cptDoc;
     }
 
+    /**
+     * 글 수정
+     *
+     * @param CptDocument $doc
+     * @param $inputs
+     * @return CptDocument
+     */
     public function update(CptDocument $doc, $inputs)
     {
         $attributes = $doc->getAttributes();
@@ -152,6 +185,13 @@ class DynamicFactoryDocumentHandler
         return $doc->find($doc->id);
     }
 
+    /**
+     * increment read count
+     *
+     * @param CptDocument $doc
+     * @param UserInterface $user
+     * @return void
+     */
     public function incrementReadCount(CptDocument $doc, UserInterface $user)
     {
         if ($this->readCounter->has($doc->id, $user) === false) {
@@ -269,16 +309,25 @@ class DynamicFactoryDocumentHandler
     public function makeOrder(Builder $query, Request $request, ConfigEntity $config)
     {
         $orderType = $request->get('order_type', '');
-        if ($orderType === '' && $config->get('orderType') != null) {
-            $orderType = $config->get('orderType', '');
-        }
+//        if ($orderType === '' && $config->get('orderType') != null) {
+//            $orderType = $config->get('orderType', '');
+//        }
 
         if ($orderType == '') {
+            // order_type 이 없을때만 dyFac Config 의 정렬을 우선 적용한다.
+            $orders = $request->get('orders', []);
+            foreach ($orders as $order) {
+                $arr_order = explode('|@|',$order);
+                $query->orderBy($arr_order[0], $arr_order[1]);
+            }
+
             $query->orderBy('head', 'desc');
         } elseif ($orderType == 'assent_count') {
             $query->orderBy('assent_count', 'desc')->orderBy('head', 'desc');
         } elseif ($orderType == 'recently_created') {
             $query->orderBy(CptDocument::CREATED_AT, 'desc')->orderBy('head', 'desc');
+        } elseif ($orderType == 'recently_published') {
+            $query->orderBy('published_at', 'desc')->orderBy('head', 'desc');
         } elseif ($orderType == 'recently_updated') {
             $query->orderBy(CptDocument::UPDATED_AT, 'desc')->orderBy('head', 'desc');
         }
@@ -431,6 +480,76 @@ class DynamicFactoryDocumentHandler
         }
 
         DfFavorite::where('target_id', $DocId)->where('user_id', $userId)->delete();
+    }
+
+    /**
+     * @param CptDocument   $document
+     * @param UserInterface $user
+     * @param string        $option 'assent' or 'dissent'
+     * @param int           $point  vote point
+     * @return void
+     */
+    public function vote(CptDocument $document, UserInterface $user, $option, $point = 1)
+    {
+        if ($this->voteCounter->has($document->id, $user, $option) === false) {
+            $this->incrementVoteCount($document, $user, $option, $point);
+        } else {
+            $this->decrementVoteCount($document, $user, $option);
+        }
+    }
+
+    /**
+     * increment vote count
+     *
+     * @param CptDocument   $document
+     * @param UserInterface $user   user
+     * @param string        $option 'assent' or 'dissent'
+     * @param int           $point  vote point
+     * @return void
+     */
+    public function incrementVoteCount(CptDocument $document, UserInterface $user, $option, $point = 1)
+    {
+        $this->voteCounter->add($document->id, $user, $option, $point);
+
+        $columnName = 'assent_count';
+        if ($option == 'dissent') {
+            $columnName = 'dissent_count';
+        }
+        $document->{$columnName} = $this->voteCounter->getPoint($document->id, $option);
+        $document->save();
+    }
+
+    /**
+     * decrement vote count
+     *
+     * @param CptDocument   $document
+     * @param UserInterface $user   user
+     * @param string        $option 'assent' or 'dissent'
+     * @return void
+     */
+    public function decrementVoteCount(CptDocument $document, UserInterface $user, $option)
+    {
+        $this->voteCounter->remove($document->id, $user, $option);
+
+        $columnName = 'assent_count';
+        if ($option == 'dissent') {
+            $columnName = 'dissent_count';
+        }
+        $document->{$columnName} = $this->voteCounter->getPoint($document->id, $option);
+        $document->save();
+    }
+
+    /**
+     * has vote
+     *
+     * @param CptDocument   $document
+     * @param UserInterface $user user
+     * @param string        $option 'assent' or 'dissent'
+     * @return bool
+     */
+    public function hasVote(CptDocument $document, $user, $option)
+    {
+        return $this->voteCounter->has($document->id, $user, $option);
     }
 
 }

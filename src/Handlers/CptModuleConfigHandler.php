@@ -35,6 +35,8 @@ class CptModuleConfigHandler
      */
     protected $defaultConfig = [
         'perPage' => 10,
+        'assent' => true,
+        'dissent' => false,
     ];
 
     public function __construct(

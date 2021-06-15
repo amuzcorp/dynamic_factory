@@ -373,6 +373,9 @@ class Plugin extends AbstractPlugin
                 Route::get('/edit_columns/{cpt_id}', [ 'as' => 'edit_columns', 'uses' => 'DynamicFactorySettingController@editColumns' ]);
                 Route::post('/update_columns/{cpt_id}', [ 'as' => 'update_columns', 'uses' => 'DynamicFactorySettingController@updateColumns' ]);
 
+                Route::get('/edit_orders/{cpt_id}', [ 'as' => 'edit_orders', 'uses' => 'DynamicFactorySettingController@editOrders' ]);
+                Route::post('/update_orders/{cpt_id}', [ 'as' => 'update_orders', 'uses' => 'DynamicFactorySettingController@updateOrders' ]);
+
                 Route::get('/create_extra/{cpt_id}', [ 'as' => 'create_extra', 'uses' => 'DynamicFactorySettingController@createExtra' ]);
 
                 Route::get('/edit/{cpt_id}', [ 'as' => 'edit', 'uses' => 'DynamicFactorySettingController@edit' ]);
