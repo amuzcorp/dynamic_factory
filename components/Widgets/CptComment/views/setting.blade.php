@@ -8,7 +8,7 @@
 </div>
 
 <div class="form-group">
-    <label>정렬</label>
+    <label>댓글 정렬</label>
     <select name="order_type" class="form-control">
         <option value="recentlyCreated" @if(array_get($args, 'order_type') == 'recentlyCreated') selected="selected" @endif >최신순</option>
         <option value="recentlyUpdated" @if(array_get($args, 'order_type') == 'recentlyUpdated') selected="selected" @endif >최근 수정순</option>
@@ -21,7 +21,7 @@
     <input type="number" name="recent_date" class="form-control" value="{{array_get($args, 'recent_date')}}" />
 </div>
 <br>
-<p>글 설정</p>
+<p>댓글 설정</p>
 <hr>
 
 <div class="form-group">
@@ -34,12 +34,12 @@
     </select>
 </div>
 <div class="form-group">
-    <label>카테고리 선택</label>
+    <label>문서 카테고리 선택</label>
     <select name="categories" class="form-control" multiple></select>
 </div>
 
 <div class="form-group">
-    <label>글 수</label>
+    <label>댓글 수</label>
     <input type="number" name="take" class="form-control" value="{{array_get($args, 'take', 5)}}" />
 </div>
 
