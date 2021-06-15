@@ -76,20 +76,20 @@ class CptModule extends AbstractModule
     protected static function registerInstanceRoute()
     {
         Route::instance(self::getId(), function () {
-            Route::get('/', ['as' => 'index', 'uses' => 'CptModuleController@index']);
-            Route::get('/show/{id}', ['as' => 'show', 'uses' => 'CptModuleController@showByItemId']);
+            Route::match(['get','post'],'/', ['as' => 'index', 'uses' => 'CptModuleController@index']);
+            Route::match(['get','post'],'/show/{id}', ['as' => 'show', 'uses' => 'CptModuleController@showByItemId']);
 
-            Route::get('/create', ['as' => 'create', 'uses' => 'CptModuleController@create']);
+            Route::match(['get','post'],'/create', ['as' => 'create', 'uses' => 'CptModuleController@create']);
             Route::post('/store', ['as' => 'store', 'uses' => 'CptModuleController@store']);
 
-            Route::get('/edit/{id}', ['as' => 'edit', 'uses' => 'CptModuleController@edit']);
+            Route::match(['get','post'],'/edit/{id}', ['as' => 'edit', 'uses' => 'CptModuleController@edit']);
             Route::post('/update', ['as' => 'update', 'uses' => 'CptModuleController@update']);
 
             Route::delete('/destroy/{id}', ['as' => 'destroy', 'uses' => 'CptModuleController@destroy']);
 
-            Route::post('/favorite/{id}', ['as' => 'favorite', 'uses' => 'CptModuleController@favorite']);
+            Route::match(['get','post'],'/favorite/{id}', ['as' => 'favorite', 'uses' => 'CptModuleController@favorite']);
 
-            Route::get('/{slug}', ['as' => 'slug', 'uses' => 'CptModuleController@slug']);
+            Route::match(['get','post'],'/{slug}', ['as' => 'slug', 'uses' => 'CptModuleController@slug']);
         }, ['namespace' => 'Overcode\XePlugin\DynamicFactory\Controllers']);
 
         DfSlug::setReserved([
