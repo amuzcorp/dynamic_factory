@@ -78,28 +78,19 @@ class CptModule extends AbstractModule
         Route::instance(self::getId(), function () {
             Route::match(['get','post'],'/', ['as' => 'index', 'uses' => 'CptModuleController@index']);
             Route::match(['get','post'],'/show/{id}', ['as' => 'show', 'uses' => 'CptModuleController@showByItemId']);
-
             Route::match(['get','post'],'/create', ['as' => 'create', 'uses' => 'CptModuleController@create']);
-            Route::post('/store', ['as' => 'store', 'uses' => 'CptModuleController@store']);
-
             Route::match(['get','post'],'/edit/{id}', ['as' => 'edit', 'uses' => 'CptModuleController@edit']);
-            Route::post('/update', ['as' => 'update', 'uses' => 'CptModuleController@update']);
+            Route::match(['get','post'],'/favorite/{id}', ['as' => 'favorite', 'uses' => 'CptModuleController@favorite']);
 
+            Route::post('/store', ['as' => 'store', 'uses' => 'CptModuleController@store']);
+            Route::post('/update', ['as' => 'update', 'uses' => 'CptModuleController@update']);
             Route::delete('/destroy/{id}', ['as' => 'destroy', 'uses' => 'CptModuleController@destroy']);
 
             Route::post('/vote/{option}/{id}', ['as' => 'vote', 'uses' => 'CptModuleController@vote']);
             Route::get('/vote/show/{id}', ['as' => 'showVote', 'uses' => 'CptModuleController@showVote']);
-            Route::get('/vote/users/{option}/{id}', [
-                'as' => 'votedUsers', 'uses' => 'CptModuleController@votedUsers'
-            ]);
-            Route::get('/vote/modal/{option}/{id}', [
-                'as' => 'votedModal', 'uses' => 'CptModuleController@votedModal'
-            ]);
-            Route::get('/vote/userList/{option}/{id}', [
-                'as' => 'votedUserList', 'uses' => 'CptModuleController@votedUserList'
-            ]);
-
-            Route::match(['get','post'],'/favorite/{id}', ['as' => 'favorite', 'uses' => 'CptModuleController@favorite']);
+            Route::get('/vote/users/{option}/{id}', ['as' => 'votedUsers', 'uses' => 'CptModuleController@votedUsers']);
+            Route::get('/vote/modal/{option}/{id}', ['as' => 'votedModal', 'uses' => 'CptModuleController@votedModal']);
+            Route::get('/vote/userList/{option}/{id}', ['as' => 'votedUserList', 'uses' => 'CptModuleController@votedUserList']);
 
             Route::match(['get','post'],'/{slug}', ['as' => 'slug', 'uses' => 'CptModuleController@slug']);
         }, ['namespace' => 'Overcode\XePlugin\DynamicFactory\Controllers']);
