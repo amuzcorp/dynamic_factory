@@ -54,7 +54,6 @@ class CategoryWidget extends AbstractWidget
             'categoryItems',
             'instanceUrl',
             'parameterKey',
-            'categoryItems',
             'fieldTypes'
         ));
 
