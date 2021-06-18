@@ -87,6 +87,17 @@
                   "description": "카테고리 위젯 기본 스킨"
                 },
 
+                "widget/cpt@searchbar": {
+                  "class": "Overcode\\XePlugin\\DynamicFactory\\Components\\Widgets\\SearchBar\\SearchBarWidget",
+                  "name": "검색바 위젯",
+                  "description": "검색바 위젯"
+                },
+                "widget/cpt@searchbar/skin/cpt@default": {
+                  "class": "Overcode\\XePlugin\\DynamicFactory\\Components\\Widgets\\SearchBar\\Skins\\Common\\CommonSkin",
+                  "name": "기본 스킨",
+                  "description": "검색바 위젯 기본 스킨"
+                },
+
                 "widget/cpt@comment": {
                   "class": "Overcode\\XePlugin\\DynamicFactory\\Components\\Widgets\\CptComment\\CptCommentWidget",
                   "name": "CPT 댓글 위젯",
