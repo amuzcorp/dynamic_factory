@@ -26,7 +26,7 @@ class SearchBarWidget extends AbstractWidget
         $title = $widgetConfig['@attributes']['title'];
         $dfService = app('overcode.df.service');
 
-        $cateCount = 2;
+        $cateCount = $widgetConfig['category_count'];
         // 카테고리
         $datas = [];
         for($i = 0; $i < $cateCount; $i++) {
@@ -108,6 +108,9 @@ class SearchBarWidget extends AbstractWidget
 
         $taxonomyHandler = app('overcode.df.taxonomyHandler');
         $categoryExtras = $taxonomyHandler->getCategoryExtras();
+        foreach($categoryExtras as $key => $extra) {
+            $categoryExtras[$key]->category_name = xe_trans($extra->category->name);
+        }
         $menu_items = $this->getMenuItems();
 
         $view = View::make(sprintf('%s/views/setting', static::$path), [

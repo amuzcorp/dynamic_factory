@@ -28,44 +28,87 @@
 
 <p>카테고리 옵션</p>
 <hr>
-
 <div class="form-group">
-    <label>카테고리1 Name</label>
-    <input type="text" class="form-control" name="cate_1_name" placeholder="" value="{{array_get($args, 'cate_1_name')}}">
-</div>
-
-<div class="form-group">
-    <label>카테고리1 placeholder</label>
-    <input type="text" class="form-control" name="cate_1_placeholder" placeholder="" value="{{array_get($args, 'cate_1_placeholder')}}">
-</div>
-
-<div class="form-group">
-    <label>카테고리1 선택</label>
-    <select name="category_1" class="form-control">
-        <option value="">출력할 카테고리를 선택해주세요</option>
-        @foreach($categoryExtras as $extra)
-            <option value="{{ $extra->slug }}" @if( array_get($args, 'category_1') === (string) $extra->slug) selected @endif>{{ xe_trans($extra->category->name) }}</option>
-        @endforeach
+    <label>카테고리 갯수</label>
+    <select class="form-control" name="category_count" onchange="setCategoryCount()">
+        <option value="">카테고리 갯수를 선택해주세요</option>
+        <option value="1" @if(array_get($args, 'category_count') === '1') selected @endif>카테고리 1개</option>
+        <option value="2" @if(array_get($args, 'category_count') === '2') selected @endif>카테고리 2개</option>
+        <option value="3" @if(array_get($args, 'category_count') === '3') selected @endif>카테고리 3개</option>
+        <option value="4" @if(array_get($args, 'category_count') === '4') selected @endif>카테고리 4개</option>
     </select>
 </div>
+<br>
 
+<div id="categoryOptions">
+    @if(array_get($args, 'category_count'))
+        @for($i = 0; $i < +array_get($args, 'category_count'); $i++)
+            <div id="cate_{{$i+1}}">
+                <div class="form-group">
+                    <label>카테고리{{$i+1}} Name</label>
+                    <input type="text" class="form-control" name="cate_{{$i+1}}_name" placeholder="" value="{{array_get($args, 'cate_'.($i+1).'_name')}}">
+                </div>
 
-<div class="form-group">
-    <label>카테고리2 Name</label>
-    <input type="text" class="form-control" name="cate_2_name" placeholder="" value="{{array_get($args, 'cate_2_name')}}">
+                <div class="form-group">
+                    <label>카테고리{{$i+1}} placeholder</label>
+                    <input type="text" class="form-control" name="cate_{{$i+1}}_placeholder" placeholder="" value="{{array_get($args, 'cate_'.($i+1).'_placeholder')}}">
+                </div>
+
+                <div class="form-group">
+                    <label>카테고리{{$i+1}} 선택</label>
+                    <select name="category_{{$i+1}}" class="form-control">
+                        <option value="">출력할 카테고리를 선택해주세요</option>
+                        @foreach($categoryExtras as $extra)
+                            <option value="{{ $extra->slug }}" @if( array_get($args, 'category_'.($i+1)) === (string) $extra->slug) selected @endif>{{ xe_trans($extra->category->name) }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <hr>
+            </div>
+        @endfor
+    @endif
+
 </div>
 
-<div class="form-group">
-    <label>카테고리2 placeholder</label>
-    <input type="text" class="form-control" name="cate_2_placeholder" placeholder="" value="{{array_get($args, 'cate_2_placeholder')}}">
-</div>
+<script>
+    function setCategoryCount() {
+        var categories = @json($categoryExtras);
+        var category_count = +$('select[name=category_count]').val();
 
-<div class="form-group">
-    <label>카테고리2 선택</label>
-    <select name="category_2" class="form-control">
-        <option value="">출력할 카테고리를 선택해주세요</option>
-        @foreach($categoryExtras as $extra)
-            <option value="{{ $extra->slug }}" @if( array_get($args, 'category_2') === (string) $extra->slug) selected @endif>{{ xe_trans($extra->category->name) }}</option>
-        @endforeach
-    </select>
-</div>
+        var str = '';
+        for(let i = 0; i < category_count; i++) {
+            if(document.getElementById('cate_' + (i+1))) {
+                str+= '<div id="cate_'+(i+1)+'">';
+                str+= document.getElementById('cate_' + (i+1)).innerHTML;
+                str+= '</div>';
+            }
+            else {
+                str += '' +
+                    '<div id="cate_' + (i + 1) + '">' +
+                    '   <div class="form-group">' +
+                    '       <label>카테고리' + (i + 1) + ' Name</label>' +
+                    '       <input type="text" class="form-control" name="cate_' + (i + 1) + '_name" placeholder="" value="">' +
+                    '   </div>' +
+                    '   <div class="form-group">' +
+                    '       <label>카테고리' + (i + 1) + ' placeholder</label>' +
+                    '       <input type="text" class="form-control" name="cate_' + (i + 1) + '_placeholder" placeholder="" value="">' +
+                    '   </div>' +
+                    '   <div class="form-group">' +
+                    '       <label>카테고리' + (i + 1) + ' 선택</label>' +
+                    '       <select name="category_' + (i + 1) + '" class="form-control">' +
+                    '           <option value="">출력할 카테고리를 선택해주세요</option>';
+                    for (var key in categories) {
+                        str += '<option value="' + categories[key].slug + '">' + categories[key].category_name + '</option>';
+                    }
+                    str += '' +
+                    '       </select>' +
+                    '   </div>' +
+                    '   <hr>' +
+                    '</div>';
+            }
+        }
+
+        document.getElementById('categoryOptions').innerHTML = '';
+        document.getElementById('categoryOptions').innerHTML = str;
+    }
+</script>
