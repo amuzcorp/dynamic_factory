@@ -35,7 +35,6 @@
         <option value="1" @if(array_get($args, 'category_count') === '1') selected @endif>카테고리 1개</option>
         <option value="2" @if(array_get($args, 'category_count') === '2') selected @endif>카테고리 2개</option>
         <option value="3" @if(array_get($args, 'category_count') === '3') selected @endif>카테고리 3개</option>
-        <option value="4" @if(array_get($args, 'category_count') === '4') selected @endif>카테고리 4개</option>
     </select>
 </div>
 <br>
