@@ -11,10 +11,6 @@
     </select>
 </div>
 
-<div class="form-group">
-    <label>검색어 Parameter Key</label>
-    <input type="text" class="form-control" name="parameter_key" value="{{array_get($args, 'parameter_key')}}" >
-</div>
 
 <div class="form-group">
     <label>검색어 placeholder</label>
@@ -43,10 +39,6 @@
     @if(array_get($args, 'category_count'))
         @for($i = 0; $i < +array_get($args, 'category_count'); $i++)
             <div id="cate_{{$i+1}}">
-                <div class="form-group">
-                    <label>카테고리{{$i+1}} Name</label>
-                    <input type="text" class="form-control" name="cate_{{$i+1}}_name" placeholder="" value="{{array_get($args, 'cate_'.($i+1).'_name')}}">
-                </div>
 
                 <div class="form-group">
                     <label>카테고리{{$i+1}} placeholder</label>
@@ -84,10 +76,6 @@
             else {
                 str += '' +
                     '<div id="cate_' + (i + 1) + '">' +
-                    '   <div class="form-group">' +
-                    '       <label>카테고리' + (i + 1) + ' Name</label>' +
-                    '       <input type="text" class="form-control" name="cate_' + (i + 1) + '_name" placeholder="" value="">' +
-                    '   </div>' +
                     '   <div class="form-group">' +
                     '       <label>카테고리' + (i + 1) + ' placeholder</label>' +
                     '       <input type="text" class="form-control" name="cate_' + (i + 1) + '_placeholder" placeholder="" value="">' +

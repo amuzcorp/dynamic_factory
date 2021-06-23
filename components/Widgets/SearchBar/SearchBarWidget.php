@@ -88,14 +88,10 @@ class SearchBarWidget extends AbstractWidget
             $sub_item['sub_title'] = $widgetConfig['sub_title'];
         }
 
-        //인스턴스로 전달한 카테고리 ID의 Parameter Key 이름
-        $parameterKey = $widgetConfig['parameter_key'];
-
         return $this->renderSkin( compact(
             'widgetConfig',
             'title',
             'instanceData',
-            'parameterKey',
             'datas',
             'sub_datas',
             'sub_item'
