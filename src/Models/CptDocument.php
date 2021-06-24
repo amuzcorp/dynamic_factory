@@ -4,7 +4,6 @@ namespace Overcode\XePlugin\DynamicFactory\Models;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Overcode\XePlugin\DynamicFactory\Components\DynamicFields\SuperRelate\SuperRelateField;
-use Xpressengine\Document\DocumentHandler;
 use Xpressengine\Document\Models\Document;
 use Xpressengine\Plugins\Comment\CommentUsable;
 use Xpressengine\Plugins\Comment\Models\Comment;
@@ -361,6 +360,11 @@ class CptDocument extends Document implements CommentUsable, SeoUsable
     public function belongUser()
     {
 
+    }
+
+    public function schedule()
+    {
+        return $this->hasMany(\Amuz\XePlugin\Bookings\Models\BookedSchedule::class, 'booked_id', 'id');
     }
 
     public function taxonomy()
