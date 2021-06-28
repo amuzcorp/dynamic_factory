@@ -364,7 +364,7 @@ class CptDocument extends Document implements CommentUsable, SeoUsable
 
     public function schedule()
     {
-        return $this->hasMany(\Amuz\XePlugin\Bookings\Models\BookedSchedule::class, 'booked_id', 'id');
+        return $this->hasMany(\Amuz\XePlugin\Bookings\Models\BookedSchedule::class, 'booked_id', 'id')->orderBy('start');
     }
 
     public function taxonomy()
