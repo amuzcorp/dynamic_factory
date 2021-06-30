@@ -536,6 +536,15 @@ class DynamicFactorySettingController extends BaseController
         return redirect()->back()->with('alert', ['type' => 'success', 'message' => xe_trans('xe::saved')]);
     }
 
+    //DocumentWriter 위젯 전용
+    public function storeRendingCptDocument(Request $request) {
+        //Todo 퍼미션 체크
+        $document = $this->dfService->storeCptDocument($request);
+        $after_work = $request->after_work;
+
+        return redirect()->route('dyFac.document.rending_store_result', ['status' => 'success', 'result' => $document, 'after_work' => $after_work]);
+    }
+
     public function getCptDocuments($request, $cpt, $config)
     {
         $perPage = $request->get('perPage', 20);

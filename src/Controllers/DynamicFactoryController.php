@@ -90,4 +90,18 @@ class DynamicFactoryController extends Controller
         return XePresenter::makeApi($matchedDocumentList);
     }
 
+    public function rendingCptDocument(Request $request) {
+
+        \XeTheme::selectBlankTheme();
+
+        $status = $request->status;
+        $after_work = $request->after_work;
+        $result = [];
+        if($request->result) {
+            $result = $request->result;
+        }
+
+        return \XePresenter::make('dynamic_factory::views.documents.document_write_widget_result', compact('status', 'after_work', 'result'));
+    }
+
 }

@@ -339,6 +339,8 @@ class Plugin extends AbstractPlugin
             Route::get('/categories', ['as' => 'categories', 'uses' => 'DynamicFactoryController@getCategories']);
             Route::post('/favorite/{id}', ['as' => 'document.favorite', 'uses' => 'DynamicFactoryController@favorite']);
             Route::get('/docSearch/{keyword?}', ['as' => 'document.search', 'uses' => 'DynamicFactoryController@docSearch']);
+
+            Route::get('/rending_store_result', ['as' => 'document.rending_store_result', 'uses' => 'DynamicFactoryController@rendingCptDocument']);
         });
         Route::get('/userSearch/{keyword?}', ['as' => 'dyFac.user.search', 'uses' => 'App\Http\Controllers\User\Settings\UserController@search']);
 
@@ -389,6 +391,8 @@ class Plugin extends AbstractPlugin
                 Route::post('/trash_cpt_documents', ['as' => 'trash_cpt_documents', 'uses' => 'DynamicFactorySettingController@trashDocuments']);
                 Route::post('/remove_cpt_documents', ['as' => 'remove_cpt_documents', 'uses' => 'DynamicFactorySettingController@removeDocuments']);
                 Route::post('/restore_cpt_documents', ['as' => 'restore_cpt_documents', 'uses' => 'DynamicFactorySettingController@restoreDocuments']);
+
+                Route::post('/rending_store_cpt_document', ['as' => 'rending_store_cpt_document', 'uses' => 'DynamicFactorySettingController@storeRendingCptDocument']);
 
                 Route::get('/trash/{cpt_id?}', ['as' => 'trash', 'uses' => 'DynamicFactorySettingController@trash', 'settings_menu' => 'setting.dynamic_factory.trash']);
             });
