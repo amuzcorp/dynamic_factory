@@ -307,7 +307,7 @@ class CptDocument extends Document implements CommentUsable, SeoUsable
     }
 
     /**
-     * 현재 문서의 관련 문서를 불러온다 (use_dynamic = true 일 경우 DF 도 붙여서 불러옴)
+     * 현재 문서가 가지고 있는 관련 문서를 불러온다 (use_dynamic = true 일 경우 DF 도 붙여서 불러옴)
      *
      * @param $field_id
      * @param bool $use_dynamic
@@ -329,7 +329,7 @@ class CptDocument extends Document implements CommentUsable, SeoUsable
     }
 
     /**
-     * 현재 문서를 관련 문서로 가지고 있는 문서를 불러온다 (반대관계에서는 다이나믹을 기본적으로는 달지 않는다)
+     * 현재 문서를 관련 문서로 가지고 있는 상위 문서를 불러온다 (반대관계에서는 다이나믹을 기본적으로는 달지 않는다)
      *
      * @param null $field_id
      * @param null $source_group
@@ -352,19 +352,24 @@ class CptDocument extends Document implements CommentUsable, SeoUsable
         return $query->get();
     }
 
-    public function hasUser()
+    /**
+     * 현재 문서가 가지고 있는 관련 사용자를 불러온다
+     *
+     * @param $field_id
+     * @return \Illuminate\Database\Eloquent\Collection
+     */
+    public function hasUser($field_id)
     {
+        $tableName = SuperRelateField::TABLE_NAME;
 
-    }
+        $query = $this->belongsToMany(\Overcode\XePlugin\DynamicFactory\Models\User::class, $tableName, 's_id', 't_id')->where($tableName.'.field_id', $field_id);
 
-    public function belongUser()
-    {
-
+        return $query->get();
     }
 
     public function schedule()
     {
-        return $this->hasMany(\Amuz\XePlugin\Bookings\Models\BookedSchedule::class, 'booked_id', 'id');
+        return $this->hasMany(\Amuz\XePlugin\Bookings\Models\BookedSchedule::class, 'booked_id', 'id')->orderBy('start');
     }
 
     public function taxonomy()

@@ -6,6 +6,13 @@ use Xpressengine\User\Models\User as XeUser;
 
 class User  extends XeUser {
 
+    /**
+     * 현재 user 가 가지고 있는 관련 문서를 불러온다.
+     *
+     * @param $field_id
+     * @param bool $use_dynamic
+     * @return \Illuminate\Database\Eloquent\Collection
+     */
     public function hasDocument($field_id, $use_dynamic = true)
     {
         $tableName = SuperRelateField::TABLE_NAME;
