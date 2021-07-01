@@ -4,7 +4,7 @@
 <div class="form-group">
     <label>{{ xe_trans($config->get('label')) }} <small>{{ $config->get('id') }}</small></label>
     <div id="autocomplete_{{ $config->get('id') }}">
-        <input type="hidden" name="srf_chg" value="0" />
+        <input type="hidden" name="{{$config->get('id')}}_srf_chg" value="0" />
         <div class="ReactTags__tags">
             <div class="ReactTags__selected"></div>
             <div class="ReactTags__tagInput">
@@ -23,7 +23,8 @@
             $wrapper: $('#autocomplete_{{ $config->get('id') }}'),
             searchUrl: '{{ route('dyFac.user.search') }}',
             field_name: 'hidden_{{ $config->get('id') }}',
-            config_name: '{{ $config->name }}'
+            config_name: '{{ $config->name }}',
+            config_id : '{{$config->get('id')}}'
         });
 @else
     var p_{{ $config->get('id') }} = new DocList({
@@ -31,7 +32,8 @@
         $wrapper: $('#autocomplete_{{ $config->get('id') }}'),
         searchUrl: '{{ route('dyFac.document.search') }}',
         field_name: 'hidden_{{ $config->get('id') }}',
-        config_name: '{{ $config->name }}'
+        config_name: '{{ $config->name }}',
+        config_id : '{{$config->get('id')}}'
     });
 @endif
     p_{{ $config->get('id') }}.bindEvents();
