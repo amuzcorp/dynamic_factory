@@ -216,7 +216,7 @@ class DynamicFactoryTaxonomyHandler
                 'children' => $this->getCategoryItemChildrenData($categoryItem)
             ];
 
-            $items[] = $categoryItemData;
+            $items[$categoryItem->id] = $categoryItemData;
         }
 
         return $items;
