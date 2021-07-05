@@ -123,9 +123,8 @@
                                             @if (($fieldType = XeDynamicField::get('documents_'.$cpt->cpt_id, $columnName)) !== null)
                                                 <div class="xe-list-board-list__dynamic-field xe-list-board-list__dynamic-field-{{ $columnName }} xe-list-board-list__mobile-style">
                                                     <span class="sr-only">{{ xe_trans($column_labels[$columnName]) }}</span>
-
                                                     @if(method_exists($fieldType,'getSettingListItem'))
-                                                        {!! $fieldType->getSettingListItem($columnName, $doc->getAttributes()) !!}
+                                                        {!! $fieldType->getSettingListItem($columnName, $doc) !!}
                                                     @else
                                                         {!! $fieldType->getSkin()->output($columnName, $doc->getAttributes()) !!}
                                                     @endif

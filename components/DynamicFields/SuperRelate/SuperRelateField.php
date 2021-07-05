@@ -4,6 +4,7 @@ namespace Overcode\XePlugin\DynamicFactory\Components\DynamicFields\SuperRelate;
 
 use Illuminate\Database\Query\Builder;
 use Illuminate\Database\Schema\Blueprint;
+use Overcode\XePlugin\DynamicFactory\Models\CptDocument;
 use Overcode\XePlugin\DynamicFactory\Models\SuperRelate;
 use Xpressengine\Config\ConfigEntity;
 use Xpressengine\Database\DynamicQuery;
@@ -310,5 +311,23 @@ class SuperRelateField extends AbstractType
         ];
 
         $this->handler->connection()->table(self::TABLE_NAME)->where($where)->delete();
+    }
+
+
+    /**
+     * 관리자 페이지 목록을 출력하기 위한 함수.
+     * CPT 목록에만 해당하며, 필드타입자체에 추가해주어야한다.
+     *
+     * @param string $id dynamic field name
+     * @param CptDocument $doc arguments
+     * @return string|null
+     */
+    public function getSettingListItem($id, CptDocument $doc){
+        $data = $doc->hasDocument($id);
+        if (count($data) == 0) {
+            return null;
+        }
+
+        return view('dynamic_factory::components/DynamicFields/SuperRelate/views/list-item',compact('id','data'));
     }
 }
