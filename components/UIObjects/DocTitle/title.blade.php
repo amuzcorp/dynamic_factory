@@ -77,7 +77,7 @@
 <div class="__xe_titleWithSlug">
     <div class="form-group">
         <label>{{ $titleName }}</label>
-        <input type="text" name="{{ $titleDomName }}" data-valid-name="{{ xe_trans('board::title') }}" class="__xe_title {{$titleClassName}} xe-list-board-body--header-title-input form-control" value="{{ $title }}" data-id="{{ $id }}" data-slug="{{ $slug }}"/>
+        <input type="text" name="{{ $titleDomName }}" placeholder="{{ $titleName }}" data-valid-name="{{ xe_trans('board::title') }}" class="__xe_title {{$titleClassName}} xe-list-board-body--header-title-input form-control" value="{{ $title }}" data-id="{{ $id }}" data-slug="{{ $slug }}"/>
 
         <div class="__xe_slug_edit" style="display:none;">
             <i class="xi-link"></i>
