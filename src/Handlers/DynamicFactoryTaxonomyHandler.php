@@ -219,7 +219,7 @@ class DynamicFactoryTaxonomyHandler
             $items[$categoryItem->id] = $categoryItemData;
         }
 
-        return $items;
+        return collect($items);
     }
 
     public function getCategoryItemChildrenData(CategoryItem $categoryItem)
