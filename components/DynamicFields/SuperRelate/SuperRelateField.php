@@ -156,13 +156,17 @@ class SuperRelateField extends AbstractType
      */
     public function update(array $args, array $wheres)
     {
-        $is_changed = array_get($args, 'srf_chg', 0);
-        if($is_changed == false) return;
-
         $config = $this->config;
-        $type = $this->handler->getRegisterHandler()->getType($this->handler, $config->get('typeId'));
+        if(!$config) return null;
 
         $where = $this->getWhere($wheres, $config);
+        if(!$where) return null;
+        if(!isset($where['field_id'])) return null;
+
+        $is_changed = array_get($args, $where['field_id'].'_srf_chg', 0);
+        if($is_changed == false) return;
+
+        $type = $this->handler->getRegisterHandler()->getType($this->handler, $config->get('typeId'));
 
         if (isset($where['target_id']) === false) {
             return null;
@@ -236,6 +240,7 @@ class SuperRelateField extends AbstractType
      */
     public function join(DynamicQuery $query, ConfigEntity $config = null)
     {
+
         if ($config === null) {
             $config = $this->config;
         }
@@ -251,7 +256,7 @@ class SuperRelateField extends AbstractType
 
         $rawString = sprintf('%s.*', $tablePrefix . $baseTable);
         // doc 에 filed_id 가 있어야 update 가능
-        $rawString .= sprintf(', null as srf_chg, null as hidden_%s', $config->get('id'));
+        $rawString .= sprintf(', null as '.$config->get('id').'_srf_chg, null as hidden_%s', $config->get('id'));
 
         foreach ($type->getColumns() as $key => $column) {
             $key = $config->get('id') . '_' . $column->name;

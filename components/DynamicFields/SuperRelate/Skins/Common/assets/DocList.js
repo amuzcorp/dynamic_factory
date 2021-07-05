@@ -1,10 +1,11 @@
 class DocList {
-  constructor ({ wrapper_id, $wrapper, searchUrl, field_name, config_name }) {
+  constructor ({ wrapper_id, $wrapper, searchUrl, field_name, config_name, config_id }) {
     this.wrapper_id = wrapper_id
     this.$wrapper = $wrapper
     this.searchUrl = searchUrl
     this.field_name = field_name
     this.config_name = config_name
+    this.config_id = config_id
     this.MIN_QUERY_LENGTH = 2
     this.ENTER = 13
     this.TAB = 9
@@ -46,7 +47,7 @@ class DocList {
       var name = _this.type
       var bSameWord = false
       var wrapper_id = _this.wrapper_id
-
+      var config_id = _this.config_id
       $('#'+_this.wrapper_id).find('.input_hidden input[type=hidden]').each(function() {
         if($(this).val() == tag.id) {
           bSameWord = true
@@ -55,7 +56,7 @@ class DocList {
 
       if (!bSameWord) {
         // 값이 변경되었음
-        $('#'+wrapper_id + ' input[name=srf_chg]').val('1')
+        $('#'+wrapper_id + ' input[name='+config_id+'_srf_chg]').val('1')
 
         $input_hidden.append(`<input type="hidden" name="${_this.field_name}[]" value="${tag.id}">`)
         $ul.closest('.ReactTags__tags').find('.ReactTags__selected')
@@ -93,9 +94,9 @@ class DocList {
       var id = $(this).data('id')
       var field_id = _this.field_name
       var wrapper_id = _this.wrapper_id
-
+      var config_id = _this.config_id
       // 값이 변경되었음
-      $('#'+wrapper_id + ' input[name=srf_chg]').val('1')
+      $('#'+wrapper_id + ' input[name='+config_id+'_srf_chg]').val('1')
 
       $(this).closest('span').remove()
 
