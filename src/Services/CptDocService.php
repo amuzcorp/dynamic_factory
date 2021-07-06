@@ -24,12 +24,15 @@ class CptDocService
     /**
      * @param Request $request
      * @param ConfigEntity $config
-     * @param null $site_key (없으면 자신의 사이트 문서만, 있으면 해당 사이트의 문서만, all_site 면 모든 사이트의 문서)
+     * @param null $site_key (없으면 자신의 사이트 문서만, 있으면 해당 사이트의 문서만, *이면 모든 사이트의 문서)
      * @return mixed
      */
     public function getItems(Request $request, ConfigEntity $config, $site_key = null)
     {
-        $model = CptDocument::division($config->get('cpt_id'), $site_key);
+        //확장필드들은 config에 기반하기때문에 전체사이트를 조회하는경우 각 사이트의 config를 따로불러올 수 없으므로 default를 기준으로 join하도록 처리함
+        //즉, default에서 선언되지 않은 확장필드를 멀티사이트에서 선언한다고해서 전체사이트 데이터를 조회할때 멀티사이트의 확장필드가 보여지지는 않음
+        //하지만 멀티사이트 전체의 게시글을 한번에 조회하는것은 보통 default사이트에서 처리되므로 큰문제는 없을듯함.
+        $model = CptDocument::division($config->get('cpt_id'), $site_key != '*' ?: 'default');
 
         $query = $model->where('instance_id', $config->get('cpt_id'));
 
@@ -37,11 +40,8 @@ class CptDocService
         $hasSiteKey = \Schema::hasColumn('documents', 'site_key');
 
         if($hasSiteKey == true) {
-            if ($site_key == null) {
-                $query->where('site_key', \XeSite::getCurrentSiteKey());
-            } else if ($site_key == 'all_site') {
-
-            } else {
+            $site_key = $site_key == null ? \XeSite::getCurrentSiteKey() : $site_key;
+            if($site_key != "*"){
                 $query->where('site_key', $site_key);
             }
         }
@@ -60,14 +60,15 @@ class CptDocService
         }
 
         $dfConfig = app('overcode.df.configHandler')->getConfig($config->get('cpt_id'));
-        $orders = $dfConfig->get('orders', []); // dyFac Config 의 정렬 정보를 가져옴
-        $request->request->add(['orders' => $orders]);
+        if($dfConfig != null) {
+            $orders = $dfConfig->get('orders', []); // dyFac Config 의 정렬 정보를 가져옴
+            $request->request->add(['orders' => $orders]);
+        }
 
         $this->handler->makeWhere($query, $request, $config);
         $this->handler->makeOrder($query, $request, $config);
 
-        $perPage = $config->get('perPage') ?: '10';
-
+        $perPage = $request->get('perPage') ?: $config->get('perPage') ?: '20';
         $paginate = $query->paginate($perPage)->appends($request->except('page'));
 
         $total = $paginate->total();
