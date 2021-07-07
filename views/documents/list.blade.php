@@ -107,7 +107,7 @@
                                                     {!! $fieldType->getSkin()->status($columnName, $doc->getAttributes()) !!}
                                                 </td>
                                                 <td style="padding:8px;">
-                                                    {!! $fieldType->getSkin()->price($columnName, $doc->getAttributes()) !!}
+                                                    {!! number_format($fieldType->getSkin()->price($columnName, $doc->getAttributes())) !!}
                                                 </td>
                                             @else
                                                 <td style="padding:8px;">
