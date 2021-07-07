@@ -79,6 +79,9 @@
                             @foreach($config['listColumns'] as $columnName)
                                 @if($columnName == 'title')
                                     <th>{{ $cpt->labels['title'] }}</th>
+                                @elseif($columnName === 'booked')
+                                    <th>결제상태</th>
+                                    <th>예약금액</th>
                                 @else
                                     <th>{{ xe_trans($column_labels[$columnName]) }}</th>
                                 @endif
@@ -98,42 +101,57 @@
                                     <td><input type="checkbox" name="id[]" class="__xe_checkbox" value="{{ $doc->id }}"></td>
                                     <td>{{ $doc->seq }}</td>
                                     @foreach($config['listColumns'] as $columnName)
-                                        <td style="padding:8px;">
-                                        @if ($columnName === 'title')
-                                                <a href="{{ route('dyFac.setting.'.$cpt->cpt_id, ['type' => 'edit', 'doc_id' => $doc->id]) }}">
-                                                    {!! $doc->title == null ? '<span style="font-style: italic; color:#999;">[제목없음]</span>' : $doc->title !!}
-                                                </a>
-                                        @elseif ($columnName === 'writer')
-                                                @if ($doc->user !== null)
-                                                    {{ $doc->user->getDisplayName() }}
-                                                @else
-                                                    Guest
-                                                @endif
-                                        @elseif ($columnName === 'assent_count')
-                                            {{ $doc->assent_count }}
-                                        @elseif ($columnName === 'dissent_count')
-                                            {{ $doc->dissent_count }}
-                                        @elseif ($columnName === 'read_count')
-                                            {{ $doc->read_count }}
-                                        @elseif ($columnName === 'created_at')
-                                            {{ $doc->created_at->format('Y-m-d H:i') }}
-                                        @elseif ($columnName === 'updated_at')
-                                            {{ $doc->updated_at->format('Y-m-d H:i') }}
-                                        @else
+                                        @if($columnName === 'booked')
                                             @if (($fieldType = XeDynamicField::get('documents_'.$cpt->cpt_id, $columnName)) !== null)
-                                                <div class="xe-list-board-list__dynamic-field xe-list-board-list__dynamic-field-{{ $columnName }} xe-list-board-list__mobile-style">
-                                                    <span class="sr-only">{{ xe_trans($column_labels[$columnName]) }}</span>
-                                                    @if(method_exists($fieldType,'getSettingListItem'))
-                                                        {!! $fieldType->getSettingListItem($columnName, $doc) !!}
-                                                    @else
-                                                        {!! $fieldType->getSkin()->output($columnName, $doc->getAttributes()) !!}
-                                                    @endif
-                                                </div>
+                                                <td style="padding:8px;">
+                                                    {!! $fieldType->getSkin()->status($columnName, $doc->getAttributes()) !!}
+                                                </td>
+                                                <td style="padding:8px;">
+                                                    {!! $fieldType->getSkin()->price($columnName, $doc->getAttributes()) !!}
+                                                </td>
                                             @else
-                                                {!! $doc->{$columnName} !!}
+                                                <td style="padding:8px;">
+                                                    {!! $doc->{$columnName} !!}
+                                                </td>
                                             @endif
+                                        @else
+                                            <td style="padding:8px;">
+                                                @if ($columnName === 'title')
+                                                    <a href="{{ route('dyFac.setting.'.$cpt->cpt_id, ['type' => 'edit', 'doc_id' => $doc->id]) }}">
+                                                        {!! $doc->title == null ? '<span style="font-style: italic; color:#999;">[제목없음]</span>' : $doc->title !!}
+                                                    </a>
+                                                @elseif ($columnName === 'writer')
+                                                    @if ($doc->user !== null)
+                                                        {{ $doc->user->getDisplayName() }}
+                                                    @else
+                                                        Guest
+                                                    @endif
+                                                @elseif ($columnName === 'assent_count')
+                                                    {{ $doc->assent_count }}
+                                                @elseif ($columnName === 'dissent_count')
+                                                    {{ $doc->dissent_count }}
+                                                @elseif ($columnName === 'read_count')
+                                                    {{ $doc->read_count }}
+                                                @elseif ($columnName === 'created_at')
+                                                    {{ $doc->created_at->format('Y-m-d H:i') }}
+                                                @elseif ($columnName === 'updated_at')
+                                                    {{ $doc->updated_at->format('Y-m-d H:i') }}
+                                                @else
+                                                    @if (($fieldType = XeDynamicField::get('documents_'.$cpt->cpt_id, $columnName)) !== null)
+                                                        <div class="xe-list-board-list__dynamic-field xe-list-board-list__dynamic-field-{{ $columnName }} xe-list-board-list__mobile-style">
+                                                            <span class="sr-only">{{ xe_trans($column_labels[$columnName]) }}</span>
+                                                            @if(method_exists($fieldType,'getSettingListItem'))
+                                                                {!! $fieldType->getSettingListItem($columnName, $doc) !!}
+                                                            @else
+                                                                {!! $fieldType->getSkin()->output($columnName, $doc->getAttributes()) !!}
+                                                            @endif
+                                                        </div>
+                                                    @else
+                                                        {!! $doc->{$columnName} !!}
+                                                    @endif
+                                                @endif
+                                            </td>
                                         @endif
-                                        </td>
                                     @endforeach
                                     <td>
                                         @if($doc->isTemp() === true)<span class="xe-badge xe-warning">임시</span>
