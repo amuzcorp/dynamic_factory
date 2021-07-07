@@ -106,6 +106,8 @@ class CptModuleController extends Controller
 
         $cpt_id = $this->config->get('cpt_id');
 
+        $site_key = \XeSite::getCurrentSiteKey();
+
         $dfConfig = app('overcode.df.configHandler')->getConfig($cpt_id);
         $column_labels = app('overcode.df.configHandler')->getColumnLabels($dfConfig);
 
@@ -117,7 +119,7 @@ class CptModuleController extends Controller
             $categories[$taxonomy->id]['items'] = $this->taxonomyHandler->getCategoryItemAttributes($taxonomy->id,$categories[$taxonomy->id]['group']);
         }
 
-        $paginate = $service->getItems($request, $this->config);
+        $paginate = $service->getItems($request, $this->config, '*');
 
         //미디어 라이브러리 추가 (미디어 필드가 있는경우에 사용해야함)
         /** @var MediaManager $mediaManager */
