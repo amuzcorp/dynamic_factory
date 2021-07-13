@@ -22,6 +22,7 @@ use Xpressengine\Document\DocumentHandler;
 use Xpressengine\Document\Models\Document;
 use Xpressengine\DynamicField\DynamicFieldHandler;
 use Xpressengine\Http\Request;
+use Xpressengine\Support\Exceptions\AccessDeniedHttpException;
 
 class DynamicFactoryService
 {
@@ -191,13 +192,20 @@ class DynamicFactoryService
 
     public function storeCptDocument(Request $request)
     {
+
+        if ($this->dfConfigHandler->get('useConsultation') === true && Auth::check() === false) {
+            throw new AccessDeniedHttpException;
+        }
+
         $inputs = $request->originExcept('_token');
         if (isset($inputs['user_id']) === false || empty($inputs['user_id'])) {
-            $inputs['user_id'] = auth()->user()->getId();
+            if(auth()->check()) $inputs['user_id'] = auth()->user()->getId();
+            else $inputs['user_id'] = '';
         }
 
         if (isset($inputs['writer']) === false || empty($inputs['writer'])) {
-            $inputs['writer'] = auth()->user()->getDisplayName();
+            if(auth()->check()) $inputs['writer'] = auth()->user()->getDisplayName();
+            else $inputs['writer'] = 'Guest';
         }
 
         XeDB::beginTransaction();

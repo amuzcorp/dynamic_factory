@@ -26,7 +26,7 @@ if($widgetConfig['title_active'] && $widgetConfig['title_active'] === 'active') 
 
 @endphp
 <div class="container">
-    <form id="createForm" method="post" action="{{ route('dyFac.setting.rending_store_cpt_document') }}" enctype="multipart/form-data" target="createCptDocument">
+    <form id="createForm" method="post" action="{{ route('dyFac.widget.rending_store_cpt_document') }}" enctype="multipart/form-data" target="createCptDocument">
         {!! csrf_field() !!}
         <input type="hidden" name="cpt_id" value="{{ $cpt->cpt_id }}" />
         <input type="hidden" name="after_work" value="{{ $widgetConfig['after_work'] }}" />
@@ -109,7 +109,6 @@ if($widgetConfig['title_active'] && $widgetConfig['title_active'] === 'active') 
                         </div>
                         <div class="form-group">
                             <label>작성자</label>
-                            {!! uio('uiobject/df@user_select', []) !!}
                         </div>
                     </div>
                 </div>
