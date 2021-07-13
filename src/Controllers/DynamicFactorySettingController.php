@@ -3,6 +3,7 @@ namespace Overcode\XePlugin\DynamicFactory\Controllers;
 
 use App\Http\Sections\DynamicFieldSection;
 use Overcode\XePlugin\DynamicFactory\Exceptions\NotFoundDocumentException;
+use Overcode\XePlugin\DynamicFactory\Handlers\CptPermissionHandler;
 use Overcode\XePlugin\DynamicFactory\Handlers\CptValidatorHandler;
 use Overcode\XePlugin\DynamicFactory\Handlers\DynamicFactoryConfigHandler;
 use Overcode\XePlugin\DynamicFactory\Handlers\DynamicFactoryDocumentHandler;
@@ -384,6 +385,27 @@ class DynamicFactorySettingController extends BaseController
         $this->configHandler->modifyConfig($config);
 
         return redirect()->back()->with('alert', ['type' => 'success', 'message' => xe_trans('xe::saved')]);
+    }
+
+    public function editPermission($cpt_id)
+    {
+        $cpt = $this->dfService->getItem($cpt_id);
+
+        $config = $this->configHandler->getConfig($cpt_id);
+        $cptPermission = app('overcode.df.permission');
+        $perms = $cptPermission->getPerms($cpt_id);
+
+        return $this->presenter->make('dynamic_factory::views.settings.permission', [
+            'cpt' => $cpt,
+            'config' => $config,
+            'perms' => $perms
+        ]);
+    }
+
+    public function updatePermission(Request $request, CptPermissionHandler $cptPermission, $cpt_id) {
+        $cptPermission->set($request, $cpt_id);
+
+        return redirect()->to(route('dyFac.setting.edit_permission', ['cpt_id' => $cpt_id]));
     }
 
     public function cptDocument($type = 'list', Request $request)

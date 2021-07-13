@@ -378,6 +378,10 @@ class Plugin extends AbstractPlugin
                 Route::get('/edit_orders/{cpt_id}', [ 'as' => 'edit_orders', 'uses' => 'DynamicFactorySettingController@editOrders' ]);
                 Route::post('/update_orders/{cpt_id}', [ 'as' => 'update_orders', 'uses' => 'DynamicFactorySettingController@updateOrders' ]);
 
+                //cpt 권한
+                Route::get('/edit_permission/{cpt_id}', [ 'as' => 'edit_permission', 'uses' => 'DynamicFactorySettingController@editPermission' ]);
+                Route::post('/update_permission/{cpt_id}', [ 'as' => 'update_permission', 'uses' => 'DynamicFactorySettingController@updatePermission' ]);
+
                 Route::get('/create_extra/{cpt_id}', [ 'as' => 'create_extra', 'uses' => 'DynamicFactorySettingController@createExtra' ]);
 
                 Route::get('/edit/{cpt_id}', [ 'as' => 'edit', 'uses' => 'DynamicFactorySettingController@edit' ]);
