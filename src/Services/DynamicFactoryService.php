@@ -22,6 +22,7 @@ use Xpressengine\Document\DocumentHandler;
 use Xpressengine\Document\Models\Document;
 use Xpressengine\DynamicField\DynamicFieldHandler;
 use Xpressengine\Http\Request;
+use Xpressengine\Permission\Instance;
 use Xpressengine\Support\Exceptions\AccessDeniedHttpException;
 
 class DynamicFactoryService
@@ -193,7 +194,7 @@ class DynamicFactoryService
     public function storeCptDocument(Request $request)
     {
 
-        if ($this->dfConfigHandler->get('useConsultation') === true && Auth::check() === false) {
+        if (\Gate::denies('create', new Instance(app('overcode.df.permission')->name($request->cpt_id)))) {
             throw new AccessDeniedHttpException;
         }
 
