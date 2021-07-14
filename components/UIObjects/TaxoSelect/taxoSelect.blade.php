@@ -2,25 +2,24 @@
     use Overcode\XePlugin\DynamicFactory\Components\UIObjects\TaxoSelect\TaxoSelectUIObject;
 @endphp
 
-@if($scriptInit === true)
-    <script>
-        jQuery(function($) {
-            $('.__xe-dropdown-form .xe-dropdown-menu a').on('click', function(event) {
-                event.preventDefault();
-                var $target = $(event.target),
-                    $container = $target.closest('.__xe-dropdown-form'),
-                    name = $target.closest('.xe-dropdown-menu').data('name'),
-                    $input = $container.find('[name="'+name+'[]"]');
+<script>
+    jQuery(function($) {
+        $('.__xe-dropdown-form .xe-dropdown-menu a').on('click', function(event) {
+            console.log(event.target);
+            event.preventDefault();
+            var $target = $(event.target),
+                $container = $target.closest('.__xe-dropdown-form'),
+                name = $target.closest('.xe-dropdown-menu').data('name'),
+                $input = $container.find('[name="'+name+'[]"]');
 
-                $input.val($target.data('value'));
-                $container.find('button').text($target.text());
+            $input.val($target.data('value'));
+            $container.find('button').text($target.text());
 
-                // event trigger for third parties
-                $input.trigger( "change" );
-            });
+            // event trigger for third parties
+            $input.trigger( "change" );
         });
-    </script>
-@endif
+    });
+</script>
 
 <div class="xe-dropdown __xe-dropdown-form">
     <input type="hidden" name="{{ $name }}[]" value="{{ is_array($value) ? $value[0] : $value }}" data-valid-name="{{ xe_trans($label) }}" />
