@@ -372,6 +372,13 @@ class CptDocument extends Document implements CommentUsable, SeoUsable
         return $this->hasMany(\Amuz\XePlugin\Bookings\Models\BookedSchedule::class, 'booked_id', 'id')->orderBy('start');
     }
 
+    public function scheduleSetStart($start, $page)
+    {
+        $query = $this->hasMany(\Amuz\XePlugin\Bookings\Models\BookedSchedule::class, 'booked_id', 'id')->where('start', '>=',$start)->orderBy('start');
+        if($page !== '*') return $query->paginate(10, ['*'], 'page', $page);
+        else return $query->get();
+    }
+
     public function taxonomy()
     {
         return $this->hasMany(DfTaxonomy::class, 'target_id', 'id');
@@ -452,5 +459,13 @@ class CptDocument extends Document implements CommentUsable, SeoUsable
     public function getLink(InstanceRoute $route)
     {
         return $route->url . '/show/' . $this->getKey();
+    }
+
+    public function getBookingFirstStartTime($targetId) {
+        return $this->hasMany(\Amuz\XePlugin\Bookings\Models\BookedSchedule::class, 'booked_id', 'id')->orderBy('start', 'ASC')->value('start');
+    }
+
+    public function getBookingLastEndTime($targetId) {
+        return $this->hasMany(\Amuz\XePlugin\Bookings\Models\BookedSchedule::class, 'booked_id', 'id')->orderBy('end', 'DESC')->value('end');
     }
 }
