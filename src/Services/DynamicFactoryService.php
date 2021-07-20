@@ -403,4 +403,22 @@ class DynamicFactoryService
         }
         XeDB::commit();
     }
+
+    public function setDocumentPermission($cpt_id, $config) {
+        $index = 0;
+        $grants = '{';
+        foreach($config as $key => $val) {
+            if($val !== 'super' && $val !== 'manager' && $val !== 'user' && $val !== 'guest') continue;
+            if($index !== 0) $grants = $grants.',';
+            $grants = $grants.'"'.$key.'":{"rating":"'.$val.'","group":[],"user":[],"except":[],"vgroup":[]}';
+            $index += 1;
+        }
+        $grants = $grants.'}';
+        if($index === 0) $grants = '[]';
+
+        \DB::table('permissions')->insert([
+            'site_key' => \XeSite::getCurrentSiteKey(), 'name' => CptModule::getId() . '.' . $cpt_id, 'grants' => $grants,
+            'created_at' => Carbon::now()->format('Y-m-d H:i:s'), 'updated_at' => Carbon::now()->format('Y-m-d H:i:s'),
+        ]);
+    }
 }
