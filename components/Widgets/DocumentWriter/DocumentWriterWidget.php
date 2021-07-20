@@ -6,6 +6,7 @@ use Carbon\Carbon;
 use Overcode\XePlugin\DynamicFactory\Models\CptDocument;
 use View;
 use Xpressengine\Category\Models\CategoryItem;
+use Xpressengine\Http\Request;
 use Xpressengine\Widget\AbstractWidget;
 
 class DocumentWriterWidget extends AbstractWidget
@@ -31,6 +32,8 @@ class DocumentWriterWidget extends AbstractWidget
         $cpt_id = $widgetConfig['cpt_id'];
 
         $cpt = $dfService->getItem($cpt_id);
+        $permission_check = app('overcode.df.permission')->get($cpt_id);
+        if(!$permission_check) app('overcode.df.permission')->set(new Request([]), $cpt_id);
 
         $taxonomies = $taxonomyHandler->getTaxonomies($cpt_id);
         $cptConfig = $dfService->getCptConfig($cpt_id);

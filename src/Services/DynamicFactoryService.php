@@ -1,9 +1,6 @@
 <?php
 namespace Overcode\XePlugin\DynamicFactory\Services;
 
-
-use Carbon\Carbon;
-use Overcode\XePlugin\DynamicFactory\Components\Modules\Cpt\CptModule;
 use Overcode\XePlugin\DynamicFactory\Exceptions\InvalidConfigException;
 use Overcode\XePlugin\DynamicFactory\Handlers\DynamicFactoryConfigHandler;
 use Overcode\XePlugin\DynamicFactory\Handlers\DynamicFactoryDocumentHandler;
@@ -83,9 +80,6 @@ class DynamicFactoryService
     {
         $inputs = $request->originExcept('_token');
 
-        $site_key = \XeSite::getCurrentSiteKey();
-        $now = Carbon::now()->format('Y-m-d H:i:s');
-
         XeDB::beginTransaction();
         try {
             $cpt = $this->dfHandler->store_cpt($inputs);
@@ -99,10 +93,7 @@ class DynamicFactoryService
                 'sortFormColumns' => DynamicFactoryConfigHandler::DEFAULT_FORM_COLUMNS
             ], $configName);
 
-\DB::table('permissions')->insert([
-                'site_key'=> $site_key, 'name' => CptModule::getId().'.'.$inputs['cpt_id'], 'grants' => '[]',
-                'created_at' => $now, 'updated_at' => $now,
-            ]);
+            app('overcode.df.permission')->set($request, $inputs['cpt_id']);
 
             $this->dfConfigHandler->addEditor($inputs['cpt_id']);   //기본 에디터 ckEditor 로 설정
 

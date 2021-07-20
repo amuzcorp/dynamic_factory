@@ -1,6 +1,8 @@
 <?php
 namespace Overcode\XePlugin\DynamicFactory\Controllers;
 
+use Carbon\Carbon;
+use Xpressengine\Permission\Repositories\DatabaseRepository;
 use App\Http\Sections\DynamicFieldSection;
 use Overcode\XePlugin\DynamicFactory\Components\Modules\Cpt\CptModule;
 use Overcode\XePlugin\DynamicFactory\Exceptions\NotFoundDocumentException;
@@ -418,6 +420,9 @@ class DynamicFactorySettingController extends BaseController
         $request->current_route_name = $current_route_name;
 
         $cpt = $this->dfService->getItem($cpt_id);
+
+        $permission_check = app('overcode.df.permission')->get($cpt_id);
+        if(!$permission_check) app('overcode.df.permission')->set($request, $cpt_id);
 
         if($type == 'create') return $this->documentCreate($cpt, $request);
         else if($type == 'edit') return $this->documentEdit($cpt, $request);
