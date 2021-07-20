@@ -422,7 +422,12 @@ class DynamicFactorySettingController extends BaseController
         $cpt = $this->dfService->getItem($cpt_id);
 
         $permission_check = app('overcode.df.permission')->get($cpt_id);
-        if(!$permission_check) app('overcode.df.permission')->set($request, $cpt_id);
+        if(!$permission_check) {
+            \DB::table('permissions')->insert([
+                'site_key'=> \XeSite::getCurrentSiteKey(), 'name' => CptModule::getId().'.'.$cpt_id, 'grants' => '[]',
+                'created_at' => Carbon::now()->format('Y-m-d H:i:s'), 'updated_at' => Carbon::now()->format('Y-m-d H:i:s'),
+            ]);
+        }
 
         if($type == 'create') return $this->documentCreate($cpt, $request);
         else if($type == 'edit') return $this->documentEdit($cpt, $request);

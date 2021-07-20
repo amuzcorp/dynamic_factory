@@ -3,6 +3,7 @@
 namespace Overcode\XePlugin\DynamicFactory\Components\Widgets\DocumentWriter;
 
 use Carbon\Carbon;
+use Overcode\XePlugin\DynamicFactory\Components\Modules\Cpt\CptModule;
 use Overcode\XePlugin\DynamicFactory\Models\CptDocument;
 use View;
 use Xpressengine\Category\Models\CategoryItem;
@@ -33,7 +34,12 @@ class DocumentWriterWidget extends AbstractWidget
 
         $cpt = $dfService->getItem($cpt_id);
         $permission_check = app('overcode.df.permission')->get($cpt_id);
-        if(!$permission_check) app('overcode.df.permission')->set(new Request([]), $cpt_id);
+        if(!$permission_check) {
+            \DB::table('permissions')->insert([
+                'site_key'=> $site_key, 'name' => CptModule::getId().'.'.$cpt_id, 'grants' => '{"create":{"rating":"guest","group":[],"user":[],"except":[],"vgroup":[]}}',
+                'created_at' => Carbon::now()->format('Y-m-d H:i:s'), 'updated_at' => Carbon::now()->format('Y-m-d H:i:s'),
+            ]);
+        }
 
         $taxonomies = $taxonomyHandler->getTaxonomies($cpt_id);
         $cptConfig = $dfService->getCptConfig($cpt_id);
