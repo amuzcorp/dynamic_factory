@@ -2,6 +2,7 @@
 namespace Overcode\XePlugin\DynamicFactory\Controllers;
 
 use App\Http\Sections\DynamicFieldSection;
+use Overcode\XePlugin\DynamicFactory\Components\Modules\Cpt\CptModule;
 use Overcode\XePlugin\DynamicFactory\Exceptions\NotFoundDocumentException;
 use Overcode\XePlugin\DynamicFactory\Handlers\CptPermissionHandler;
 use Overcode\XePlugin\DynamicFactory\Handlers\CptValidatorHandler;
@@ -649,6 +650,9 @@ class DynamicFactorySettingController extends BaseController
     {
         // TODO 최고관리자 또는 자신이 작성한 CPT 만 삭제 가능하게 권한 체크
         $this->dfService->destroyCpt($cpt_id);
+
+ // TODO CPT 권한 삭제
+        \DB::table('permissions')->where('name', CptModule::getId().'.'.$cpt_id)->delete();
 
         return $this->presenter->makeApi([]);
     }
