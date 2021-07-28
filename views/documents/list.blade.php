@@ -28,6 +28,7 @@
                         <a href="{{ route($current_route_name, ['type' => 'create']) }}" class="xe-btn xe-btn-primary" data-toggle="xe-page-modal"><i class="xi-file-text-o"></i> {{ sprintf($cpt->labels['new_add_cpt'], $cpt->cpt_name) }}</a>
                     </div>
                 </div>
+
                 <div class="panel-heading">
                     <div class="pull-left">
                         <div class="btn-group __xe_function_buttons" role="group" aria-label="...">
@@ -68,6 +69,7 @@
                         </form>
                     </div>
                 </div>
+
                 <div class="panel-body">
                     <form class="__xe_form_list" method="post">
                         <input type="hidden" name="_token" value="{{ csrf_token() }}">
@@ -168,6 +170,7 @@
                         </table>
                     </form>
                 </div>
+
                 @if ($cptDocs->count() > 0)
                     <div class="panel-footer">
                         <div class="text-center" style="padding: 24px 0;">
@@ -177,6 +180,7 @@
                         </div>
                     </div>
                 @endif
+
             </div>
         </div>
     </div>
