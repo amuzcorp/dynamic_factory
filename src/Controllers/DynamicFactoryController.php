@@ -36,8 +36,7 @@ class DynamicFactoryController extends Controller
         $categories = [];
 
         foreach($taxo_ids as $taxo_id){
-            $items = $this->taxonomyHandler->getCategoryItemsTree($taxo_id) ?: [];
-            $categories = array_merge($categories, $items);
+            $categories = array_merge($categories, $this->taxonomyHandler->getCategoryItemsTree($taxo_id)->toArray());
         }
 
         return XePresenter::makeApi([
