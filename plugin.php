@@ -337,6 +337,8 @@ class Plugin extends AbstractPlugin
             'middleware' => ['web']
         ], function() {
             Route::get('/categories', ['as' => 'categories', 'uses' => 'DynamicFactoryController@getCategories']);
+            Route::get('/taxonomies', ['as' => 'taxonomies', 'uses' => 'DynamicFactoryController@getTaxonomies']);
+            Route::get('/category_items', ['as' => 'category_items', 'uses' => 'DynamicFactoryController@getCategoryItems']);
             Route::post('/favorite/{id}', ['as' => 'document.favorite', 'uses' => 'DynamicFactoryController@favorite']);
             Route::get('/docSearch/{keyword?}', ['as' => 'document.search', 'uses' => 'DynamicFactoryController@docSearch']);
 

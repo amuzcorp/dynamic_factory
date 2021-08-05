@@ -22,6 +22,46 @@ class DynamicFactoryController extends Controller
 
     /**
      * CPT_ID 에 해당하는 카테고리를 정리하여 json 으로 반환
+     * route('dyFac.category_items')
+     *
+     * @param Request $request
+     * @return mixed
+     */
+    public function getCategoryItems(Request $request) {
+        $taxo_ids = $request->get('category_ids');
+
+        $items = [];
+        if($taxo_ids) {
+            foreach ($taxo_ids as $taxo_id) {
+                $items = array_merge($items, $this->taxonomyHandler->getCategoryItemsTree($taxo_id)->toArray());
+            }
+        }
+
+        return XePresenter::makeApi([
+            'items' => $items
+        ]);
+    }
+
+    /**
+     * CPT_ID 에 해당하는 텍소노미를 정리하여 json 으로 반환
+     * route('dyFac.taxonomies')
+     *
+     * @param Request $request
+     * @return mixed
+     */
+    public function getTaxonomies(Request $request) {
+        $cpt_id = $request->get('cpt_id');
+        $taxonomies = app('overcode.df.taxonomyHandler')->getTaxonomies($cpt_id);
+        foreach($taxonomies as $key => $taxonomy) {
+            $taxonomies[$key]->name = xe_trans($taxonomy->name);
+        }
+        return XePresenter::makeApi([
+            'taxonomies' => $taxonomies
+        ]);
+    }
+
+    /**
+     * CPT_ID 에 해당하는 카테고리를 정리하여 json 으로 반환
      * route('dyFac.categories')
      *
      * @param Request $request

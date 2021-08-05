@@ -33,8 +33,14 @@
         @endforeach
     </select>
 </div>
+
 <div class="form-group">
-    <label>문서 카테고리 선택</label>
+    <label>카테고리 선택</label>
+    <select name="taxonomies" class="form-control" multiple></select>
+</div>
+
+<div class="form-group">
+    <label>카테고리 아이템 선택</label>
     <select name="categories" class="form-control" multiple></select>
 </div>
 
@@ -49,7 +55,7 @@
             if(!$(this).val())  return false;
 
             XE.ajax({
-                url: '{{ route('dyFac.categories') }}',
+                url: '{{ route('dyFac.taxonomies') }}',
                 type: 'get',
                 dataType: 'json',
                 data: {
@@ -57,7 +63,29 @@
                 },
                 success: function (data) {
                     // console.log(data.categories);
-                    settingCategories(data.categories);
+                    console.log(data.taxonomies)
+                    settingTaxonomies(data.taxonomies);
+                },
+                error: function (data) {
+                    console.log(data);
+                }
+            });
+
+        }).trigger('change');
+
+        $('select[name=taxonomies]').change(function(e){
+            if(!$(this).val())  return false;
+
+            XE.ajax({
+                url: '{{ route('dyFac.category_items') }}',
+                type: 'get',
+                dataType: 'json',
+                data: {
+                    cpt_id: $(this).val(),
+                    category_ids: $('select[name=taxonomies]').val()
+                },
+                success: function (data) {
+                    settingCategories(data.items);
                 },
                 error: function (data) {
                     console.log(data);
@@ -66,6 +94,14 @@
 
         }).trigger('change');
     })
+
+    function settingTaxonomies(taxonomies) {
+        $('select[name=taxonomies]').empty();
+        for(let idx in taxonomies) {
+            let option = "<option value='"+ taxonomies[idx].id +"'>"+ taxonomies[idx].name +"</option>";
+            $('select[name=taxonomies]').append(option);
+        }
+    }
 
     function settingCategories(categories) {
         $('select[name=categories]').empty();
