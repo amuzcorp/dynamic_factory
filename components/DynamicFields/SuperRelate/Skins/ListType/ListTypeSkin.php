@@ -1,14 +1,15 @@
 <?php
-namespace Overcode\XePlugin\DynamicFactory\Components\DynamicFields\SuperRelate\Skins\Common;
+namespace Overcode\XePlugin\DynamicFactory\Components\DynamicFields\SuperRelate\Skins\ListType;
 
 use Overcode\XePlugin\DynamicFactory\Components\DynamicFields\SuperRelate\SuperRelateField;
+use Overcode\XePlugin\DynamicFactory\Models\CptDocument;
 use Overcode\XePlugin\DynamicFactory\Models\RelateDocument;
 use Overcode\XePlugin\DynamicFactory\Models\SuperRelate;
 use Overcode\XePlugin\DynamicFactory\Plugin;
 use Xpressengine\DynamicField\AbstractSkin;
 use XeFrontend;
 
-class CommonSkin extends AbstractSkin
+class ListTypeSkin extends AbstractSkin
 {
     protected static $loaded = false;
 
@@ -19,7 +20,7 @@ class CommonSkin extends AbstractSkin
      */
     public function name()
     {
-        return 'SuperRelate 단일 선택';
+        return 'SuperRelate 복수 선택';
     }
 
     /**
@@ -29,7 +30,7 @@ class CommonSkin extends AbstractSkin
      */
     public function getPath()
     {
-        return 'dynamic_factory::components/DynamicFields/SuperRelate/Skins/Common/views';
+        return 'dynamic_factory::components/DynamicFields/SuperRelate/Skins/ListType/views';
     }
 
     /**
@@ -45,11 +46,11 @@ class CommonSkin extends AbstractSkin
     protected function appendScript()
     {
         XeFrontend::css([
-            Plugin::asset('/components/DynamicFields/SuperRelate/Skins/Common/assets/style.css'),
+            Plugin::asset('/components/DynamicFields/SuperRelate/Skins/ListType/assets/style.css'),
         ])->load();
         XeFrontend::js([
-            Plugin::asset('/components/DynamicFields/SuperRelate/Skins/Common/assets/DocList.js'),
-            Plugin::asset('/components/DynamicFields/SuperRelate/Skins/Common/assets/UserList.js'),
+            Plugin::asset('/components/DynamicFields/SuperRelate/Skins/ListType/assets/DocList.js'),
+            Plugin::asset('/components/DynamicFields/SuperRelate/Skins/ListType/assets/UserList.js'),
         ])->appendTo('head')->load();
     }
 
@@ -65,6 +66,23 @@ class CommonSkin extends AbstractSkin
         if (self::$loaded === false) {
             $this->appendScript();
             self::$loaded = true;
+        }
+
+        $query = CptDocument::where('id', '!=', null);
+
+        if($this->config->get('r_instance_id') == 'user') {
+
+        } else {
+            $field_config = app('xe.config')->get( $this->config->name );
+            if($field_config !== null) {
+                // 선택한 타입들의 글만 표시
+                if($field_config->get('r_instance_id')) $query->where('instance_id', $field_config->get('r_instance_id'));
+
+                // 자신이 작성한 글만 옵션 선택시
+                $user_id = auth()->user()->getId();
+                if($field_config->get('author') == 'author' && $user_id != null) $query->where('user_id',$user_id);
+            }
+            $matchedDocumentList = $query->paginate(15, ['id','title'], 'page', 1);
         }
 
         return parent::create($args);
@@ -87,9 +105,8 @@ class CommonSkin extends AbstractSkin
         $items = $this->getRelateItems($args);
 
         list($data, $key) = $this->filter($args);
-//        dd(list($data, $key) = $this->filter($args));
-//        dd(array_merge($data, $this->mergeData), $items);
         $viewFactory = $this->handler->getViewFactory();
+
         return $viewFactory->make($this->getViewPath('edit'), [
             'args' => $args,
             'config' => $this->config,
@@ -121,10 +138,10 @@ class CommonSkin extends AbstractSkin
 
         if($target_is_user) {
             $items = SuperRelate::Select('user.id as r_id', 'user.display_name as r_name')->where($params)
-                ->leftJoin('user', sprintf('%s.t_id',$tableName), '=', 'user.id')->get();
+                ->leftJoin('user', sprintf('%s.t_id',$tableName), '=', 'user.id')->orderBy( sprintf('%s.ordering',$tableName), 'ASC')->get();
         }else {
             $items = SuperRelate::Select('documents.id as r_id', 'documents.title as r_name')->where($params)
-                ->leftJoin('documents', sprintf('%s.t_id',$tableName), '=', 'documents.id')->get();
+                ->leftJoin('documents', sprintf('%s.t_id',$tableName), '=', 'documents.id')->orderBy(sprintf('%s.ordering',$tableName), 'ASC')->get();
         }
 
         return $items;

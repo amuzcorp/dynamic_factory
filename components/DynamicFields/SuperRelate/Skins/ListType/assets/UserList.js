@@ -1,4 +1,4 @@
-class DocList {
+class UserList {
   constructor ({ wrapper_id, $wrapper, searchUrl, field_name, config_name, config_id }) {
     this.wrapper_id = wrapper_id
     this.$wrapper = $wrapper
@@ -58,17 +58,9 @@ class DocList {
         // 값이 변경되었음
         $('#'+wrapper_id + ' input[name='+config_id+'_srf_chg]').val('1')
 
-        //단일선택 리스트 내용 지움
-        $input_hidden.find('input').remove();
-
-        //내용 append
         $input_hidden.append(`<input type="hidden" name="${_this.field_name}[]" value="${tag.id}">`)
-
-        //단일선택 리스트 내용 지움
-        $ul.closest('.ReactTags__tags').find('.ReactTags__tag').remove()
-
         $ul.closest('.ReactTags__tags').find('.ReactTags__selected')
-          .append(`<span class="ReactTags__tag">${(tag.title || tag.id)}<a class="ReactTags__remove btnRemoveTag" data-id="${tag.id}">x</a></span>`)
+          .append(`<span class="ReactTags__tag">${(tag.display_name || tag.name)}<a class="ReactTags__remove btnRemoveTag" data-id="${tag.id}">x</a></span>`)
       }
 
       $ul.remove()
@@ -118,9 +110,10 @@ class DocList {
   }
 
   makeIt (item, query) {
+    // console.log(item, query);
     var escapedRegex = query.trim().replace(/[-\\^$*+?.()|[\]{}]/g, '\\$&')
     var r = RegExp(escapedRegex, 'gi')
-    var itemName = item.title || item.writer
+    var itemName = item.display_name || item.name
 
     return itemName.replace(r, '<mark>$&</mark>')
   }
