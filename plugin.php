@@ -38,7 +38,7 @@ class Plugin extends AbstractPlugin
 
         // DynamicFactoryDocumentHandler
         $app->singleton(DynamicFactoryDocumentHandler::class, function() {
-            $proxyHandler = XeInterception::proxy(DynamicFactoryDocumentHandler::class);
+            $proxyHandler = XeInterception::proxy(DynamicFactoryDocumentHandler::class,'DynamicFactoryDocumentHandler');
 
             $readCounter = XeCounter::make(app('request'), 'read');
             $readCounter->setGuest();
@@ -56,7 +56,7 @@ class Plugin extends AbstractPlugin
 
         // DynamicFactoryService
         $app->singleton(DynamicFactoryService::class, function () {
-            $proxyHandler = XeInterception::proxy(DynamicFactoryService::class);
+            $proxyHandler = XeInterception::proxy(DynamicFactoryService::class,'DynamicFactoryService');
 
             return new $proxyHandler(
                 app('overcode.df.handler'),
