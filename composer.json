@@ -6,7 +6,7 @@
         "plugin"
     ],
     "license": "LGPL-3.0-or-later",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "type": "xpressengine-plugin",
     "support": {
         "email": "overcode@amuz.co.kr"
