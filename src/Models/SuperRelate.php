@@ -9,5 +9,5 @@ class SuperRelate extends Model
 
     public $timestamps = false;
 
-    protected $fillable = ['field_id', 's_id', 's_group', 's_type', 't_id', 't_group', 't_type'];
+    protected $fillable = ['field_id', 's_id', 's_group', 's_type', 't_id', 't_group', 't_type', 'ordering'];
 }
