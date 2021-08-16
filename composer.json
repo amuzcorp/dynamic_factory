@@ -169,6 +169,11 @@
                   "name": "SuperRelate Default fieldSkin",
                   "description": "The fieldSkin supported by Dynamic_factory plugin.",
                   "class": "Overcode\\XePlugin\\DynamicFactory\\Components\\DynamicFields\\SuperRelate\\Skins\\Common\\CommonSkin"
+                },
+                "fieldType/dynamic_factory@SuperRelate/fieldSkin/dynamic_factory@list_style": {
+                  "name": "SuperRelate List Style fieldSkin",
+                  "description": "The fieldSkin supported by Dynamic_factory plugin.",
+                  "class": "Overcode\\XePlugin\\DynamicFactory\\Components\\DynamicFields\\SuperRelate\\Skins\\ListType\\ListTypeSkin"
                 }
             }
         }

@@ -6,21 +6,17 @@
 {{--    {{dd($config->get('id'))}}--}}
     <label>{{ xe_trans($config->get('label')) }} <small>{{ $config->get('id') }}</small></label>
     <div id="autocomplete_{{ $config->get('id') }}">
-        <input type="hidden" name="{{$config->get('id')}}_srf_chg" value="0" />
+        <input type="hidden" name="{{$config->get('id')}}_srf_chg" value="1" />
         <div class="ReactTags__tags">
             <div class="ReactTags__selected">
-                @foreach($items as $item)
-                    <span class="ReactTags__tag">{{ $item->r_name }}<a class="ReactTags__remove btnRemoveTag" data-id="{{ $item->r_id }}">x</a></span>
-                @endforeach
+                <span class="ReactTags__tag">{{ $items[0]->r_name }}<a class="ReactTags__remove btnRemoveTag" data-id="{{ $items[0]->r_id }}">x</a></span>
             </div>
             <div class="ReactTags__tagInput">
                 <input type="text" placeholder="{{ $is_user ? '사용자의 이름' : '문서의 제목' }}으로 검색하세요." class="form-control" />
                 <div class="ReactTags__suggestions"></div>
             </div>
             <div class="input_hidden">
-                @foreach($items as $item)
-                    <input type="hidden" name="hidden_{{ $config->get('id') }}[]" value="{{ $item->r_id }}" />
-                @endforeach
+                <input type="hidden" name="hidden_{{ $config->get('id') }}[]" value="{{ $items[0]->r_id }}" />
             </div>
         </div>
     </div>

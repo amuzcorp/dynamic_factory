@@ -51,6 +51,7 @@ class SuperRelateField extends AbstractType
             't_id' => new ColumnEntity('t_id', ColumnDataType::STRING),
             't_group' => new ColumnEntity('t_group', ColumnDataType::STRING),
             't_type' => new ColumnEntity('t_type', ColumnDataType::STRING),
+            'ordering' => new ColumnEntity('ordering', ColumnDataType::INTEGER),
         ];
     }
 
@@ -136,9 +137,9 @@ class SuperRelateField extends AbstractType
         $insertParam['t_type'] = $is_user ? 'user' : 'document';
 
         $doc_ids = array_get($args, sprintf('hidden_%s', $config->get('id')), []);  // relate doc ids
-
-        foreach($doc_ids as $id) {
+        foreach($doc_ids as $key => $id) {
             $insertParam['t_id'] = $id;
+            $insertParam['ordering'] = $key;
             SuperRelate::updateOrCreate($insertParam);
         }
 
@@ -199,8 +200,9 @@ class SuperRelateField extends AbstractType
 
         $doc_ids = array_get($args, sprintf('hidden_%s', $config->get('id')), []);  // relate doc ids
 
-        foreach ($doc_ids as $id) {
+        foreach ($doc_ids as $key => $id) {
             $insertParam['t_id'] = $id;
+            $insertParam['ordering'] = $key;
             SuperRelate::updateOrCreate($insertParam);
         }
 
@@ -289,6 +291,7 @@ class SuperRelateField extends AbstractType
                     $table->string('t_id', 36)->comment('Target Id (doc_id, user_id)');
                     $table->string('t_group')->comment('Target Field Group');
                     $table->string('t_type')->comment('Target Type (doc, user)');
+                    $table->integer('ordering')->default(0)->comment('ordering');
 
                     $table->index(['field_id', 's_id', 't_id'], 'index');
                 }
