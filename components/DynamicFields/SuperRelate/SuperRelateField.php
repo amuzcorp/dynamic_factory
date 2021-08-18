@@ -327,10 +327,21 @@ class SuperRelateField extends AbstractType
      */
     public function getSettingListItem($id, CptDocument $doc){
         $data = $doc->hasDocument($id);
+
         if (count($data) == 0) {
             return null;
         }
 
         return view('dynamic_factory::components/DynamicFields/SuperRelate/views/list-item',compact('id','data'));
+    }
+
+    public function getSettingListUserItem($id, CptDocument $doc){
+        $data = $doc->hasUser($id);
+
+        if (count($data) == 0) {
+            return null;
+        }
+
+        return view('dynamic_field_extend::src/DynamicFields/CategoryInput/views/list-item-user',compact('id','data'));
     }
 }

@@ -142,10 +142,22 @@
                                                     @if (($fieldType = XeDynamicField::get('documents_'.$cpt->cpt_id, $columnName)) !== null)
                                                         <div class="xe-list-board-list__dynamic-field xe-list-board-list__dynamic-field-{{ $columnName }} xe-list-board-list__mobile-style">
                                                             <span class="sr-only">{{ xe_trans($column_labels[$columnName]) }}</span>
-                                                            @if(method_exists($fieldType,'getSettingListItem'))
-                                                                {!! $fieldType->getSettingListItem($columnName, $doc) !!}
+                                                            @if($fieldType->getConfig()->get('r_instance_id') && $fieldType->getConfig()->get('r_instance_id') === 'user')
+                                                                <!-- superRelate 타켓이 User일 경우 -->
+                                                                @if(method_exists($fieldType,'getSettingListUserItem'))
+                                                                    {!! $fieldType->getSettingListUserItem($columnName, $doc) !!}
+                                                                @else
+                                                                    {!! $fieldType->getSkin()->output($columnName, $doc->getAttributes()) !!}
+                                                                @endif
+
                                                             @else
-                                                                {!! $fieldType->getSkin()->output($columnName, $doc->getAttributes()) !!}
+
+                                                                @if(method_exists($fieldType,'getSettingListItem'))
+                                                                    {!! $fieldType->getSettingListItem($columnName, $doc) !!}
+                                                                @else
+                                                                    {!! $fieldType->getSkin()->output($columnName, $doc->getAttributes()) !!}
+                                                                @endif
+
                                                             @endif
                                                         </div>
                                                     @else
