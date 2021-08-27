@@ -90,6 +90,7 @@ class CommonSkin extends AbstractSkin
 //        dd(list($data, $key) = $this->filter($args));
 //        dd(array_merge($data, $this->mergeData), $items);
         $viewFactory = $this->handler->getViewFactory();
+
         return $viewFactory->make($this->getViewPath('edit'), [
             'args' => $args,
             'config' => $this->config,

@@ -1,8 +1,15 @@
 <div class="form-group">
     <label class="xe-form__label--requried">문서 종류 선택</label> <small>생성 후 변경 할 수 없습니다.</small>
+
     <select class="form-control" name="r_instance_id" id="r_instance_id">
         @if($config !== null)
-            <option value="{{ $config->get('r_instance_id') }}">{{ array_get($iids, sprintf('%s.%s', $config->get('r_instance_id'), 'name')) }}</option>
+            <option value="{{ $config->get('r_instance_id') }}">
+                @if($config->get('r_instance_id') !== 'user')
+                    {{ array_get($iids, sprintf('%s.%s', $config->get('r_instance_id'), 'name')) }}
+                @else
+                    <span>(user)사용자</span>
+                @endif
+            </option>
         @else
             <option value="">선택하세요</option>
             @foreach($iids as $iid)
