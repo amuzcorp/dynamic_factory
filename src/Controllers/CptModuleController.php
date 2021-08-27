@@ -315,7 +315,9 @@ class CptModuleController extends Controller
         $menuUrl,
         $id
     ) {
-        $item = CptDocument::division($this->instanceId)->find($id);
+        //$item = CptDocument::division($this->instanceId)->find($id);
+        $user = Auth::user();
+        $item = $service->getItem($id, $user, $this->config);
 
         if ($item == null) {
             throw new NotFoundDocumentException;
