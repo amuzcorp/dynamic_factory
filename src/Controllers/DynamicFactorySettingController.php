@@ -452,11 +452,11 @@ class DynamicFactorySettingController extends BaseController
         ];
 
         $stateTypeCounts = [
-            'all' => CptDocument::cpt($cpt->cpt_id)->count(),
-            'published' => CptDocument::cpt($cpt->cpt_id)->published()->public()->count(),
-            'publishReserved' => CptDocument::cpt($cpt->cpt_id)->publishReserved()->public()->count(),
-            'tempBlog' => CptDocument::cpt($cpt->cpt_id)->temp()->count(),
-            'private' => CptDocument::cpt($cpt->cpt_id)->private()->count()
+            'all' => CptDocument::cpt($cpt->cpt_id)->where('site_key', \XeSite::getCurrentSiteKey())->count(),
+            'published' => CptDocument::cpt($cpt->cpt_id)->where('site_key', \XeSite::getCurrentSiteKey())->published()->public()->count(),
+            'publishReserved' => CptDocument::cpt($cpt->cpt_id)->where('site_key', \XeSite::getCurrentSiteKey())->publishReserved()->public()->count(),
+            'tempBlog' => CptDocument::cpt($cpt->cpt_id)->where('site_key', \XeSite::getCurrentSiteKey())->temp()->count(),
+            'private' => CptDocument::cpt($cpt->cpt_id)->where('site_key', \XeSite::getCurrentSiteKey())->private()->count()
         ];
 
         $config = $this->configHandler->getConfig($cpt->cpt_id);
