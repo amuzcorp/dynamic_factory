@@ -14,6 +14,7 @@ use Xpressengine\Plugins\Comment\Models\Comment;
 class CptModule extends AbstractModule
 {
     const THUMBNAIL_TYPE = 'spill';
+    const ROUTE_PREFIX =  'settings.cpt';
 
     /**
      * boot
@@ -22,7 +23,7 @@ class CptModule extends AbstractModule
      */
     public static function boot()
     {
-        self::registerSettingsRoute();
+        self::registerSettingsRoute(self::getId(),self::ROUTE_PREFIX);
         self::registerInstanceRoute();
         self::registerCommentCountIntercept();
     }
@@ -32,39 +33,39 @@ class CptModule extends AbstractModule
      *
      * @return void
      */
-    protected static function registerSettingsRoute()
+    protected static function registerSettingsRoute($target_id,$prefix)
     {
-        Route::settings(self::getId(), function () {
+        Route::settings($target_id, function () use ($prefix){
             // global
             Route::get(
                 '/global/config',
-                ['as' => 'settings.cpt.cpt.global.config', 'uses' => 'CptModuleSettingController@editGlobalConfig']
+                ['as' => $prefix . '.global.config', 'uses' => 'CptModuleSettingController@editGlobalConfig']
             );
             Route::post(
                 '/global/config/update',
-                ['as' => 'settings.cpt.cpt.global.config.update', 'uses' => 'CptModuleSettingController@updateGlobalConfig']
+                ['as' => $prefix . '.global.config.update', 'uses' => 'CptModuleSettingController@updateGlobalConfig']
             );
             Route::get(
                 '/global/permission',
-                ['as' => 'settings.cpt.cpt.global.permission', 'uses' => 'CptModuleSettingController@editGlobalPermission']
+                ['as' => $prefix . '.global.permission', 'uses' => 'CptModuleSettingController@editGlobalPermission']
             );
             Route::post(
                 '/global/permission/update',
-                ['as' => 'settings.cpt.cpt.global.permission.update', 'uses' => 'CptModuleSettingController@updateGlobalPermission']
+                ['as' => $prefix . '.global.permission.update', 'uses' => 'CptModuleSettingController@updateGlobalPermission']
             );
 
             // module
-            Route::get('config/{instanceId}', ['as' => 'settings.cpt.cpt.config', 'uses' => 'CptModuleSettingController@editConfig']);
+            Route::get('config/{instanceId}', ['as' => $prefix . '.config', 'uses' => 'CptModuleSettingController@editConfig']);
             Route::post(
                 'config/update/{instanceId}',
-                ['as' => 'settings.cpt.cpt.config.update', 'uses' => 'CptModuleSettingController@updateConfig']
+                ['as' => $prefix . '.config.update', 'uses' => 'CptModuleSettingController@updateConfig']
             );
-            Route::get('permission/{instanceId}', ['as' => 'settings.cpt.cpt.permission', 'uses' => 'CptModuleSettingController@editPermission']);
+            Route::get('permission/{instanceId}', ['as' => $prefix . '.permission', 'uses' => 'CptModuleSettingController@editPermission']);
             Route::post(
                 'permission/update/{instanceId}',
-                ['as' => 'settings.cpt.cpt.permission.update', 'uses' => 'CptModuleSettingController@updatePermission']
+                ['as' => $prefix . '.permission.update', 'uses' => 'CptModuleSettingController@updatePermission']
             );
-            Route::get('skin/edit/{instanceId}', ['as' => 'settings.cpt.cpt.skin', 'uses' => 'CptModuleSettingController@editSkin']);
+            Route::get('skin/edit/{instanceId}', ['as' => $prefix . '.skin', 'uses' => 'CptModuleSettingController@editSkin']);
         }, ['namespace' => 'Overcode\XePlugin\DynamicFactory\Controllers']);
     }
 
@@ -209,7 +210,7 @@ class CptModule extends AbstractModule
      */
     public function createMenuForm()
     {
-        $skins = XeSkin::getList('module/cpt@cpt');
+        $skins = XeSkin::getList(self::getId());
 
         $dfService = app('overcode.df.service');
         $cpts = $dfService->getItemsAll();
@@ -313,7 +314,7 @@ class CptModule extends AbstractModule
     public static function getInstanceSettingURI($instanceId)
     {
 //        return route('settings.cpt.cpt.config', $instanceId);
-        return route('settings.cpt.cpt.skin', $instanceId);
+        return route(self::ROUTE_PREFIX . '.skin', $instanceId);
     }
 
     /**

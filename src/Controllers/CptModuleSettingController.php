@@ -2,6 +2,7 @@
 
 namespace Overcode\XePlugin\DynamicFactory\Controllers;
 
+use Amuz\XePlugin\Maemulmoa\Components\Modules\Vendor\VendorModule;
 use App\Http\Controllers\Controller;
 use App\Http\Sections\SkinSection;
 use App\Http\Sections\ToggleMenuSection;
@@ -14,6 +15,7 @@ use Xpressengine\Captcha\CaptchaManager;
 use Xpressengine\Captcha\Exceptions\ConfigurationNotExistsException;
 use Xpressengine\Http\Request;
 use Session;
+use Xpressengine\Routing\InstanceRoute;
 
 class CptModuleSettingController extends Controller
 {
@@ -193,7 +195,8 @@ class CptModuleSettingController extends Controller
     {
         $config = $this->configHandler->get($instanceId);
 
-        $skinSection = new SkinSection(CptModule::getId(), $instanceId);
+        $instance = InstanceRoute::where('instance_id',$instanceId)->first();
+        $skinSection = new SkinSection($instance['module'], $instanceId);
 
         return $this->presenter->make('module.skin', [
             'config' => $config,

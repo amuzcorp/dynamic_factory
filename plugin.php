@@ -31,7 +31,6 @@ use Overcode\XePlugin\DynamicFactory\IdentifyManager;
 class Plugin extends AbstractPlugin
 {
     protected $cpts;
-
     protected $df_config;
 
     public function register()
@@ -102,7 +101,8 @@ class Plugin extends AbstractPlugin
 
         // CptUrlHandler
         $app->singleton(CptUrlHandler::class, function ($app) {
-            return new CptUrlHandler();
+            $proxyHandler = XeInterception::proxy(CptUrlHandler::class,'CptUrlHandler');
+            return new $proxyHandler();
         });
         $app->alias(CptUrlHandler::class, 'overcode.df.url');
 

@@ -1,8 +1,11 @@
 <?php
 namespace Overcode\XePlugin\DynamicFactory\Handlers;
 
+use Amuz\XePlugin\Maemulmoa\Components\Modules\Vendor\VendorModule;
+use Overcode\XePlugin\DynamicFactory\Components\Modules\Cpt\CptModule;
 use Overcode\XePlugin\DynamicFactory\Models\CptDocument;
 use Xpressengine\Config\ConfigEntity;
+use Xpressengine\Routing\InstanceRoute;
 
 class CptUrlHandler
 {
@@ -25,6 +28,12 @@ class CptUrlHandler
     public function getInstanceId()
     {
         return $this->instanceId;
+    }
+
+    public function getModule()
+    {
+        $instance = InstanceRoute::where('instance_id',$this->instanceId)->first();
+        return array_get($instance,'module');
     }
 
     public function get($name = 'index', array $params = [], $instanceId = null)
@@ -58,8 +67,9 @@ class CptUrlHandler
         return $this->get('slug', $params, $instanceId);
     }
 
-    public function managerUrl($name, $params = [])
+    public function managerUrl($name, $params = [], $prefix = null)
     {
-        return route('settings.cpt.cpt.'. $name, $params);
+        $prefix = $prefix == null ? CptModule::ROUTE_PREFIX : $prefix;
+        return route($prefix. '.' . $name, $params);
     }
 }
