@@ -2,6 +2,7 @@
 namespace Overcode\XePlugin\DynamicFactory;
 
 use Overcode\XePlugin\DynamicFactory\Components\Modules\Cpt\CptModule;
+use Overcode\XePlugin\DynamicFactory\Controllers\CptModuleController;
 use Overcode\XePlugin\DynamicFactory\Handlers\CptPermissionHandler;
 use Overcode\XePlugin\DynamicFactory\Handlers\DynamicFactoryConfigHandler;
 use Overcode\XePlugin\DynamicFactory\Handlers\DynamicFactoryDocumentHandler;
@@ -25,6 +26,7 @@ use Xpressengine\DynamicField\ColumnEntity;
 use Xpressengine\DynamicField\ConfigHandler;
 use Xpressengine\DynamicField\DynamicFieldHandler;
 use Xpressengine\Plugin\AbstractPlugin;
+use Overcode\XePlugin\DynamicFactory\IdentifyManager;
 
 class Plugin extends AbstractPlugin
 {
@@ -68,6 +70,12 @@ class Plugin extends AbstractPlugin
             );
         });
         $app->alias(DynamicFactoryService::class, 'overcode.df.service');
+
+
+        $app->singleton(IdentifyManager::class, function ($app) {
+            return new IdentifyManager(app('session'), app('xe.document'), app('hash'));
+        });
+        $app->alias(IdentifyManager::class, 'overcode.df.identify');
 
         //CptDocService
         $app->singleton(CptDocService::class , function() {
