@@ -3,6 +3,7 @@ namespace Overcode\XePlugin\DynamicFactory;
 
 use Illuminate\Database\Schema\Blueprint;
 use Overcode\XePlugin\DynamicFactory\Components\Modules\Cpt\CptModule;
+use Overcode\XePlugin\DynamicFactory\Controllers\CptModuleController;
 use Overcode\XePlugin\DynamicFactory\Handlers\CptPermissionHandler;
 use Overcode\XePlugin\DynamicFactory\Handlers\DynamicFactoryConfigHandler;
 use Overcode\XePlugin\DynamicFactory\Handlers\DynamicFactoryDocumentHandler;
@@ -26,11 +27,11 @@ use Xpressengine\DynamicField\ColumnEntity;
 use Xpressengine\DynamicField\ConfigHandler;
 use Xpressengine\DynamicField\DynamicFieldHandler;
 use Xpressengine\Plugin\AbstractPlugin;
+use Overcode\XePlugin\DynamicFactory\IdentifyManager;
 
 class Plugin extends AbstractPlugin
 {
     protected $cpts;
-
     protected $df_config;
 
     public function register()
@@ -70,6 +71,12 @@ class Plugin extends AbstractPlugin
         });
         $app->alias(DynamicFactoryService::class, 'overcode.df.service');
 
+
+        $app->singleton(IdentifyManager::class, function ($app) {
+            return new IdentifyManager(app('session'), app('xe.document'), app('hash'));
+        });
+        $app->alias(IdentifyManager::class, 'overcode.df.identify');
+
         //CptDocService
         $app->singleton(CptDocService::class , function() {
             return new CptDocService(
@@ -95,7 +102,8 @@ class Plugin extends AbstractPlugin
 
         // CptUrlHandler
         $app->singleton(CptUrlHandler::class, function ($app) {
-            return new CptUrlHandler();
+            $proxyHandler = XeInterception::proxy(CptUrlHandler::class,'CptUrlHandler');
+            return new $proxyHandler();
         });
         $app->alias(CptUrlHandler::class, 'overcode.df.url');
 

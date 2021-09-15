@@ -2,6 +2,7 @@
 
 namespace Overcode\XePlugin\DynamicFactory\Controllers;
 
+use App\Http\Sections\SkinSection;
 use Overcode\XePlugin\DynamicFactory\Models\Cpt;
 use Overcode\XePlugin\DynamicFactory\Plugin;
 use Overcode\XePlugin\DynamicFactory\Components\Modules\Cpt\CptModule;
@@ -29,6 +30,7 @@ use Xpressengine\Media\MediaManager;
 use Xpressengine\Media\Models\Media;
 use Xpressengine\Permission\Instance;
 use Xpressengine\Routing\InstanceConfig;
+use Xpressengine\Routing\InstanceRoute;
 use Xpressengine\Support\Exceptions\AccessDeniedHttpException;
 use Xpressengine\Support\Purifier;
 use Xpressengine\Support\PurifierModules\Html5;
@@ -56,6 +58,7 @@ class CptModuleController extends Controller
     {
         $instanceConfig = InstanceConfig::instance();
         $this->instanceId = $instanceConfig->getInstanceId();
+        $instance = InstanceRoute::where('instance_id',$this->instanceId)->first();
 
         $this->configHandler = $configHandler;
         $this->cptUrlHandler = $cptUrlHandler;
@@ -72,7 +75,7 @@ class CptModuleController extends Controller
         $this->cpt = $this->dfService->getItem($this->config->get('cpt_id'));
         $current_route = app('request')->route();
 
-        XePresenter::setSkinTargetId(CptModule::getId());
+        XePresenter::setSkinTargetId($instance['module']);
         XePresenter::share('cpt', $this->cpt);
         XePresenter::share('current_instance_route', ($current_route != null) ? $current_route->getName() : null);
         XePresenter::share('documentHandler', $dfDocHandler);
