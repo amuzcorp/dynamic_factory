@@ -552,7 +552,10 @@ class Plugin extends AbstractPlugin
      */
     public function DynamicFieldNewColumnCheck() {
         // implement code
-        if(\Schema::hasColumn('df_super_relate', 'ordering') == false) return false;
+        if(\Schema::hasTable('df_super_relate')){
+            if(\Schema::hasColumn('df_super_relate', 'ordering') == false) return false;
+        }
+
 
         return true;
     }
