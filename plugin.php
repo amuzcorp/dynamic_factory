@@ -1,6 +1,7 @@
 <?php
 namespace Overcode\XePlugin\DynamicFactory;
 
+use Illuminate\Database\Schema\Blueprint;
 use Overcode\XePlugin\DynamicFactory\Components\Modules\Cpt\CptModule;
 use Overcode\XePlugin\DynamicFactory\Controllers\CptModuleController;
 use Overcode\XePlugin\DynamicFactory\Handlers\CptPermissionHandler;
@@ -166,6 +167,8 @@ class Plugin extends AbstractPlugin
      */
     public function boot()
     {
+        if($this->DynamicFieldNewColumnCheck() === false) $this->addDynamicFieldNewColumn();
+
         $this->loadCpts();
         $this->CptCategorySettingFromPlugin();
         $this->CptDynamicFieldSettingFromPlugin();
@@ -543,6 +546,29 @@ class Plugin extends AbstractPlugin
 
         return true;
     }
+
+    /**
+     * 다이나믹 필드 New Columns 추가 했을 경우 상시 체크하여 업데이트
+     */
+    public function DynamicFieldNewColumnCheck() {
+        // implement code
+        if(\Schema::hasColumn('df_super_relate', 'ordering') == false) return false;
+
+        return true;
+    }
+
+    /**
+     * DynamicFieldNewColumnCheck = false 일 경우 실행
+     */
+    public function addDynamicFieldNewColumn() {
+        //SuperRelate Ordering 추가
+        if(\Schema::hasColumn('df_super_relate', 'ordering') == false) {
+            \Schema::table('df_super_relate', function (Blueprint $table) {
+                $table->integer('ordering')->default(0)->comment('ordering');
+            });
+        }
+    }
+
 
     /**
      * 플러그인을 업데이트한다.
