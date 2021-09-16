@@ -46,8 +46,6 @@ class CptDocService
             }
         }
 
-        $query->visible();
-
         if ($config->get('useConsultation') === true){
             $cptPermission = app('overcode.df.permission');
             $isManager = Gate::allows(
@@ -67,6 +65,11 @@ class CptDocService
 
         $this->handler->makeWhere($query, $request, $config);
         $this->handler->makeOrder($query, $request, $config);
+
+        $sql = $query->toSql();
+        $is_controlled_visible = false;
+        foreach(['status','visible','approved'] as $visible) if(strpos($sql, $visible) !== false) $is_controlled_visible = true;
+        if(!$is_controlled_visible) $query->visible();
 
         $perPage = $request->get('perPage') ?: $config->get('perPage') ?: '20';
         $paginate = $query->paginate($perPage)->appends($request->except('page'));
