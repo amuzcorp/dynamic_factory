@@ -112,7 +112,7 @@ class DynamicFactoryController extends Controller
             return XePresenter::makeApi([]);
         }
 
-        $query = CptDocument::where('title', 'like', '%'.$keyword.'%');
+        $query = CptDocument::where('title', 'like', '%'.$keyword.'%')->where('site_key', \XeSite::getCurrentSiteKey());
         if($request->get('cn') !== null) {
             $field_config = app('xe.config')->get($request->get('cn'));
             if($field_config !== null) {
