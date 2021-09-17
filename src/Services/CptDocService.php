@@ -75,6 +75,18 @@ class CptDocService
         $currentPage = $paginate->currentPage();
         $count = 0;
 
+        if($request->hasHeader('X-AMUZ-APPLICATION-HELPER')){
+            $taxonomyHandler = app('overcode.df.taxonomyHandler');
+            foreach($paginate as $item) {
+                $selectedTaxonomies = $taxonomyHandler->getItemOnlyTargetId($item->id);
+                foreach($selectedTaxonomies as $taxonomy) {
+                    $taxonomy->word = xe_trans($taxonomy->word);
+                    $taxonomy->description = xe_trans($taxonomy->description);
+                }
+                $item->selectedTaxonomies = $selectedTaxonomies;
+            }
+        }
+
         // 순번 필드를 추가하여 transform
         $paginate->getCollection()->transform(function ($paginate) use ($total, $perPage, $currentPage, &$count) {
             $paginate->seq = ($total - ($perPage * ($currentPage - 1))) - $count;
