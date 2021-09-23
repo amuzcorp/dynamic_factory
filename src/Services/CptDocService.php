@@ -5,6 +5,7 @@ use Illuminate\Support\Collection;
 use Overcode\XePlugin\DynamicFactory\Exceptions\NotFoundDocumentException;
 use Overcode\XePlugin\DynamicFactory\Handlers\DynamicFactoryDocumentHandler;
 use Overcode\XePlugin\DynamicFactory\IdentifyManager;
+use Overcode\XePlugin\DynamicFactory\Models\CategoryExtra;
 use Overcode\XePlugin\DynamicFactory\Models\CptDocument;
 use Xpressengine\Config\ConfigEntity;
 use Xpressengine\Http\Request;
@@ -80,9 +81,14 @@ class CptDocService
 
         if($request->get('taxonomies') && $request->get('taxonomies') === 'Y'){
             $taxonomyHandler = app('overcode.df.taxonomyHandler');
+            $categoryHandler = app('xe.category');
             foreach($paginate as $item) {
                 $selectedTaxonomies = $taxonomyHandler->getItemOnlyTargetId($item->id);
                 foreach($selectedTaxonomies as $taxonomy) {
+                    $cate = $categoryHandler->cates()->find($taxonomy->category_id);
+                    $category_Extra = CategoryExtra::where('category_id', $taxonomy->category_id)->first();
+                    $taxonomy->category_slug = $category_Extra->slug;
+                    $taxonomy->parent_cate_name = xe_trans($cate->name);
                     $taxonomy->word = xe_trans($taxonomy->word);
                     $taxonomy->description = xe_trans($taxonomy->description);
                 }
