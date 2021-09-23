@@ -78,7 +78,7 @@ class CptDocService
         $currentPage = $paginate->currentPage();
         $count = 0;
 
-        if($request->hasHeader('X-AMUZ-APPLICATION-HELPER')){
+        if($request->get('taxonomies') && $request->get('taxonomies') === 'Y'){
             $taxonomyHandler = app('overcode.df.taxonomyHandler');
             foreach($paginate as $item) {
                 $selectedTaxonomies = $taxonomyHandler->getItemOnlyTargetId($item->id);
