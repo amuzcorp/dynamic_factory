@@ -86,7 +86,6 @@ class CptModule extends AbstractModule
             Route::post('/store', ['as' => 'store', 'uses' => 'CptModuleController@store']);
             Route::post('/update', ['as' => 'update', 'uses' => 'CptModuleController@update']);
             Route::delete('/destroy/{id}', ['as' => 'destroy', 'uses' => 'CptModuleController@destroy']);
-
             Route::post('/vote/{option}/{id}', ['as' => 'vote', 'uses' => 'CptModuleController@vote']);
             Route::get('/vote/show/{id}', ['as' => 'showVote', 'uses' => 'CptModuleController@showVote']);
             Route::get('/vote/users/{option}/{id}', ['as' => 'votedUsers', 'uses' => 'CptModuleController@votedUsers']);
@@ -97,7 +96,8 @@ class CptModule extends AbstractModule
         }, ['namespace' => 'Overcode\XePlugin\DynamicFactory\Controllers']);
 
         DfSlug::setReserved([
-            'index', 'create', 'edit', 'destroy', 'show', 'identify', 'revision', 'store', 'preview', 'temporary',
+            //아래 추가
+            'index', 'create', 'edit', 'destroy', 'trash','show', 'identify', 'revision', 'store', 'preview', 'temporary',
             'trash', 'certify', 'update', 'vote', 'manageMenus', 'comment', 'file', 'suggestion', 'slug', 'hasSlug',
             'favorite'
         ]);

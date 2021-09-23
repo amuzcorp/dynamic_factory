@@ -32,6 +32,7 @@ use Xpressengine\Permission\Instance;
 use Xpressengine\Routing\InstanceConfig;
 use Xpressengine\Routing\InstanceRoute;
 use Xpressengine\Support\Exceptions\AccessDeniedHttpException;
+use Xpressengine\Support\Exceptions\HttpXpressengineException;
 use Xpressengine\Support\Purifier;
 use Xpressengine\Support\PurifierModules\Html5;
 use Xpressengine\User\Models\User;
@@ -369,6 +370,30 @@ class CptModuleController extends Controller
             'cptConfig' => $cptConfig,
             'dynamicFieldsById' => $dynamicFieldsById
         ]);
+    }
+
+    //destroy
+    public function destroy(
+        CptDocService $service,
+        Request $request,
+        Validator $validator,
+        IdentifyManager $identifyManager,
+        $menuUrl,
+        $id
+    ){
+        $this->validate($request, [
+            'id' => 'cpt_id',
+        ]);
+
+        $remove = CptDocument::where('id', $request->id)->delete();
+        if(!$remove) return redirect()->back()->with('alert', ['type' => 'danger', 'message' => '오류가 발생했습니다']);
+
+        if($request->get('redirectUrl') != null){
+            return redirect()->to($request->get('redirectUrl'))->with('alert', ['type' => 'success', 'message' => xe_trans('xe::deleted')]);
+        }else{
+            return redirect()->to($this->cptUrlHandler->get('index'))->with('alert', ['type' => 'success', 'message' => xe_trans('xe::deleted')]);
+//            return redirect()->back()->with('alert', ['type' => 'success', 'message' => xe_trans('xe::deleted')]);
+        }
     }
 
     public function update(
