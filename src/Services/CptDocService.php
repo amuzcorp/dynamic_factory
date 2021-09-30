@@ -79,6 +79,11 @@ class CptDocService
         $currentPage = $paginate->currentPage();
         $count = 0;
 
+        foreach($paginate as $item) {
+            if(!app('overcode.df.documentHandler')->hasFavorite($item->id, \Auth::user()->getId())) $item->has_favorite = 0;
+            else $item->has_favorite = 1;
+        }
+
         if($request->get('taxonomies') && $request->get('taxonomies') === 'Y'){
             $taxonomyHandler = app('overcode.df.taxonomyHandler');
             $categoryHandler = app('xe.category');
@@ -96,6 +101,15 @@ class CptDocService
             }
         }
 
+        //getThumbnail
+        if($request->get('thumbnail') && $request->get('thumbnail') === 'Y') {
+            $dfDocumentHandler = app('overcode.df.documentHandler');
+            foreach($paginate as $item) {
+                if($dfDocumentHandler->getThumb($item->id)) $item->thumbnail = $dfDocumentHandler->getThumb($item->id);
+            }
+        }
+
+
         // 순번 필드를 추가하여 transform
         $paginate->getCollection()->transform(function ($paginate) use ($total, $perPage, $currentPage, &$count) {
             $paginate->seq = ($total - ($perPage * ($currentPage - 1))) - $count;
@@ -110,10 +124,12 @@ class CptDocService
     {
         $item = CptDocument::division($config->get('cpt_id'))->find($id);
 
+        if(!app('overcode.df.documentHandler')->hasFavorite($item->id, \Auth::user()->getId())) $item->has_favorite = 0;
+        else $item->has_favorite = 1;
+
         if ($item === null) {
             throw new NotFoundDocumentException;
         }
-
         return $item;
     }
 
