@@ -251,12 +251,16 @@ class DynamicFactoryDocumentHandler
 
         if(array_get($data, 'taxOr') == 'Y') {
             $query->where(function ($q) use ($category_items, $data) {
+                $setCateIds = [];
                 foreach($category_items as $item_id) {
                     $categoryItem = CategoryItem::find($data);
                     if ($categoryItem !== null) {
-                        $q->orWhere('df_taxonomy.item_ids', 'like', '%"' . $item_id . '"%');
+                        $setCateIds[] = $item_id;
+//                        $q->orWhere('df_taxonomy.item_ids', 'like', '%"' . $item_id . '"%');
                     }
                 }
+                //whereIn으로 교체
+                $q->whereIn('df_taxonomy.item_ids', $setCateIds);
             });
         }else {
             foreach($category_items as $item_id) {
