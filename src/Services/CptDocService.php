@@ -72,6 +72,8 @@ class CptDocService
         foreach(['status','visible','approved'] as $visible) if(strpos($sql, $visible) !== false) $is_controlled_visible = true;
         if(!$is_controlled_visible) $query->visible();
 
+        $query->GroupBy('documents.id');
+
         $perPage = $request->get('perPage') ?: $config->get('perPage') ?: '20';
         $paginate = $query->paginate($perPage)->appends($request->except('page'));
 
