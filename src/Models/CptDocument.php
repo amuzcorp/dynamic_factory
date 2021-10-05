@@ -323,6 +323,7 @@ class CptDocument extends Document implements CommentUsable, SeoUsable
             $target_group = SuperRelate::Where($tableName.'.field_id', $field_id)->where('s_id', $this->id)->where('s_group', $group)->pluck('t_group')->first();
 
             $query->setProxyOption(['group' => $target_group, 'table' => 'documents'], false);
+            $query->groupBy('documents.id');
         }
 
         return $query->get();
