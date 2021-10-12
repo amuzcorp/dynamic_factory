@@ -37,6 +37,30 @@
                     </div>
                     <div class="pull-right">
                         <form id="__xe_search_form" class="input-group search-group">
+                            <input type="hidden" name="taxOr" value="Y">
+                            @foreach($taxonomies as $index => $taxonomy)
+                                @php
+                                    $taxo_item = app('overcode.df.taxonomyHandler')->getCategoryItemsTree($taxonomy->id);
+                                @endphp
+                                <div class="input-group-btn __xe_btn_taxo_item">
+                                    <input type="hidden" name="{{'taxo_'.($index + 1)}}" value="{{ Request::get('taxo_'.($index + 1)) }}" >
+
+                                    <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                                        <span class="taxo_{{($index + 1)}}_xe_text">
+                                            {{Request::get('taxo_'.($index + 1)) && Request::get('taxo_'.($index + 1)) != '' ? $taxo_item[Request::get('taxo_'.($index + 1))]['text'] : xe_trans($taxonomy->name).' 조회'}}
+                                        </span>
+                                        <span class="caret"></span>
+                                    </button>
+                                    <ul class="dropdown-menu" role="menu">
+                                        <li @if(Request::get('taxo_'.($index + 1)) == '') class="active" @endif><a value="" onclick="searchTaxonomy(this, {{$index+1}})">전체</a></li>
+                                        @foreach($taxo_item as $key => $val)
+                                            <li @if( Request::get('taxo_'.($index + 1)) && Request::get('taxo_'.($index + 1)) == $key) class="active" @endif><a value="{{$key}}" onclick="searchTaxonomy(this, {{$index+1}})">{{$val['text']}}</a></li>
+                                        @endforeach
+                                    </ul>
+                                </div>
+                            @endforeach
+
+
                             <div class="input-group-btn __xe_btn_order_type">
                                 <input type="hidden" name="order_type" value="{{ Request::get('order_type') }}">
                                 <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false"><span class="__xe_text">{{Request::has('order_type') && Request::get('order_type') != '' ? $orderNames[Request::get('order_type')] : '정렬'}}</span> <span class="caret"></span></button>
@@ -275,5 +299,15 @@
                 }
             });
         }
+    }
+
+    function searchTaxonomy(e, key) {
+        $('[name="taxo_' + key + '"]').val($(e).attr('value'));
+        $('.taxo_'+key+'_xe_text').text($(e).text());
+
+        $(e).closest('.dropdown-menu').find('li').removeClass('active');
+        $(e).closest('li').addClass('active');
+
+        $('#__xe_search_form').submit();
     }
 </script>

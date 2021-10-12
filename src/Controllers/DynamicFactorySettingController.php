@@ -2,6 +2,7 @@
 namespace Overcode\XePlugin\DynamicFactory\Controllers;
 
 use Carbon\Carbon;
+use Xpressengine\Category\Models\CategoryItem;
 use Xpressengine\Permission\Repositories\DatabaseRepository;
 use App\Http\Sections\DynamicFieldSection;
 use Overcode\XePlugin\DynamicFactory\Components\Modules\Cpt\CptModule;
@@ -462,6 +463,8 @@ class DynamicFactorySettingController extends BaseController
         $config = $this->configHandler->getConfig($cpt->cpt_id);
         $column_labels = $this->configHandler->getColumnLabels($config);
 
+        $taxonomies = app('overcode.df.taxonomyHandler')->getTaxonomies($cpt->cpt_id);
+
         $cptDocs = $this->getCptDocuments($request, $cpt, $config);
 
         $searchTargetWord = $request->get('search_target');
@@ -479,7 +482,8 @@ class DynamicFactorySettingController extends BaseController
             'column_labels' => $column_labels,
             'searchTargetWord' => $searchTargetWord,
             'stateTypeCounts' => $stateTypeCounts,
-            'orderNames' => $orderNames
+            'orderNames' => $orderNames,
+            'taxonomies' => $taxonomies
         ]);
     }
 
@@ -858,6 +862,46 @@ class DynamicFactorySettingController extends BaseController
 
             $query = $query->whereIn('user_id', $writerIds);
         }
+
+        $category_items = [];
+
+        $data = $request->except('_token');
+        foreach($data as $id => $value){
+            if(strpos($id, 'taxo_', 0) === 0) {
+                if($value) {
+                    $category_items[] = $value;
+                }
+            }
+        }
+
+        if(count($category_items) > 0) {
+            $query->leftJoin(
+                'df_taxonomy',
+                sprintf('%s.%s', $query->getQuery()->from, 'id'),
+                '=',
+                sprintf('%s.%s', 'df_taxonomy', 'target_id')
+            );
+        }
+
+        if(array_get($data, 'taxOr') == 'Y') {
+            $query->where(function ($q) use ($category_items, $data) {
+                foreach($category_items as $item_id) {
+                    $categoryItem = CategoryItem::find($data);
+                    if ($categoryItem !== null) {
+                        $q->orWhere('df_taxonomy.item_ids', 'like', '%"' . $item_id . '"%');
+                    }
+                }
+            });
+        } else {
+            foreach($category_items as $item_id) {
+                $categoryItem = CategoryItem::find($data);
+                if ($categoryItem !== null) {
+                    $query = $query->where('df_taxonomy.item_ids', 'like', '%"' . $item_id . '"%');
+                }
+            }
+        }
+
+        $query->GroupBy('documents.id');
 
         //필터 검색
         /*if ($state = $request->get('search_state')) {
