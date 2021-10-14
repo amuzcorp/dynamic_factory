@@ -57,12 +57,11 @@
         var searchUrl = '';
 
         var listId = "{{$config->get('id')}}_cptListItem";
-
-        @if($is_user)
+        var is_user = {{$is_user}};
+        if(is_user === 1)
             searchUrl = '{{ route('dyFac.user.search') }}';
-        @else
+        else
             searchUrl = '{{ route('dyFac.document.search') }}';
-        @endif
 
         XE.ajax({
             url: searchUrl + '/' + keyword,
@@ -76,6 +75,7 @@
                 document.getElementById(listId).innerHTML = '';
                 var str = '';
                 var hidden = 0;
+                var title = '';
                 if (data.length > 0) {
                     var inputs = $(".{{ $config->get('id') }}_input_hidden input");
                     var clip_list = [];
@@ -83,12 +83,18 @@
                         if(inputs[i].value) clip_list.push(inputs[i].value);
                     }
                     for(let i = 0; i < data.length; i++) {
-                        if(clip_list.includes( data[i].id )) {
-                            str += `<li class="item-latest" id="${data[i].id}" onclick="selectItem('${data[i].id}', '${data[i].title}')" style="display: none;">${data[i].title}</li>`;
-                            hidden += 1;
-                            console.log(i);
+                        title = '';
+                        if(is_user === 1) {
+                            title = data[i].display_name;
                         } else {
-                            str += `<li class="item-latest" id="${data[i].id}" onclick="selectItem('${data[i].id}', '${data[i].title}')">${data[i].title}</li>`;
+                            title = data[i].title;
+                        }
+
+                        if(clip_list.includes( data[i].id )) {
+                            str += `<li class="item-latest" id="${data[i].id}" onclick="selectItem('${data[i].id}', '${title}')" style="display: none;">${title}</li>`;
+                            hidden += 1;
+                        } else {
+                            str += `<li class="item-latest" id="${data[i].id}" onclick="selectItem('${data[i].id}', '${title}')">${title}</li>`;
                         }
                     }
 
