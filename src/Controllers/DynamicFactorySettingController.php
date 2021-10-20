@@ -425,10 +425,12 @@ class DynamicFactorySettingController extends BaseController
         $permission_check = app('overcode.df.permission')->get($cpt_id,\XeSite::getCurrentSiteKey());
 
         if(!$permission_check) {
-            \DB::table('permissions')->insert([
-                'site_key'=> \XeSite::getCurrentSiteKey(), 'name' => CptModule::getId().'.'.$cpt_id, 'grants' => '[]',
-                'created_at' => Carbon::now()->format('Y-m-d H:i:s'), 'updated_at' => Carbon::now()->format('Y-m-d H:i:s'),
-            ]);
+            if(!\DB::table('permissions')->where('site_key', \XeSite::getCurrentSiteKey())->where('name',CptModule::getId().'.'.$cpt_id)->first()) {
+                \DB::table('permissions')->insert([
+                    'site_key' => \XeSite::getCurrentSiteKey(), 'name' => CptModule::getId() . '.' . $cpt_id, 'grants' => '[]',
+                    'created_at' => Carbon::now()->format('Y-m-d H:i:s'), 'updated_at' => Carbon::now()->format('Y-m-d H:i:s'),
+                ]);
+            }
         }
 
         if($type == 'create') return $this->documentCreate($cpt, $request);
