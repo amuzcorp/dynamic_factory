@@ -423,6 +423,7 @@ class DynamicFactorySettingController extends BaseController
         $cpt = $this->dfService->getItem($cpt_id);
 
         $permission_check = app('overcode.df.permission')->get($cpt_id,\XeSite::getCurrentSiteKey());
+        dd($permission_check,$cpt_id,\XeSite::getCurrentSiteKey());
         if(!$permission_check) {
             \DB::table('permissions')->insert([
                 'site_key'=> \XeSite::getCurrentSiteKey(), 'name' => CptModule::getId().'.'.$cpt_id, 'grants' => '[]',
