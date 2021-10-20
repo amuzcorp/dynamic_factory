@@ -123,7 +123,7 @@ class CptPermissionHandler
     public function get($instanceId, $siteKey = null)
     {
         if($siteKey == null) $siteKey = \XeSite::getCurrentSiteKey();
-        dd($siteKey);
+        dd($this->name($instanceId),$siteKey);
         return $this->permissionHandler->get($this->name($instanceId),$siteKey);
     }
 
