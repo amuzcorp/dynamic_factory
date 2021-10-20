@@ -15,8 +15,8 @@
 
 
             <div class="Tags__tagInput">
-                <input type="text" name="{{$config->get('id')}}_cpt_search" id="cpt_document_search_input" placeholder="{{ $is_user ? '사용자의 이름' : '문서의 제목' }}으로 검색하세요." class="form-control input-left"/>
-                <a class="btn btn-primary btn-right" id="cpt_document_search" style="">검색</a>
+                <input type="text" name="{{$config->get('id')}}_cpt_search" id="cptSearchDocInput_{{$config->get('id')}}" placeholder="{{ $is_user ? '사용자의 이름' : '문서의 제목' }}으로 검색하세요." class="form-control input-left"/>
+                <a class="btn btn-primary btn-right" id="cptSearchDoc_{{$config->get('id')}}" style="">검색</a>
 
                 <div class="ReactTags__suggestions"></div>
             </div>
@@ -42,11 +42,11 @@
     } );
 
 
-    $('#cpt_document_search').click(function() {
+    $('#cptSearchDoc_{{$config->get('id')}}').click(function() {
         cpt_search();
     });
 
-    $("#cpt_document_search_input").on("keyup",function(key){
+    $("#cptSearchDocInput_{{$config->get('id')}}").on("keyup",function(key){
         if(key.keyCode==13) {
             cpt_search();
         }

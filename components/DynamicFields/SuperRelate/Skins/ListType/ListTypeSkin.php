@@ -20,7 +20,7 @@ class ListTypeSkin extends AbstractSkin
      */
     public function name()
     {
-        return 'SuperRelate 복수 선택';
+        return 'SuperRelate 복수 선택 (리스트형)';
     }
 
     /**
@@ -51,6 +51,7 @@ class ListTypeSkin extends AbstractSkin
         XeFrontend::js([
             Plugin::asset('/components/DynamicFields/SuperRelate/Skins/ListType/assets/DocList.js'),
             Plugin::asset('/components/DynamicFields/SuperRelate/Skins/ListType/assets/UserList.js'),
+            Plugin::asset('/components/DynamicFields/SuperRelate/Skins/ListType/assets/findDoc.js'),
         ])->appendTo('head')->load();
     }
 
