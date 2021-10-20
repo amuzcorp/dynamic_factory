@@ -120,9 +120,10 @@ class CptPermissionHandler
      * @param string $instanceId board instance id
      * @return \Xpressengine\Permission\Permission
      */
-    public function get($instanceId,$siteKey = null)
+    public function get($instanceId, $siteKey = null)
     {
         if($siteKey == null) $siteKey = \XeSite::getCurrentSiteKey();
+        dd($siteKey);
         return $this->permissionHandler->get($this->name($instanceId),$siteKey);
     }
 
