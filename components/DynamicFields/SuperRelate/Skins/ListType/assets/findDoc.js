@@ -79,7 +79,6 @@ function cpt_search(configName) {
 });
 }
   function selectItem(configName, id, name) {
-
   var tagIndex = document.getElementById(configName + "_tags").getElementsByClassName('ReactTags__tag');
   var index_no = (tagIndex.length + 1);
 
@@ -111,7 +110,6 @@ function cpt_search(configName) {
   function remove_cpt_item(event, configName) {
   var target_id = $(event).data('id');
   document.getElementById('tag_' + target_id).remove();
-    console.log($(this).data('config_name'));
   var inputs = $("."+ configName +"_input_hidden input");
   for(let i = 0; i < inputs.length; i++) {
   if(inputs[i].value === target_id) inputs[i].remove();
