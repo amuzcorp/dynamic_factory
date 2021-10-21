@@ -11,7 +11,7 @@
                             {{$key + 1}}.
                         </span>
                         {{$item->r_name}}
-                        <a class="ReactTags__remove btnRemoveTag" data-id="{{$item->r_id}}" onclick="remove_cpt_item(this)">x</a>
+                        <a class="ReactTags__remove btnRemoveTag" data-id="{{$item->r_id}}" onclick="remove_cpt_item(this, '{{$config->get('id')}}')">x</a>
                     </span>
                 @endforeach
             </div>

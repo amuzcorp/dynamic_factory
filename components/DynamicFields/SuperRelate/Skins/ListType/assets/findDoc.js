@@ -38,7 +38,6 @@ function cpt_search(configName) {
   dataType: 'json',
   cache: false,
   success: function (data) {
-    console.log(data);
     document.getElementById(listId).innerHTML = '';
     var str = '';
     var title = '';
@@ -91,7 +90,7 @@ function cpt_search(configName) {
                     </span>`;
 
   $("." + configName + "_input_hidden").append(hidden);
-  $("." + configName + "_tags").append(tags);
+  $("#" + configName + "_tags").append(tags);
 
   $("#"+id).hide();
   $("input[name=" + configName + "_srf_chg").val( 1 );
@@ -109,10 +108,10 @@ function cpt_search(configName) {
   $('#noItem').hide();
 }
 }
-  function remove_cpt_item(event) {
+  function remove_cpt_item(event, configName) {
   var target_id = $(event).data('id');
   document.getElementById('tag_' + target_id).remove();
-
+    console.log($(this).data('config_name'));
   var inputs = $("."+ configName +"_input_hidden input");
   for(let i = 0; i < inputs.length; i++) {
   if(inputs[i].value === target_id) inputs[i].remove();
