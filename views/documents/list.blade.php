@@ -23,7 +23,14 @@
                     <div class="pull-left">
                         <h3 class="panel-title">{{ $cpt->cpt_name }} 목록</h3>
                     </div>
+                    <form action="" method="post">
+                    </form>
                     <div class="pull-right">
+                        <label class="xe-btn xe-btn-warning-outline">
+                            <i class="xi-icon xi-plus"></i> 파일 첨부
+                            <input type="file" class="__xe_file xe-hidden" name="file" accept=".xls,.xlsx" onchange="uploadCSV(this)">
+                        </label>
+                        <a href="{{ route('dyFac.setting.downloadCSV', ['cpt_id' => $cpt->cpt_id]) }}" class="xe-btn xe-btn-success-outline"><i class="xi-download"></i>CSV 저장</a>
                         <a href="{{ route('dyFac.setting.edit', ['cpt_id' => $cpt->cpt_id]) }}" class="xe-btn xe-btn-positive-outline"><i class="xi-cog"></i> 설정</a>
                         <a href="{{ route($current_route_name, ['type' => 'create']) }}" class="xe-btn xe-btn-primary" data-toggle="xe-page-modal"><i class="xi-file-text-o"></i> {{ sprintf($cpt->labels['new_add_cpt'], $cpt->cpt_name) }}</a>
                     </div>
@@ -309,5 +316,12 @@
         $(e).closest('li').addClass('active');
 
         $('#__xe_search_form').submit();
+    }
+
+    function uploadCSV(item) {
+        if($('input[name=file]').val()) {
+            console.log($('input[name=file]').val());
+        }
+
     }
 </script>

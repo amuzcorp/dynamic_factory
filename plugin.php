@@ -383,6 +383,9 @@ class Plugin extends AbstractPlugin
                     'settings_menu' => 'setting.dynamic_factory.index'
                 ]);
 
+                Route::get('/downloadCSV/{cpt_id}', [ 'as' => 'downloadCSV', 'uses' => 'DynamicFactorySettingController@downloadCSV' ]);
+                Route::post('/uploadCSV', [ 'as' => 'uploadCSV', 'uses' => 'DynamicFactorySettingController@uploadCSV' ]);
+
                 Route::get('/create', [ 'as' => 'create', 'uses' => 'DynamicFactorySettingController@create' ]);
                 Route::post('/store_cpt', ['as' => 'store_cpt', 'uses' => 'DynamicFactorySettingController@storeCpt']);
                 Route::get('/edit_editor/{cpt_id}', [ 'as' => 'edit_editor', 'uses' => 'DynamicFactorySettingController@editEditor' ]);

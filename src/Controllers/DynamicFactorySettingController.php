@@ -2,7 +2,13 @@
 namespace Overcode\XePlugin\DynamicFactory\Controllers;
 
 use Carbon\Carbon;
+use Illuminate\Http\Request as SymfonyRequest;
+use Illuminate\Http\Response;
+use Illuminate\Http\UploadedFile;
+use Overcode\XePlugin\DynamicFactory\Models\DfSlug;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 use Xpressengine\Category\Models\CategoryItem;
+use Xpressengine\Editor\EditorHandler;
 use Xpressengine\Permission\Repositories\DatabaseRepository;
 use App\Http\Sections\DynamicFieldSection;
 use Overcode\XePlugin\DynamicFactory\Components\Modules\Cpt\CptModule;
@@ -31,6 +37,7 @@ use Xpressengine\Category\Models\Category;
 use Xpressengine\Http\Request;
 use App\Http\Controllers\Controller as BaseController;
 use Session;
+use Overcode\XePlugin\DynamicFactory\Plugins\PHPExcel_IOFactory;
 
 class DynamicFactorySettingController extends BaseController
 {
@@ -919,5 +926,345 @@ class DynamicFactorySettingController extends BaseController
         }*/
 
         return $query;
+    }
+
+    public function downloadCSV(Request $request, $cpt_id) {
+        $docData = CptDocument::division($cpt_id)->where('instance_id', $cpt_id)->get();
+
+        if(!$docData) return redirect()->back()->with('alert', ['type' => 'danger', 'message' => '다운로드할 문서 정보가 존재 하지 않습니다']);
+        $cpt = app('overcode.df.service')->getItem($cpt_id);
+
+        //application/pdf
+        $headers = array(
+            "Content-type" => "application/vnd.ms-excel; charset=UTF-8;",
+            "Content-Disposition" => 'attachment; filename='.$cpt->menu_name.'_'.date('Y_m_d H_i_s').'.csv',
+            "Cache-Control" => "must-revalidate, post-check=0, pre-check=0",
+        );
+
+        $headerText = '';
+
+        $relateCptId = '';
+
+        foreach($docData[0]->getAttributes() as $key => $val) {
+            if(strpos($key,"_srf_chg")) {
+                $relateCptId = str_replace('_srf_chg', '', $key);
+            }
+            if($key === $relateCptId.'_s_id' || $key === $relateCptId.'_s_group' || $key === $relateCptId.'_s_type' || $key === $relateCptId.'_t_id' || $key === $relateCptId.'_t_group'
+                || $key === $relateCptId.'_t_type' || $key === $relateCptId.'_ordering') {
+                continue;
+            }
+            if($headerText !== '') $headerText = $headerText.','.$key;
+            else $headerText = $key;
+        }
+
+        $test = explode(',', $headerText);
+
+        $excels = [];
+        foreach($docData as $inx => $data) {
+            $doc_items = $data->getAttributes();
+            $relateCptId = '';
+            foreach($test as $key=>$val) {
+                //Relate Cpt 데이터 분류
+                if(strpos($val,"_srf_chg")) {
+                    $relateCptId = str_replace('_srf_chg', '', $val);
+                    $excels[$inx][$val] = 1;
+                } else if($val === 'hidden_'.$relateCptId) {
+                    $item_realteCptData = [];
+                    foreach($data->hasDocument($relateCptId) as $relate_data) {
+                        $item_realteCptData[] = $relate_data->id;
+                    }
+                    $excels[$inx][$val] = json_enc($item_realteCptData);
+                }
+                //일반 데이터 + 일반 Field 분류 데이터
+                else {
+                    //Content에 포함된 /r/n으로 인한 오작동 방지용 json 인코딩
+                    if($val === 'content') {
+                        $doc_items[$val] = json_enc($doc_items[$val]);
+                    }
+                    $excels[$inx][$val] = $doc_items[$val];
+                }
+
+            }
+        }
+
+        $callback = function () use ($headerText, $excels) {
+            $file = fopen('php://output', 'w');
+
+            fputs($file, $bom = (chr(0xEF) . chr(0xBB) . chr(0xBF)));
+
+            fwrite($file, $headerText."\n");
+            foreach ($excels as $data) {
+                foreach($data as $key => $val) {
+                    fwrite($file, $val . ",");
+                }
+                fwrite($file, "\n");
+            }
+            fclose($file);
+        };
+
+        return \Illuminate\Support\Facades\Response::stream($callback, 200, $headers);
+    }
+
+    public function uploadCSV(Request $request) {
+        $instanceId = 'smart_store';
+        $editor = XeEditor::get($instanceId);
+        $config = $editor->getConfig();
+        $cpt_id = 'smart_store_item';
+
+        // output
+        include 'plugins/smart_store/src/Plugin/PHPExcel.php';
+        require_once "plugins/smart_store/src/Plugin/PHPExcel/IOFactory.php";
+        $uploadedFile = $request->file('upload_excel');
+
+        $extensions = array_map(function ($v) {
+            return trim($v);
+        }, explode(',', $config->get('extensions', '')));
+        if (array_search('*', $extensions) === false
+            && !in_array(strtolower($uploadedFile->getClientOriginalExtension()), $extensions)) {
+            throw new HttpException(
+                Response::HTTP_NOT_ACCEPTABLE,
+                xe_trans('xe::msgAvailableUploadingFiles', [
+                    'extensions' => $config->get('extensions'),
+                    'uploadFileName' => $uploadedFile->getClientOriginalName()
+                ])
+            );
+        }
+
+        $file = XeStorage::upload($uploadedFile, EditorHandler::FILE_UPLOAD_PATH);
+        $filename = 'storage/app/'.$file->path.'/'.$file->filename;
+        $complete_count = 0;
+
+        XeDB::beginTransaction();
+        try {
+            $objReader = \PHPExcel_IOFactory::createReaderForFile($filename);
+
+            // 읽기전용으로 설정
+            $objReader->setReadDataOnly(true);
+
+            // 엑셀파일을 읽는다
+            $objExcel = $objReader->load($filename);
+
+            // 첫번째 시트를 선택
+            $objExcel->setActiveSheetIndex(0);
+            $objWorksheet = $objExcel->getActiveSheet();
+            $rowIterator = $objWorksheet->getRowIterator();
+
+            foreach ($rowIterator as $row) { // 모든 행에 대해서
+                $cellIterator = $row->getCellIterator();
+                $cellIterator->setIterateOnlyExistingCells(false);
+
+            }
+            $maxRow = $objWorksheet->getHighestRow();
+
+            if($objWorksheet->getHighestColumn(1) !== 'BK') {
+//                \XeStorage::delete($file);
+                return  redirect()->route('smart_store.contents.index')->with(
+                    'alert',
+                    ['type' => 'danger', 'message' => '양식이 일치하지 않는 엑셀파일입니다.']
+                );
+            }
+
+            for ($i = 2 ; $i <= $maxRow ; $i++) {
+
+                $product_number = $objWorksheet->getCell('A' . $i)->getValue();
+
+                if ($product_number === null) continue;
+
+                $textTable = 'field_xpressengine_text';
+
+                $insertCheck = CptDocument::division('smart_store_item')->where('instance_id', 'smart_store_item')->
+                leftjoin($textTable, sprintf('%s.target_id',$textTable) , '=', 'documents.id')
+                    ->where(sprintf('%s.field_id',$textTable), 'product_number')
+                    ->where(sprintf('%s.text',$textTable), $product_number)->count();
+
+                if($insertCheck > 0) continue;
+
+                //채널
+                $channel = $objWorksheet->getCell('C' . $i)->getValue();
+
+                //상품명
+                $title = $objWorksheet->getCell('E' . $i)->getValue();
+
+                //스토어전용 상품명
+                $store_product_name = $objWorksheet->getCell('F' . $i)->getValue();
+
+                //쇼핑윈도전용 상품명
+                $window_product_name = $objWorksheet->getCell('G' . $i)->getValue();
+
+                //판매상태
+                if ($objWorksheet->getCell('H' . $i)->getValue() === '판매중') {
+                    $sales_status = '1';
+                } else {
+                    $sales_status = '0';
+                }
+
+                //전시상태
+                if ($objWorksheet->getCell('I' . $i)->getValue() === '전시중지') {
+                    $exhibition_status = '0';
+                } else {
+                    $exhibition_status = '1';
+                }
+
+                //판매가
+                $price = (int)$objWorksheet->getCell('K' . $i)->getValue();
+
+                //판매자 할인가
+                if (!$objWorksheet->getCell('M' . $i)->getValue()) {
+                    $seller_discount = 0;
+                } else {
+                    $seller_discount = (int)str_replace('원', '', $objWorksheet->getCell('M' . $i)->getValue());
+                }
+
+                //관리자 할인가
+                if (!$objWorksheet->getCell('N' . $i)->getValue()) {
+                    $admin_discount = 0;
+                } else {
+                    $admin_discount = (int)str_replace('원', '', $objWorksheet->getCell('N' . $i)->getValue());
+                }
+
+                //판매자 할인가 - 모바일
+                if (!$objWorksheet->getCell('P' . $i)->getValue()) {
+                    $seller_discount_mobile = 0;
+                } else {
+                    $seller_discount_mobile = (int)str_replace('원', '', $objWorksheet->getCell('P' . $i)->getValue());
+                }
+
+                //판매자 할인가 - 모바일
+                if (!$objWorksheet->getCell('Q' . $i)->getValue()) {
+                    $admin_discount_mobile = 0;
+                } else {
+                    $admin_discount_mobile = (int)str_replace('원', '', $objWorksheet->getCell('Q' . $i)->getValue());
+                }
+
+                //배송비
+                $shipping_fee = (int)$objWorksheet->getCell('AJ' . $i)->getValue();
+
+                //반품배송비
+                $return_shipping_fee = (int)$objWorksheet->getCell('AK' . $i)->getValue();
+
+                //교환배송비
+                $exchange_shipping_fee = (int)$objWorksheet->getCell('AL' . $i)->getValue();
+
+                //대분류
+                $large_category = $objWorksheet->getCell('AP' . $i)->getValue();
+
+                //중분류
+                $middle_category = $objWorksheet->getCell('AQ' . $i)->getValue();
+
+                //소분류
+                $small_category = $objWorksheet->getCell('AR' . $i)->getValue();
+
+                //세분류
+                $detail_category = $objWorksheet->getCell('AS' . $i)->getValue();
+
+                //제조사명
+                $manufacturer_name = $objWorksheet->getCell('AT' . $i)->getValue();
+
+                //브랜드명
+                $brand_name = $objWorksheet->getCell('AW' . $i)->getValue();
+
+                //판매시작일
+                $sales_start_date = $objWorksheet->getCell('BF' . $i)->getValue();
+
+                //판매종료일
+                $sales_end_date = $objWorksheet->getCell('BG' . $i)->getValue();
+
+                //썸네일 주소
+                $thumbnail = $objWorksheet->getCell('BE' . $i)->getValue();
+
+//                $reg_date = $objWorksheet->getCell('F' . $i)->getValue(); // F열
+//                $reg_date = PHPExcel_Style_NumberFormat::toFormattedString($reg_date, 'YYYY-MM-DD'); // 날짜 형태의 셀을 읽을때는 toFormattedString를 사용한다.
+
+                $image_name = null;
+
+                if ($thumbnail) {
+                    $mediaRequest = new Request();
+                    $mediaRequest->request->add(['instance_id' => $cpt_id]);
+
+                    $info = pathinfo($thumbnail);
+                    $contents = file_get_contents($thumbnail);
+
+                    $file_name = explode("?", $info['basename'])[0];
+                    $file = '/tmp/' . $file_name;
+                    file_put_contents($file, $contents);
+
+                    $uploaded_file = new UploadedFile($file, $file_name, null, null, null, true);
+
+                    $mediaRequest->files->set('file', $uploaded_file);
+                    $media = app('xe.media_library.handler')->uploadMediaLibraryFile($mediaRequest); // MediaLibraryFile model return
+
+                    $image_name[] = $media->file_id;
+                }
+
+                $data['title'] = $title;
+                $data['slug'] = DfSlug::make($title, $cpt_id);
+                $data['content'] = "<p>" . $title . "</p>";
+                $data['_coverId'] = null;
+                $data['thumbnail_column'] = $image_name;
+                $data['product_number_text'] = $product_number;
+                $data['store_channel_text'] = $channel;
+                $data['smart_store_product_name_text'] = $store_product_name;
+                $data['shop_window_product_name_text'] = $window_product_name;
+
+                $data['sales_status_boolean'] = $sales_status;
+                $data['exhibition_status_boolean'] = $exhibition_status;
+
+                $data['price_num'] = $price;
+                $data['seller_discount_num'] = $seller_discount;
+                $data['admin_discount_num'] = $admin_discount;
+                $data['seller_discount_mobile_num'] = $seller_discount_mobile;
+                $data['admin_discount_mobile_num'] = $admin_discount_mobile;
+                $data['shipping_fee_num'] = $shipping_fee;
+                $data['return_shipping_fee_num'] = $return_shipping_fee;
+                $data['exchange_shipping_fee_num'] = $exchange_shipping_fee;
+                $data['large_category_text'] = $large_category;
+                $data['middle_category_text'] = $middle_category;
+                $data['small_category_text'] = $small_category;
+                $data['detail_category_text'] = $detail_category;
+                $data['manufacturer_name_text'] = $manufacturer_name;
+                $data['brand_name_text'] = $brand_name;
+                $data['sales_start_date_text'] = $sales_start_date;
+                $data['sales_end_date_text'] = $sales_end_date;
+                $data['cpt_status'] = 'public';
+                $data['published_at'] = "____-__-__ __:__:__";
+                $data['user_id'] = \Auth::user()->id;
+                $data['writer'] = \Auth::user()->display_name;
+
+                $inputs = new SymfonyRequest($data);
+                $inputs = Request::createFromBase($inputs);
+                $inputs->request->add(
+                    [
+                        'cpt_id' => $cpt_id,
+                    ]
+                );
+
+                $storeItem = app('overcode.df.service')->storeCptDocument($inputs);
+
+                if ($storeItem) {
+                    $complete_count = $complete_count + 1;
+                }
+            }
+
+        } catch (exception $e) {
+            XeDB::rollback();
+            /*\XeStorage::delete($file);*/
+            return  redirect()->route('smart_store.contents.index')->with(
+                'alert',
+                ['type' => 'danger', 'message' => $e]
+            );
+        }
+        XeDB::commit();
+//        \XeStorage::delete($file);
+
+        if($complete_count > 0) {
+            $message = '총'.$complete_count.'개의 상품이 등록되었습니다';
+        } else {
+            $message = '이미 등록된 상품 리스트 입니다.';
+        }
+
+        return redirect()->route('dyFac.setting.'.$cpt_id)->with(
+            'alert',
+            ['type' => 'success', 'message' => $message]
+        );
     }
 }
