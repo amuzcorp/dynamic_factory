@@ -28,7 +28,7 @@
                         <input type="hidden" name="cpt_id" value="{{$cpt->cpt_id}}">
                         <div class="pull-right">
                             <label class="xe-btn xe-btn-warning-outline">
-                                <i class="xi-icon xi-plus"></i> 파일 첨부
+                                <i class="xi-icon xi-plus"></i> CSV 등록
                                 <input type="file" class="__xe_file xe-hidden" name="csv_file" accept=".csv" onchange="uploadCSV(this)">
                             </label>
                             <a href="{{ route('dyFac.setting.downloadCSV', ['cpt_id' => $cpt->cpt_id]) }}" class="xe-btn xe-btn-success-outline"><i class="xi-download"></i>CSV 저장</a>
