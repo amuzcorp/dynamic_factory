@@ -79,7 +79,11 @@ class Plugin extends AbstractPlugin
 
         //CptDocService
         $app->singleton(CptDocService::class , function() {
-            return new CptDocService(
+            $proxyHandler = XeInterception::proxy(CptDocService::class,'CptDocService');
+//            return new CptDocService(
+//                app('overcode.df.documentHandler')
+//            );
+            return new $proxyHandler(
                 app('overcode.df.documentHandler')
             );
         });
