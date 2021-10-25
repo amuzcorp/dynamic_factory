@@ -69,22 +69,22 @@ class ListTypeSkin extends AbstractSkin
             self::$loaded = true;
         }
 
-        $query = CptDocument::where('id', '!=', null);
-
-        if($this->config->get('r_instance_id') == 'user') {
-
-        } else {
-            $field_config = app('xe.config')->get( $this->config->name );
-            if($field_config !== null) {
-                // 선택한 타입들의 글만 표시
-                if($field_config->get('r_instance_id')) $query->where('instance_id', $field_config->get('r_instance_id'));
-
-                // 자신이 작성한 글만 옵션 선택시
-                $user_id = auth()->user()->getId();
-                if($field_config->get('author') == 'author' && $user_id != null) $query->where('user_id',$user_id);
-            }
-            $matchedDocumentList = $query->paginate(15, ['id','title'], 'page', 1);
-        }
+//        $query = CptDocument::where('id', '!=', null);
+//
+//        if($this->config->get('r_instance_id') == 'user') {
+//
+//        } else {
+//            $field_config = app('xe.config')->get( $this->config->name );
+//            if($field_config !== null) {
+//                // 선택한 타입들의 글만 표시
+//                if($field_config->get('r_instance_id')) $query->where('instance_id', $field_config->get('r_instance_id'));
+//
+//                // 자신이 작성한 글만 옵션 선택시
+//                $user_id = auth()->user()->getId();
+//                if($field_config->get('author') == 'author' && $user_id != null) $query->where('user_id',$user_id);
+//            }
+//            $matchedDocumentList = $query->paginate(15, ['id','title'], 'page', 1);
+//        }
 
         return parent::create($args);
     }

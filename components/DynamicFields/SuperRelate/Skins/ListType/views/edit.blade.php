@@ -4,7 +4,7 @@
         <input type="hidden" name="{{$config->get('id')}}_srf_chg" value="0" />
 
         <div class="Tags__tags">
-            <div class="ReactTags__selected relate_tags" data-config_name="{{ $config->get('id') }}" id="{{ $config->get('id') }}_tags">
+            <div class="ReactTags__selected relate_tags" data-config_id="{{$config->get('id')}}" data-config_name="{{$config->name}}" id="{{ $config->get('id') }}_tags">
                 @foreach($items as $key => $item)
                     <span class="ReactTags__tag" id="tag_{{$item->r_id}}">
                         <span class="tag_index">
@@ -23,8 +23,8 @@
             </div>
 
             <div class="Tags__tagInput">
-                <input type="text" name="{{$config->get('id')}}_cpt_search" placeholder="{{ ($config->get('r_instance_id') == 'user') ? '사용자의 이름' : '문서의 제목' }}으로 검색하세요." class="form-control input-left cpt_search_doc_input" data-config_name="{{$config->get('id')}}" />
-                <a class="btn btn-primary btn-right cpt_search_doc" data-config_name="{{$config->get('id')}}" style="">검색</a>
+                <input type="text" name="{{$config->get('id')}}_cpt_search" placeholder="{{ ($config->get('r_instance_id') == 'user') ? '사용자의 이름' : '문서의 제목' }}으로 검색하세요." class="form-control input-left cpt_search_doc_input" data-config_id="{{$config->get('id')}}" data-config_name="{{$config->name}}" />
+                <a class="btn btn-primary btn-right cpt_search_doc" data-config_id="{{$config->get('id')}}" data-config_name="{{$config->name}}" style="">검색</a>
 
                 <div class="ReactTags__suggestions"></div>
             </div>
