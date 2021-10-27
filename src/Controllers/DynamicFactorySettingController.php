@@ -613,8 +613,8 @@ class DynamicFactorySettingController extends BaseController
                 $arr_order = explode('|@|',$order);
                 $query->orderBy($arr_order[0], $arr_order[1]);
             }
-
-            $query->orderBy('head', 'desc');
+            //TODO 오류 있어서 임시 제거
+//            $query->orderBy('head', 'desc');
         } elseif ($orderType == 'assent_count') {
             $query->orderBy('assent_count', 'desc')->orderBy('head', 'desc');
         } elseif ($orderType == 'recently_created') {
