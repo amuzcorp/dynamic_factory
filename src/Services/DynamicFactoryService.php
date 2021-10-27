@@ -311,6 +311,7 @@ class DynamicFactoryService
         if($site_key != '*' && Schema::hasColumn('documents', 'site_key')){
             $site_key = $site_key != null ? $site_key : \XeSite::getCurrentSitekey();
             $query->where('site_key', $site_key);
+            dd($site_key, $query->get());
         }
 
 //        $query->visible(); // trash 가 아닌것만
