@@ -320,7 +320,6 @@ class DynamicFactoryService
                 $query = $handler->getItems($query, $attributes);
             }
         }
-        dd($site_key, $query->get());
 
         return $query;
     }
