@@ -939,7 +939,7 @@ class DynamicFactorySettingController extends BaseController
             "Content-Disposition" => 'attachment; filename='.$cpt->menu_name.'_'.date('Y_m_d H_i_s').'.csv',
             "Cache-Control" => "must-revalidate, post-check=0, pre-check=0",
         );
-        $headerText = 'no';
+        $headerText = 'no,cpt_status';
         $relateCptId = '';
         foreach($docData[0]->getAttributes() as $key => $val) {
 
@@ -968,8 +968,6 @@ class DynamicFactorySettingController extends BaseController
                 $headerText = $headerText.','.$key;
             }
         }
-        if($headerText !== '') $headerText = $headerText.',cpt_status';
-        else $headerText = 'cpt_status';
 
         $test = explode(',', $headerText);
 
