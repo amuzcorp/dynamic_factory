@@ -950,7 +950,7 @@ class DynamicFactorySettingController extends BaseController
                 $key == 'comment_count'||$key == 'read_count'||
                 $key == 'certify_key'||$key == 'dissent_count'||
                 $key == 'approved'||$key == 'published'||$key == 'status'||
-                $key == 'display'||$key == 'format'||$key == 'locale'||$key == 'parent_id') {
+                $key == 'display'||$key == 'format'||$key == 'locale'||$key == 'parent_id' || $key == 'deleted_at') {
                 continue;
             }
 
@@ -1141,7 +1141,7 @@ class DynamicFactorySettingController extends BaseController
                 unset($val['assent_count']);
                 unset($val['dissent_count']);
                 unset($val['approved']);
-                unset($val['published']);
+                unset($val['published_at']);
                 unset($val['status']);
                 unset($val['display']);
                 unset($val['format']);
