@@ -930,7 +930,7 @@ class DynamicFactorySettingController extends BaseController
     public function downloadCSV($cpt_id) {
         $docData = CptDocument::division($cpt_id)->where('instance_id', $cpt_id)->where('type', $cpt_id)->get();
 
-        if(!$docData) return redirect()->back()->with('alert', ['type' => 'danger', 'message' => '다운로드할 문서 정보가 존재 하지 않습니다']);
+        if(count($docData) === 0) return redirect()->back()->with('alert', ['type' => 'danger', 'message' => '문서를 하나 이상 작성 후 다운로드 해주세요.']);
         $cpt = app('overcode.df.service')->getItem($cpt_id);
 
         //application/pdf
