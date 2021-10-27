@@ -606,24 +606,25 @@ class DynamicFactorySettingController extends BaseController
         // 정렬
         $orderType = $request->get('order_type', '');
 
-        if ($orderType == '') {
-            // order_type 이 없을때만 dyFac Config 의 정렬을 우선 적용한다.
-            $orders = $config->get('orders', []);
-            foreach ($orders as $order) {
-                $arr_order = explode('|@|',$order);
-                $query->orderBy($arr_order[0], $arr_order[1]);
-            }
-            //TODO 오류 있어서 임시 제거
+        //TODO 오류 있어서 임시 제거
+
+//        if ($orderType == '') {
+//            // order_type 이 없을때만 dyFac Config 의 정렬을 우선 적용한다.
+//            $orders = $config->get('orders', []);
+//            foreach ($orders as $order) {
+//                $arr_order = explode('|@|',$order);
+//                $query->orderBy($arr_order[0], $arr_order[1]);
+//            }
 //            $query->orderBy('head', 'desc');
-        } elseif ($orderType == 'assent_count') {
-            $query->orderBy('assent_count', 'desc')->orderBy('head', 'desc');
-        } elseif ($orderType == 'recently_created') {
-            $query->orderBy(CptDocument::CREATED_AT, 'desc')->orderBy('head', 'desc');
-        } elseif ($orderType == 'recently_published') {
-            $query->orderBy('published_at', 'desc')->orderBy('head', 'desc');
-        } elseif ($orderType == 'recently_updated') {
-            $query->orderBy(CptDocument::UPDATED_AT, 'desc')->orderBy('head', 'desc');
-        }
+//        } elseif ($orderType == 'assent_count') {
+//            $query->orderBy('assent_count', 'desc')->orderBy('head', 'desc');
+//        } elseif ($orderType == 'recently_created') {
+//            $query->orderBy(CptDocument::CREATED_AT, 'desc')->orderBy('head', 'desc');
+//        } elseif ($orderType == 'recently_published') {
+//            $query->orderBy('published_at', 'desc')->orderBy('head', 'desc');
+//        } elseif ($orderType == 'recently_updated') {
+//            $query->orderBy(CptDocument::UPDATED_AT, 'desc')->orderBy('head', 'desc');
+//        }
 
         $paginate = $query->paginate($perPage, ['*'], 'page')->appends($request->except('page'));
 
