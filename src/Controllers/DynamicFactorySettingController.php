@@ -1135,11 +1135,29 @@ class DynamicFactorySettingController extends BaseController
                 unset($val['updated_at']);
                 unset($val['instance_id']);
                 unset($val['deleted_at']);
+                unset($val['certify_key']);
+                unset($val['read_count']);
+                unset($val['comment_count']);
+                unset($val['assent_count']);
+                unset($val['dissent_count']);
+                unset($val['approved']);
+                unset($val['published']);
+                unset($val['status']);
+                unset($val['display']);
+                unset($val['format']);
+                unset($val['locale']);
+                unset($val['head']);
+                unset($val['reply']);
+                unset($val['ipaddress']);
+                unset($val['site_key']);
+                unset($val['created_at']);
 
                 //Slug 추가
                 if($cptDocument) {
                     $val['slug'] = $cptDocument->getSlug();
                 } else {
+                    unset($val['parent_id']);
+                    unset($val['doc_id']);
                     $val['published_at'] = '____-__-__ __:__:__';
                     $val['slug'] = DfSlug::make($val['title'], $target_cpt_id);
                 }
@@ -1154,10 +1172,10 @@ class DynamicFactorySettingController extends BaseController
                         'cpt_id' => $target_cpt_id,
                     ]
                 );
+
                 //CPT 문서가 존재하고 doc ID가 있으면 update
                 if($cptDocument) app('overcode.df.service')->updateCptDocument($inputs);
                 else app('overcode.df.service')->storeCptDocument($inputs);
-
             }
             //exception
         } catch (\Exception $e) {
