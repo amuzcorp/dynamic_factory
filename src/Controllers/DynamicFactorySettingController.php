@@ -1122,7 +1122,9 @@ class DynamicFactorySettingController extends BaseController
 
                 //문서에 기록된 CPT ID
                 $target_cpt_id = $val['instance_id'];
-
+                if(!$target_cpt_id || $target_cpt_id === '') {
+                    $target_cpt_id = $cpt_id;
+                }
                 //CSV 업로드 진행중인 CPT 와 기록된 CPT ID가 다를경우 continue
                 if($cpt_id !== $target_cpt_id) continue;
 
@@ -1150,6 +1152,15 @@ class DynamicFactorySettingController extends BaseController
                 unset($val['ipaddress']);
                 unset($val['site_key']);
                 unset($val['created_at']);
+
+                if(!$val['user_id'] || $val['user_id'] === '') {
+                    $val['user_id'] = \Auth::user()->id;
+                    $val['writer'] = \Auth::user()->display_name;
+                }
+
+                if(!$val['title'] || $val['title'] === '') {
+                    $val['title'] = date('Y-m-d H:i:s').' 문서 작성';
+                }
 
                 //Slug 추가
                 if($cptDocument) {
