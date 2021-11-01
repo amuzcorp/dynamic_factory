@@ -945,58 +945,38 @@ class DynamicFactorySettingController extends BaseController
             'cpt_status'
         ];
 
-        $relateCptId = '';
         foreach($config['formColumns'] as $index => $column) {
-            foreach($docData[0]->getAttributes() as $key => $val) {
-                if($key === 'pure_content') continue;
-                if(strpos($key, $column) !== false) {
-                    if(strpos($key,"_srf_chg")) {
-                        $relateCptId = str_replace('_srf_chg', '', $key);
+            /**
+             * 다이나믹 필드 column 조회
+             */
+            $fieldType = \XeDynamicField::get($config->get('documentGroup'), $column);
+            if($fieldType) {
+                /**
+                 * 특수 필드 사용 시 조건 추가
+                 */
+                if($fieldType->getTableName() === 'field_dynamic_factory_super_relate') {
+                    /**
+                     * RelateCPT 작성 시 2가지 필드만 필요
+                     */
+                    //belong_application_srf_chg
+                    //hidden_belong_application
+                    $formOrder[] = $column.'_srf_chg';
+                    $formOrder[] = 'hidden_'.$column;
+                } else {
+                    foreach($fieldType->getColumns() as $key => $type) {
+                        $formOrder[] = $column.'_'.$key;
                     }
-                    if($key === $relateCptId.'_s_id' || $key === $relateCptId.'_s_group' || $key === $relateCptId.'_s_type' || $key === $relateCptId.'_t_id' || $key === $relateCptId.'_t_group'
-                        || $key === $relateCptId.'_t_type' || $key === $relateCptId.'_ordering') {
-                        continue;
-                    }
-                    $formOrder[] = $key;
-//                    $config['formColumns'][$index] = $key;
                 }
+            } else {
+                $formOrder[] = $column;
             }
         }
-        //application/pdf
         $headers = array(
             "Content-type" => "application/vnd.ms-excel; charset=UTF-8;",
             "Content-Disposition" => 'attachment; filename='.$cpt->menu_name.'_'.date('Y_m_d H_i_s').'.csv',
             "Cache-Control" => "must-revalidate, post-check=0, pre-check=0",
         );
-//        $headerText = 'no,cpt_status';
-//        $relateCptId = '';
-//        foreach($docData[0]->getAttributes() as $key => $val) {
-//
-//            //불필요한 필드 삭제
-//            if($key == 'user_type'||$key == 'pure_content'||$key == 'head'||
-//                $key == 'reply'||$key == 'ipaddress'||
-//                $key == 'approved'||$key == 'assent_count'||
-//                $key == 'comment_count'||$key == 'read_count'||
-//                $key == 'certify_key'||$key == 'dissent_count'||
-//                $key == 'approved'||$key == 'published'||$key == 'status'||
-//                $key == 'display'||$key == 'format'||$key == 'locale'||$key == 'parent_id' || $key == 'deleted_at') {
-//                continue;
-//            }
-//
-//            if(strpos($key,"_srf_chg")) {
-//                $relateCptId = str_replace('_srf_chg', '', $key);
-//            }
-//            if($key === $relateCptId.'_s_id' || $key === $relateCptId.'_s_group' || $key === $relateCptId.'_s_type' || $key === $relateCptId.'_t_id' || $key === $relateCptId.'_t_group'
-//                || $key === $relateCptId.'_t_type' || $key === $relateCptId.'_ordering') {
-//                continue;
-//            }
-//
-//            if($key === 'id') {
-//                $headerText = $headerText.',doc_id';
-//            } else {
-//                $headerText = $headerText.','.$key;
-//            }
-//        }
+
         $headerText = '';
         foreach($formOrder as $column) {
             if($headerText === '') {
