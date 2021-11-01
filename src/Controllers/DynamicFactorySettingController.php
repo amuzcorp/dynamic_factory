@@ -1170,6 +1170,8 @@ class DynamicFactorySettingController extends BaseController
 
                 //기록된 doc_id 로 작성된 CPT 문서가 있는지 체크
                 $cptDocument = CptDocument::division($target_cpt_id)->where('instance_id',$target_cpt_id)->where('id', $val['doc_id'])->first();
+                $val['user_id'] = '';
+                $val['writer'] = '';
 
                 if($val['email'] !== '') {
                     $user = XeUser::where('email', $val['email'])->first();
