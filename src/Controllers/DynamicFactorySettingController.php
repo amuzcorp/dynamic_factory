@@ -6,6 +6,7 @@ use Illuminate\Http\Request as SymfonyRequest;
 use Illuminate\Http\Response;
 use Illuminate\Http\UploadedFile;
 use Overcode\XePlugin\DynamicFactory\Models\DfSlug;
+use Overcode\XePlugin\DynamicFactory\Models\User as XeUser;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Xpressengine\Category\Models\CategoryItem;
 use Xpressengine\Editor\EditorHandler;
@@ -934,39 +935,78 @@ class DynamicFactorySettingController extends BaseController
         if(count($docData) === 0) return redirect()->back()->with('alert', ['type' => 'danger', 'message' => '문서를 하나 이상 작성 후 다운로드 해주세요.']);
         $cpt = app('overcode.df.service')->getItem($cpt_id);
 
+        $config = $this->configHandler->getConfig($cpt_id);
+        $column_labels = $this->configHandler->getColumnLabels($config);
+
+        $formOrder = [
+            'no',
+            'doc_id',
+            'email',
+            'cpt_status'
+        ];
+
+        $relateCptId = '';
+        foreach($config['formColumns'] as $index => $column) {
+            foreach($docData[0]->getAttributes() as $key => $val) {
+                if($key === 'pure_content') continue;
+                if(strpos($key, $column) !== false) {
+                    if(strpos($key,"_srf_chg")) {
+                        $relateCptId = str_replace('_srf_chg', '', $key);
+                    }
+                    if($key === $relateCptId.'_s_id' || $key === $relateCptId.'_s_group' || $key === $relateCptId.'_s_type' || $key === $relateCptId.'_t_id' || $key === $relateCptId.'_t_group'
+                        || $key === $relateCptId.'_t_type' || $key === $relateCptId.'_ordering') {
+                        continue;
+                    }
+                    $formOrder[] = $key;
+//                    $config['formColumns'][$index] = $key;
+                }
+            }
+        }
         //application/pdf
         $headers = array(
             "Content-type" => "application/vnd.ms-excel; charset=UTF-8;",
             "Content-Disposition" => 'attachment; filename='.$cpt->menu_name.'_'.date('Y_m_d H_i_s').'.csv',
             "Cache-Control" => "must-revalidate, post-check=0, pre-check=0",
         );
-        $headerText = 'no,cpt_status';
-        $relateCptId = '';
-        foreach($docData[0]->getAttributes() as $key => $val) {
-
-            //불필요한 필드 삭제
-            if($key == 'user_type'||$key == 'pure_content'||$key == 'head'||
-                $key == 'reply'||$key == 'ipaddress'||
-                $key == 'approved'||$key == 'assent_count'||
-                $key == 'comment_count'||$key == 'read_count'||
-                $key == 'certify_key'||$key == 'dissent_count'||
-                $key == 'approved'||$key == 'published'||$key == 'status'||
-                $key == 'display'||$key == 'format'||$key == 'locale'||$key == 'parent_id' || $key == 'deleted_at') {
-                continue;
-            }
-
-            if(strpos($key,"_srf_chg")) {
-                $relateCptId = str_replace('_srf_chg', '', $key);
-            }
-            if($key === $relateCptId.'_s_id' || $key === $relateCptId.'_s_group' || $key === $relateCptId.'_s_type' || $key === $relateCptId.'_t_id' || $key === $relateCptId.'_t_group'
-                || $key === $relateCptId.'_t_type' || $key === $relateCptId.'_ordering') {
-                continue;
-            }
-
-            if($key === 'id') {
-                $headerText = $headerText.',doc_id';
+//        $headerText = 'no,cpt_status';
+//        $relateCptId = '';
+//        foreach($docData[0]->getAttributes() as $key => $val) {
+//
+//            //불필요한 필드 삭제
+//            if($key == 'user_type'||$key == 'pure_content'||$key == 'head'||
+//                $key == 'reply'||$key == 'ipaddress'||
+//                $key == 'approved'||$key == 'assent_count'||
+//                $key == 'comment_count'||$key == 'read_count'||
+//                $key == 'certify_key'||$key == 'dissent_count'||
+//                $key == 'approved'||$key == 'published'||$key == 'status'||
+//                $key == 'display'||$key == 'format'||$key == 'locale'||$key == 'parent_id' || $key == 'deleted_at') {
+//                continue;
+//            }
+//
+//            if(strpos($key,"_srf_chg")) {
+//                $relateCptId = str_replace('_srf_chg', '', $key);
+//            }
+//            if($key === $relateCptId.'_s_id' || $key === $relateCptId.'_s_group' || $key === $relateCptId.'_s_type' || $key === $relateCptId.'_t_id' || $key === $relateCptId.'_t_group'
+//                || $key === $relateCptId.'_t_type' || $key === $relateCptId.'_ordering') {
+//                continue;
+//            }
+//
+//            if($key === 'id') {
+//                $headerText = $headerText.',doc_id';
+//            } else {
+//                $headerText = $headerText.','.$key;
+//            }
+//        }
+        $headerText = '';
+        foreach($formOrder as $column) {
+            if($headerText === '') {
+                $headerText = $column;
             } else {
-                $headerText = $headerText.','.$key;
+                if($column === 'id') {
+                    $headerText = $headerText.',doc_id';
+                } else {
+                    $headerText = $headerText.','.$column;
+                }
             }
         }
 
@@ -980,6 +1020,11 @@ class DynamicFactorySettingController extends BaseController
 
                 if($val === 'no') {
                     $excels[$inx][$val] = $inx + 1;
+                    continue;
+                }
+
+                if($val === 'email') {
+                    $excels[$inx][$val] = \Auth::user()->email;
                     continue;
                 }
 
@@ -1121,40 +1166,23 @@ class DynamicFactorySettingController extends BaseController
             foreach ($params as $val) {
 
                 //문서에 기록된 CPT ID
-                $target_cpt_id = $val['instance_id'];
-                if(!$target_cpt_id || $target_cpt_id === '') {
-                    $target_cpt_id = $cpt_id;
-                }
-                //CSV 업로드 진행중인 CPT 와 기록된 CPT ID가 다를경우 continue
-                if($cpt_id !== $target_cpt_id) continue;
+                $target_cpt_id = $cpt_id;
 
                 //기록된 doc_id 로 작성된 CPT 문서가 있는지 체크
                 $cptDocument = CptDocument::division($target_cpt_id)->where('instance_id',$target_cpt_id)->where('id', $val['doc_id'])->first();
 
-                unset($val['type']);
-                unset($val['email']);
-                unset($val['updated_at']);
-                unset($val['instance_id']);
-                unset($val['deleted_at']);
-                unset($val['certify_key']);
-                unset($val['read_count']);
-                unset($val['comment_count']);
-                unset($val['assent_count']);
-                unset($val['dissent_count']);
-                unset($val['approved']);
-                unset($val['published_at']);
-                unset($val['status']);
-                unset($val['display']);
-                unset($val['format']);
-                unset($val['locale']);
-                unset($val['head']);
-                unset($val['reply']);
-                unset($val['ipaddress']);
-                unset($val['site_key']);
-                unset($val['created_at']);
+                if($val['email'] !== '') {
+                    $user = XeUser::where('email', $val['email'])->first();
+                    if($user) {
+                        $val['user_id'] = \Auth::user()->id;
+                        $val['writer'] = \Auth::user()->display_name;
+                    }
+                }
 
                 if(!$val['user_id'] || $val['user_id'] === '') {
                     $val['user_id'] = \Auth::user()->id;
+                }
+                if(!$val['writer'] || $val['writer'] === '') {
                     $val['writer'] = \Auth::user()->display_name;
                 }
 
@@ -1171,10 +1199,10 @@ class DynamicFactorySettingController extends BaseController
                     $val['published_at'] = '____-__-__ __:__:__';
                     $val['slug'] = DfSlug::make($val['title'], $target_cpt_id);
                 }
+                unset($val['email']);
 
                 //토큰 추가
                 $val['_token'] = csrf_token();
-
                 $inputs = new SymfonyRequest($val);
                 $inputs = Request::createFromBase($inputs);
                 $inputs->request->add(
