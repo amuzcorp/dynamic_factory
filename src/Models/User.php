@@ -17,7 +17,7 @@ class User  extends XeUser {
     {
         $tableName = SuperRelateField::TABLE_NAME;
 
-        $query = $this->belongsToMany(CptDocument::class, $tableName, 't_id', 's_id')->where($tableName.'.field_id', $field_id);
+        $query = $this->belongsToMany(CptDocument::class, $tableName,  's_id', 't_id')->where($tableName.'.field_id', $field_id);
         if($use_dynamic){
             $target_group = SuperRelate::Where('field_id', $field_id)->where('s_id', $this->id)->where('s_group', 'user')->pluck('t_group')->first();
 
