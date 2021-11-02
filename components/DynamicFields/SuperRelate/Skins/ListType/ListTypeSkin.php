@@ -49,8 +49,9 @@ class ListTypeSkin extends AbstractSkin
             Plugin::asset('/components/DynamicFields/SuperRelate/Skins/ListType/assets/style.css'),
         ])->load();
         XeFrontend::js([
-            Plugin::asset('/components/DynamicFields/SuperRelate/Skins/ListType/assets/DocList.js'),
-            Plugin::asset('/components/DynamicFields/SuperRelate/Skins/ListType/assets/UserList.js'),
+            'assets/vendor/jqueryui/jquery-ui.min.js',
+//            Plugin::asset('/components/DynamicFields/SuperRelate/Skins/ListType/assets/DocList.js'),
+//            Plugin::asset('/components/DynamicFields/SuperRelate/Skins/ListType/assets/UserList.js'),
             Plugin::asset('/components/DynamicFields/SuperRelate/Skins/ListType/assets/findDoc.js'),
         ])->appendTo('head')->load();
     }
