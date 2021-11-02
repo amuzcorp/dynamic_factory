@@ -945,12 +945,20 @@ class DynamicFactorySettingController extends BaseController
             'cpt_status'
         ];
 
+        $excels[] = [
+            'no' => '넘버',
+            'doc_id' => '문서 ID',
+            'email' => '작성자 이메일',
+            'cpt_status' => '공개 속성',
+        ];
+
         foreach($config['formColumns'] as $index => $column) {
             /**
              * 다이나믹 필드 column 조회
              */
             $fieldType = \XeDynamicField::get($config->get('documentGroup'), $column);
             if($fieldType) {
+                $label = xe_trans($column_labels[$column]);
                 /**
                  * 특수 필드 사용 시 조건 추가
                  */
@@ -962,17 +970,40 @@ class DynamicFactorySettingController extends BaseController
                     //hidden_belong_application
                     $formOrder[] = $column.'_srf_chg';
                     $formOrder[] = 'hidden_'.$column;
+
+                    $excels[0][$column.'_srf_chg'] = $label.' 속성';
+                    $excels[0]['hidden_'.$column] = $label.' 리스트';
                 } else {
                     foreach($fieldType->getColumns() as $key => $type) {
                         $formOrder[] = $column.'_'.$key;
+                        if($key === 'start') {
+                            $text = ' 시작';
+                        } else if($key === 'end') {
+                            $text = ' 종료';
+                        } else if($key === 'columns') {
+                            $text = ' 리스트';
+                        } else if($key === 'num') {
+                            $text = ' 숫자만';
+                        } else if($key === 'text') {
+                            $text = '';
+                        } else {
+                            $text = $key;
+                        }
+                        if( $fieldType->getTableName() === 'field_dynamic_field_extend_calendar') {
+                            $text = $text.'시간 0000-00-00 00:00';
+                        }
+
+                        $excels[0][$column.'_'.$key] = $label.$text;
                     }
                 }
             } else {
+                $excels[0][$column] = $column_labels[$column];
                 $formOrder[] = $column;
             }
         }
+
         $headers = array(
-            "Content-type" => "application/vnd.ms-excel; charset=UTF-8;",
+            "Content-type" => "Type:text/csv; charset=UTF-8;",
             "Content-Disposition" => 'attachment; filename='.$cpt->menu_name.'_'.date('Y_m_d H_i_s').'.csv',
             "Cache-Control" => "must-revalidate, post-check=0, pre-check=0",
         );
@@ -992,8 +1023,8 @@ class DynamicFactorySettingController extends BaseController
 
         $test = explode(',', $headerText);
 
-        $excels = [];
-        foreach($docData as $inx => $data) {
+        foreach($docData as $index => $data) {
+            $inx = $index + 1;
             $doc_items = $data->getAttributes();
             $relateCptId = '';
             foreach($test as $key => $val) {
@@ -1017,7 +1048,12 @@ class DynamicFactorySettingController extends BaseController
                     foreach($data->hasDocument($relateCptId) as $relate_data) {
                         $item_realteCptData[] = $relate_data->id;
                     }
-                    $excels[$inx][$val] = json_enc($item_realteCptData);
+                    if(count($item_realteCptData) === 0){
+                        $excels[$inx][$relateCptId.'_srf_chg'] = 1;
+                        $excels[$inx][$val] = '[]';
+                    } else {
+                        $excels[$inx][$val] = str_replace(',', '|', json_enc($item_realteCptData));
+                    }
                 }
                 /* Relate Cpt 데이터 기록 json encode */
 
@@ -1108,7 +1144,7 @@ class DynamicFactorySettingController extends BaseController
         $index = 0;
         foreach($forms as $key => $val) {
             //CSV A1 라인 continue
-            if($key === 0) continue;
+            if($key === 0 || $key === 1) continue;
 
             $relateCptId = '';
             for($i = 0; $i < count($forms[0]); $i++) {
@@ -1123,7 +1159,11 @@ class DynamicFactorySettingController extends BaseController
                 }
                 //CSV에 기록된 RelateCPT ID 정보 json decode
                 else if($forms[0][$i] === 'hidden_'.$relateCptId) {
-                    $params[$index][$forms[0][$i]] = json_dec($val[$i]);
+                    if($val[$i] !== '') {
+                        $val[$i] = str_replace('|', ',', $val[$i]);
+                        $params[$index][$forms[0][$i]] = json_dec($val[$i]);
+                    }
+                    else $params[$index][$forms[0][$i]] = '[]';
                 }
                 //calendar 기록 양식에 맞게 컨버트 [ 0 => 일자 , 1 => 시간 (시:분) ]
                 else if(strpos($forms[0][$i],"_date_start") !== false || strpos($forms[0][$i],"_date_end") !== false) {
@@ -1150,7 +1190,6 @@ class DynamicFactorySettingController extends BaseController
         XeDB::beginTransaction();
         try {
             foreach ($params as $val) {
-
                 //문서에 기록된 CPT ID
                 $target_cpt_id = $cpt_id;
 
