@@ -1146,7 +1146,7 @@ class DynamicFactorySettingController extends BaseController
             }
             $index++;
         }
-        dd($params);
+
         XeDB::beginTransaction();
         try {
             foreach ($params as $val) {
