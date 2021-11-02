@@ -1153,6 +1153,8 @@ class DynamicFactorySettingController extends BaseController
                 foreach($val as $key => $value) {
                     if(substr( $key, (strlen($key) - 7), strlen($key) ) === "_column" && $val[$key] === "") {
                         unset($val[$key]);
+                    } else if(strpos($key,"_date_start") !== false || strpos($key,"_date_end") !== false) {
+                        $val[$key] = str_replace('.', '-', $val[$key]);
                     }
                 }
 
