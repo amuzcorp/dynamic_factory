@@ -1150,6 +1150,11 @@ class DynamicFactorySettingController extends BaseController
 
                 //기록된 doc_id 로 작성된 CPT 문서가 있는지 체크
                 $cptDocument = CptDocument::division($target_cpt_id)->where('instance_id',$target_cpt_id)->where('id', $val['doc_id'])->first();
+                foreach($val as $key => $value) {
+                    if(substr( $key, (strlen($key) - 7), strlen($key) ) === "_column" && $val[$key] === "") {
+                        unset($val[$key]);
+                    }
+                }
 
                 $val['user_id'] = '';
                 $val['writer'] = '';
@@ -1173,6 +1178,9 @@ class DynamicFactorySettingController extends BaseController
                 if(!$val['title'] || $val['title'] === '') {
                     $val['title'] = date('Y-m-d H:i:s').' 문서 작성';
                 }
+                if(!isset($val['content'])) {
+                    $val['content'] = '<p>'.date('Y-m-d H:i:s').'등록 </p>';
+                }
 
                 //Slug 추가
                 if($cptDocument) {
@@ -1187,6 +1195,9 @@ class DynamicFactorySettingController extends BaseController
 
                 //토큰 추가
                 $val['_token'] = csrf_token();
+                $val['_coverId'] = [];
+                $val['_files'] = [];
+                $inputs['format'] = $editor->htmlable() ? CptDocument::FORMAT_HTML : CptDocument::FORMAT_NONE;
                 $inputs = new SymfonyRequest($val);
                 $inputs = Request::createFromBase($inputs);
                 $inputs->request->add(
