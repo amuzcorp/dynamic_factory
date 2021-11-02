@@ -1,7 +1,7 @@
 <div class="form-group">
     <label>{{ xe_trans($config->get('label')) }} <small>{{ $config->get('id') }}</small></label>
     <div id="selected_{{ $config->get('id') }}">
-        <input type="hidden" name="{{$config->get('id')}}_srf_chg" value="0" />
+        <input type="hidden" name="{{$config->get('id')}}_srf_chg" value="1" />
 
         <div class="Tags__tags">
             <div class="ReactTags__selected relate_tags" data-config_id="{{$config->get('id')}}" data-config_name="{{$config->name}}" id="{{ $config->get('id') }}_tags">
