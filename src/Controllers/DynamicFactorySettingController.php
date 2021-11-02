@@ -1126,11 +1126,16 @@ class DynamicFactorySettingController extends BaseController
                     $params[$index][$forms[0][$i]] = json_dec($val[$i]);
                 }
                 //calendar 기록 양식에 맞게 컨버트 [ 0 => 일자 , 1 => 시간 (시:분) ]
-                else if(strpos($forms[0][$i],"_date_start") || strpos($forms[0][$i],"_date_end")) {
+                else if(strpos($forms[0][$i],"_date_start") !== false || strpos($forms[0][$i],"_date_end") !== false) {
                     $val[$i] = str_replace('.', '-', $val[$i]);
+                    $date = date('Y-m-d', strtotime($val[$i]));
+                    $time = date('H:i', strtotime($val[$i]));
+                    if(strpos($forms[0][$i],"_date_end") !== false && $time === '00:00') {
+                        $time = '23:59';
+                    }
                     $params[$index][$forms[0][$i]] = [
-                        date('Y-m-d', strtotime($val[$i])),
-                        date('H:i', strtotime($val[$i]))
+                        $date,
+                        $time
                     ];
                 }
                 //특수 필드가 아닌 일반 필드는 값 그대로 저장
@@ -1141,7 +1146,7 @@ class DynamicFactorySettingController extends BaseController
             }
             $index++;
         }
-
+        dd($params);
         XeDB::beginTransaction();
         try {
             foreach ($params as $val) {
