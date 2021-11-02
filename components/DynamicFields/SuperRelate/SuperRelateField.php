@@ -200,11 +200,14 @@ class SuperRelateField extends AbstractType
 
         $doc_ids = array_get($args, sprintf('hidden_%s', $config->get('id')), []);  // relate doc ids
 
+        $test = [];
         foreach ($doc_ids as $key => $id) {
             $insertParam['t_id'] = $id;
             $insertParam['ordering'] = $key;
+            $test[] = $insertParam;
             SuperRelate::updateOrCreate($insertParam);
         }
+        dd($test);
 
         // event fire
         $this->handler->getRegisterHandler()->fireEvent(
