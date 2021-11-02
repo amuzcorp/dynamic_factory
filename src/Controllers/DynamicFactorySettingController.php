@@ -1127,6 +1127,7 @@ class DynamicFactorySettingController extends BaseController
                 }
                 //calendar 기록 양식에 맞게 컨버트 [ 0 => 일자 , 1 => 시간 (시:분) ]
                 else if(strpos($forms[0][$i],"_date_start") || strpos($forms[0][$i],"_date_end")) {
+                    $val[$i] = str_replace('.', '-', $val[$i]);
                     $params[$index][$forms[0][$i]] = [
                         date('Y-m-d', strtotime($val[$i])),
                         date('H:i', strtotime($val[$i]))
@@ -1153,8 +1154,6 @@ class DynamicFactorySettingController extends BaseController
                 foreach($val as $key => $value) {
                     if(substr( $key, (strlen($key) - 7), strlen($key) ) === "_column" && $val[$key] === "") {
                         unset($val[$key]);
-                    } else if(strpos($key,"_date_start") !== false || strpos($key,"_date_end") !== false) {
-                        $val[$key] = str_replace('.', '-', $val[$key]);
                     }
                 }
 
