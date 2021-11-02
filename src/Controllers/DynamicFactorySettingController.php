@@ -984,6 +984,8 @@ class DynamicFactorySettingController extends BaseController
                             $text = ' 리스트';
                         } else if($key === 'num') {
                             $text = ' 숫자만';
+                        } else if($key === 'boolean') {
+                            $text = ' 택1 (1, 0)';
                         } else if($key === 'text') {
                             $text = '';
                         } else {
