@@ -986,10 +986,16 @@ class DynamicFactorySettingController extends BaseController
                             $text = ' 숫자만';
                         } else if($key === 'boolean') {
                             $text = ' 택1 (1, 0)';
+                        } else if($key === 'postcode') {
+                            $text = ' 우편번호';
+                        } else if($key === 'address1') {
+                            $text = ' 주소';
+                        } else if($key === 'address2') {
+                            $text = ' 상세주소';
                         } else if($key === 'text') {
                             $text = '';
                         } else {
-                            $text = $key;
+                            $text = ' '.$key;
                         }
                         if( $fieldType->getTableName() === 'field_dynamic_field_extend_calendar') {
                             $text = $text.'시간 0000-00-00 00:00';
