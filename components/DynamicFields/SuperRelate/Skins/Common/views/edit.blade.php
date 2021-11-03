@@ -3,8 +3,10 @@
 
 
 if(count($items) !== 0) {
-    $r_name = $items[0]->r_name;
-    $r_id = $items[0]->r_id;
+    if($items[0]->r_name) $r_name = $items[0]->r_name;
+    else $r_name = '';
+    if($items[0]->r_id) $r_id = $items[0]->r_id;
+    else $r_id = '';
 } else {
     $r_name = '';
     $r_id = '';
@@ -16,8 +18,10 @@ if(count($items) !== 0) {
         <input type="hidden" name="{{$config->get('id')}}_srf_chg" value="1" />
         <div class="ReactTags__tags">
             <div class="ReactTags__selected">
-                @if(count($items) !== 0)
-                    <span class="ReactTags__tag">{{ $items[0]->r_name }}<a class="ReactTags__remove btnRemoveTag" data-id="{{ $items[0]->r_id }}">x</a></span>
+                @if($r_id !== '' && $r_name !== '')
+                    @if(count($items) !== 0)
+                        <span class="ReactTags__tag">{{ $items[0]->r_name }}<a class="ReactTags__remove btnRemoveTag" data-id="{{ $items[0]->r_id }}">x</a></span>
+                    @endif
                 @endif
             </div>
             <div class="ReactTags__tagInput">
