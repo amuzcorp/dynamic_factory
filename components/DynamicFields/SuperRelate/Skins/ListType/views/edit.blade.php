@@ -4,7 +4,7 @@
         <input type="hidden" name="{{$config->get('id')}}_srf_chg" value="1" />
 
         <div class="Tags__tags">
-            <div class="ReactTags__selected relate_tags" data-config_id="{{$config->get('id')}}" data-config_name="{{$config->name}}" id="{{ $config->get('id') }}_tags">
+            <div class="list_ReactTags__selected relate_tags" data-config_id="{{$config->get('id')}}" data-config_name="{{$config->name}}" id="{{ $config->get('id') }}_tags">
                 @foreach($items as $key => $item)
                     <span class="ReactTags__tag" id="tag_{{$item->r_id}}">
                         <span class="tag_index">

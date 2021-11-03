@@ -20,11 +20,11 @@ div.ReactTags__tagInput input:focus {
 }
 
 /* Styles for selected tags */
-div.ReactTags__selected {
+div.list_ReactTags__selected {
   float: left;
 }
 
-div.ReactTags__selected span.ReactTags__tag {
+div.list_ReactTags__selected span.ReactTags__tag {
   border: 1px solid #ddd;
   background: #eee;
   font-size: 12px;
@@ -34,7 +34,7 @@ div.ReactTags__selected span.ReactTags__tag {
   border-radius: 2px;
 }
 
-div.ReactTags__selected a.ReactTags__remove {
+div.list_ReactTags__selected a.ReactTags__remove {
   color: #aaa;
   margin-left: 5px;
   cursor: pointer;
@@ -73,7 +73,7 @@ div.ReactTags__suggestions ul li.active {
 
 
 /* Custom */
-.ReactTags__selected {
+.list_ReactTags__selected {
   width:100% !important;
 }
 .input-left {
