@@ -330,6 +330,10 @@ class DynamicFactoryDocumentHandler
             $query->orderBy('published_at', 'desc')->orderBy('head', 'desc');
         } elseif ($orderType == 'recently_updated') {
             $query->orderBy(CptDocument::UPDATED_AT, 'desc')->orderBy('head', 'desc');
+        } elseif ($orderType == 'title_asc') {
+            $query->orderBy('title', 'asc')->orderBy('head', 'desc');
+        } elseif ($orderType == 'title_desc') {
+            $query->orderBy('title', 'desc')->orderBy('head', 'desc');
         }
 
         $query->getProxyManager()->orders($query->getQuery(), $request->all());
