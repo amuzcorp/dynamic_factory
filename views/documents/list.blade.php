@@ -322,9 +322,7 @@
 
     function uploadCSV(item) {
         if($('input[name=csv_file]').val()) {
-            console.log($('input[name=csv_file]').val());
             $('#uploadCSV').submit();
         }
-
     }
 </script>
