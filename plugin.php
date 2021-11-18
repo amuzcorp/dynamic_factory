@@ -501,6 +501,9 @@ class Plugin extends AbstractPlugin
             if($item->tags) $item->tags_item = $item->tags->toArray();
             else $item->tags_item = [];
 
+            if(!app('xe.board.handler')->hasFavorite($item->id, \Auth::user()->getId())) $item->has_favorite = 0;
+            else $item->has_favorite = 1;
+
             return $item;
         });
 
@@ -510,6 +513,9 @@ class Plugin extends AbstractPlugin
             foreach($query as $item) {
                 if($item->tags) $item->tags_item = $item->tags->toArray();
                 else $item->tags_item = [];
+
+                if(!app('xe.board.handler')->hasFavorite($item->id, \Auth::user()->getId())) $item->has_favorite = 0;
+                else $item->has_favorite = 1;
             }
 
             return $query;
