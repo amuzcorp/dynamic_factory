@@ -494,6 +494,27 @@ class Plugin extends AbstractPlugin
                 app('overcode.df.configHandler')->setCurrentSortFormColumns($cptId);
             }
         );
+
+        intercept('Xpressengine\Plugins\Board\Services\BoardService@getItem','BoardModuleShowsIntercept',function($getItem,$id,$user,$config,$isManager){
+            $item = $getItem($id,$user,$config, $isManager);
+
+            if($item->tags) $item->tags_item = $item->tags->toArray();
+            else $item->tags_item = [];
+
+            return $item;
+        });
+
+        intercept('Xpressengine\Plugins\Board\Services\BoardService@getItems','BoardModuleListsIntercept',function($method,$query,$request){
+            $query = $method($query,$request);
+
+            foreach($query as $item) {
+                if($item->tags) $item->tags_item = $item->tags->toArray();
+                else $item->tags_item = [];
+            }
+
+            return $query;
+        });
+
     }
 
 
