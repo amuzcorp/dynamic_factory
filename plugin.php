@@ -495,52 +495,6 @@ class Plugin extends AbstractPlugin
             }
         );
 
-        intercept('Xpressengine\Plugins\Board\Services\BoardService@getItem','BoardModuleShowsIntercept',function($getItem,$id,$user,$config,$isManager){
-            $item = $getItem($id,$user,$config, $isManager);
-
-            $user = \XeUser::where('id', $item->user_id)->first();
-            $item->user_profile = $user->getProfileImage();
-
-            foreach($item->files as $file) {
-                if(!isset($file->path) || !isset($file->filename)) continue;
-                $file_path = 'storage/app/'.$file->path.'/'.$file->filename;
-                $file_path = str_replace('media_library', 'media/public/media_library', $file_path);
-                $file->file_path = url("/").'/'.$file_path;
-            }
-
-            if($item->tags) $item->tags_item = $item->tags->toArray();
-            else $item->tags_item = [];
-
-            if(!app('xe.board.handler')->hasFavorite($item->id, \Auth::user()->getId())) $item->has_favorite = 0;
-            else $item->has_favorite = 1;
-
-            return $item;
-        });
-
-        intercept('Xpressengine\Plugins\Board\Services\BoardService@getItems','BoardModuleListsIntercept',function($method,$query,$request){
-            $query = $method($query,$request);
-
-            foreach($query as $item) {
-
-                $user = \XeUser::where('id', $item->user_id)->first();
-                $item->user_profile = $user->getProfileImage();
-                foreach($item->files as $file) {
-                    if(!isset($file->path) || !isset($file->filename)) continue;
-                    $file_path = 'storage/app/'.$file->path.'/'.$file->filename;
-                    $file_path = str_replace('media_library', 'media/public/media_library', $file_path);
-                    $file->file_path = url("/").'/'.$file_path;
-                }
-
-                if($item->tags) $item->tags_item = $item->tags->toArray();
-                else $item->tags_item = [];
-
-                if(!app('xe.board.handler')->hasFavorite($item->id, \Auth::user()->getId())) $item->has_favorite = 0;
-                else $item->has_favorite = 1;
-            }
-
-            return $query;
-        });
-
     }
 
 
