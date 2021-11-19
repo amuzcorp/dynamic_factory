@@ -501,6 +501,13 @@ class Plugin extends AbstractPlugin
             $user = \XeUser::where('id', $item->user_id)->first();
             $item->user_profile = $user->getProfileImage();
 
+            foreach($item->files as $file) {
+                if(!isset($file->path) || !isset($file->filename)) continue;
+                $file_path = 'storage/app/'.$file->path.'/'.$file->filename;
+                $file_path = str_replace('media_library', 'media/public/media_library', $file_path);
+                $file->file_path = url("/").'/'.$file_path;
+            }
+
             if($item->tags) $item->tags_item = $item->tags->toArray();
             else $item->tags_item = [];
 
@@ -517,6 +524,12 @@ class Plugin extends AbstractPlugin
 
                 $user = \XeUser::where('id', $item->user_id)->first();
                 $item->user_profile = $user->getProfileImage();
+                foreach($item->files as $file) {
+                    if(!isset($file->path) || !isset($file->filename)) continue;
+                    $file_path = 'storage/app/'.$file->path.'/'.$file->filename;
+                    $file_path = str_replace('media_library', 'media/public/media_library', $file_path);
+                    $file->file_path = url("/").'/'.$file_path;
+                }
 
                 if($item->tags) $item->tags_item = $item->tags->toArray();
                 else $item->tags_item = [];
