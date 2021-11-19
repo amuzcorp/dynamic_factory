@@ -498,6 +498,9 @@ class Plugin extends AbstractPlugin
         intercept('Xpressengine\Plugins\Board\Services\BoardService@getItem','BoardModuleShowsIntercept',function($getItem,$id,$user,$config,$isManager){
             $item = $getItem($id,$user,$config, $isManager);
 
+            $user = \XeUser::where('id', $item->user_id)->first();
+            $item->user_profile = $user->getProfileImage();
+
             if($item->tags) $item->tags_item = $item->tags->toArray();
             else $item->tags_item = [];
 
@@ -511,6 +514,10 @@ class Plugin extends AbstractPlugin
             $query = $method($query,$request);
 
             foreach($query as $item) {
+
+                $user = \XeUser::where('id', $item->user_id)->first();
+                $item->user_profile = $user->getProfileImage();
+
                 if($item->tags) $item->tags_item = $item->tags->toArray();
                 else $item->tags_item = [];
 
