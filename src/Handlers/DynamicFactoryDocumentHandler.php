@@ -227,6 +227,7 @@ class DynamicFactoryDocumentHandler
             $query = $query->where('user_id', $request->get('user_id'));
         }
 
+        // 이 배열은 category_id 가 key 가 되고 item_id를 val에 배열로 넣는다.
         $category_items = [];
 
         $data = $request->except('_token');
@@ -234,19 +235,27 @@ class DynamicFactoryDocumentHandler
             if(strpos($id, 'taxo_', 0) === 0) {
                 foreach($value as $val) {
                     if(isset($val)) {
-                        $category_items[] = $val;
+                        $category_id = explode("_",$id);
+                        if(is_array($val)){
+                            $category_items[$category_id[1]] = $val;
+                        }else{
+                            if(!isset($category_items[$category_id[1]])) $category_items[$category_id[1]] = [];
+                            $category_items[$category_id[1]][] = $val;
+                        }
                     }
                 }
             }
         }
 
         if(count($category_items) > 0) {
-            $query->leftJoin(
-                'df_taxonomy',
-                sprintf('%s.%s', $query->getQuery()->from, 'id'),
-                '=',
-                sprintf('%s.%s', 'df_taxonomy', 'target_id')
-            );
+            $from = $query->getQuery()->from;
+            foreach($category_items as $category_id => $selected_items){
+                $table_name = "taxonomy_{$category_id}";
+                $query->leftJoin("df_taxonomy as " . $table_name, function($leftJoin) use($from,$table_name,$category_id) {
+                    $leftJoin->on(sprintf('%s.%s', $from, 'id'),'=',sprintf('%s.%s', $table_name, 'target_id'))
+                    ->where($table_name . ".category_id",$category_id);
+                });
+            }
         }
 
         if(array_get($data, 'taxOr') == 'Y') {
@@ -258,12 +267,12 @@ class DynamicFactoryDocumentHandler
                     }
                 }
             });
-        }else {
-            foreach($category_items as $item_id) {
-                $categoryItem = CategoryItem::find($data);
-                if ($categoryItem !== null) {
-                    $query = $query->where('df_taxonomy.item_ids', 'like', '%"' . $item_id . '"%');
-                }
+        }else{
+            foreach($category_items as $category_id => $selected_items){
+                $table_name = "taxonomy_{$category_id}";
+                $query->where(function($q) use ($table_name,$selected_items){
+                    foreach($selected_items as $item_id) $q->where($table_name . '.item_ids', 'like', '%"' . (int) $item_id . '"%');
+                });
             }
         }
 
