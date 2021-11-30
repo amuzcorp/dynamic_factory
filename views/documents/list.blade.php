@@ -68,16 +68,20 @@ foreach($data as $id => $value){
                     <div class="pull-right">
                         <form id="__xe_search_form" class="input-group search-group">
                             <div class="input-group-btn __xe_btn_taxo_item">
-                                <input type="hidden" name="taxOr" value="N">
+                                <input type="hidden" name="taxOr" value="{{Request::get('taxOr')}}">
                                 <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
                                     <span class="taxOr_xe_text">
-                                        카테고리 일치
+                                        @if(Request::get('taxOr') !== 'Y')
+                                            카테고리 일치
+                                        @else
+                                            카테고리 포함
+                                        @endif
                                     </span>
                                     <span class="caret"></span>
                                 </button>
                                 <ul class="dropdown-menu" role="menu">
-                                    <li class="active"><a value="N">카테고리 일치</a></li>
-                                    <li><a value="Y">카테고리 포함</a></li>
+                                    <li @if(Request::get('taxOr') !== 'Y') class="active" @endif><a value="N" onclick="searchTaxoOr(this)">카테고리 일치</a></li>
+                                    <li @if(Request::get('taxOr') === 'Y') class="active" @endif><a value="Y" onclick="searchTaxoOr(this)">카테고리 포함</a></li>
                                 </ul>
                             </div>
                             @foreach($taxonomies as $index => $taxonomy)
@@ -104,17 +108,19 @@ foreach($data as $id => $value){
                                         <span class="caret"></span>
                                     </button>
                                     <ul class="dropdown-menu" role="menu">
-                                        <li @if(!isset($category_items[(string) $taxonomy->id])) class="active" @endif><a value="" onclick="searchTaxonomy(this, {{$index+1}})">전체</a></li>
+                                        <li @if(!isset($category_items[(string) $taxonomy->id])) class="active" @endif><a value="" onclick="searchTaxonomy(this, {{$taxonomy->id}})">전체</a></li>
                                         @foreach($taxo_item as $key => $val)
                                             @if(isset($category_items[(string) $taxonomy->id]))
                                                 @if(in_array((string) $val['value'], $category_items[(string) $taxonomy->id]))
-                                                    <li class="active"><a value="{{$key}}" onclick="searchTaxonomy(this, {{$index+1}})">{{$val['text']}}</a></li>
+                                                    <li class="active"><a value="{{$key}}" onclick="searchTaxonomy(this, {{$taxonomy->id}})">{{$val['text']}}</a></li>
                                                 @else
-                                                    <li><a value="{{$key}}" onclick="searchTaxonomy(this, {{$index+1}})">{{$val['text']}}</a></li>
+                                                    <li><a value="{{$key}}" onclick="searchTaxonomy(this, {{$taxonomy->id}})">{{$val['text']}}</a></li>
                                                 @endif
                                             @else
-                                                <li><a value="{{$key}}" onclick="searchTaxonomy(this, {{$index+1}})">{{$val['text']}}</a></li>
+                                                <li><a value="{{$key}}" onclick="searchTaxonomy(this, {{$taxonomy->id}})">{{$val['text']}}</a></li>
                                             @endif
+
+                                                @php $index++; @endphp
                                         @endforeach
                                     </ul>
                                 </div>
@@ -361,10 +367,14 @@ foreach($data as $id => $value){
         }
     }
 
+    function searchTaxoOr(e) {
+        $('[name="taxOr"]').val($(e).attr('value'));
+        $('#__xe_search_form').submit();
+    }
+
     function searchTaxonomy(e, key) {
         $('[id="taxo_' + key + '"]').val($(e).attr('value'));
         $('.taxo_'+key+'_xe_text').text($(e).text());
-
         $(e).closest('.dropdown-menu').find('li').removeClass('active');
         $(e).closest('li').addClass('active');
 
