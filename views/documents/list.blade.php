@@ -1,3 +1,24 @@
+@php
+
+$data = Request::except('_token');
+$category_items = [];
+foreach($data as $id => $value){
+    if(strpos($id, 'taxo_', 0) === 0) {
+        foreach($value as $val) {
+            if(isset($val)) {
+                $category_id = explode("_",$id);
+                if(is_array($val)){
+                    $category_items[$category_id[1]] = $val;
+                }else{
+                    if(!isset($category_items[$category_id[1]])) $category_items[$category_id[1]] = [];
+                    $category_items[$category_id[1]][] = $val;
+                }
+            }
+        }
+    }
+}
+@endphp
+
 @section('page_title')
     <h2>{{ $cpt->cpt_name }}</h2>
 @stop
@@ -46,24 +67,54 @@
                     </div>
                     <div class="pull-right">
                         <form id="__xe_search_form" class="input-group search-group">
-                            <input type="hidden" name="taxOr" value="Y">
+                            <div class="input-group-btn __xe_btn_taxo_item">
+                                <input type="hidden" name="taxOr" value="N">
+                                <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                                    <span class="taxOr_xe_text">
+                                        카테고리 일치
+                                    </span>
+                                    <span class="caret"></span>
+                                </button>
+                                <ul class="dropdown-menu" role="menu">
+                                    <li class="active"><a value="N">카테고리 일치</a></li>
+                                    <li><a value="Y">카테고리 포함</a></li>
+                                </ul>
+                            </div>
                             @foreach($taxonomies as $index => $taxonomy)
                                 @php
                                     $taxo_item = app('overcode.df.taxonomyHandler')->getCategoryItemsTree($taxonomy->id);
                                 @endphp
                                 <div class="input-group-btn __xe_btn_taxo_item">
-                                    <input type="hidden" name="{{'taxo_'.($index + 1)}}" value="{{ Request::get('taxo_'.($index + 1)) }}" >
+                                    @if(isset($category_items[(string) $taxonomy->id]))
+                                        @foreach($category_items[(string) $taxonomy->id] as $key => $category)
+                                            <input type="hidden" name="{{'taxo_'.$taxonomy->id}}[]" id="{{'taxo_'.$taxonomy->id}}" value="{{$category}}">
+                                        @endforeach
+                                    @else
+                                        <input type="hidden" name="{{'taxo_'.$taxonomy->id}}[]" id="{{'taxo_'.$taxonomy->id}}" value="">
+                                    @endif
 
                                     <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
-                                        <span class="taxo_{{($index + 1)}}_xe_text">
-                                            {{Request::get('taxo_'.($index + 1)) && Request::get('taxo_'.($index + 1)) != '' ? $taxo_item[Request::get('taxo_'.($index + 1))]['text'] : xe_trans($taxonomy->name).' 조회'}}
+                                        @if(isset($category_items[(string) $taxonomy->id]))
+                                            <span class="taxo_{{($index + 1)}}_xe_text">
+                                            {{$taxo_item[$category_items[(string) $taxonomy->id][0]]['text']}}
                                         </span>
+                                        @else
+                                            <span class="taxo_{{($index + 1)}}_xe_text">{{xe_trans($taxonomy->name).' 조회'}}</span>
+                                        @endif
                                         <span class="caret"></span>
                                     </button>
                                     <ul class="dropdown-menu" role="menu">
-                                        <li @if(Request::get('taxo_'.($index + 1)) == '') class="active" @endif><a value="" onclick="searchTaxonomy(this, {{$index+1}})">전체</a></li>
+                                        <li @if(!isset($category_items[(string) $taxonomy->id])) class="active" @endif><a value="" onclick="searchTaxonomy(this, {{$index+1}})">전체</a></li>
                                         @foreach($taxo_item as $key => $val)
-                                            <li @if( Request::get('taxo_'.($index + 1)) && Request::get('taxo_'.($index + 1)) == $key) class="active" @endif><a value="{{$key}}" onclick="searchTaxonomy(this, {{$index+1}})">{{$val['text']}}</a></li>
+                                            @if(isset($category_items[(string) $taxonomy->id]))
+                                                @if(in_array((string) $val['value'], $category_items[(string) $taxonomy->id]))
+                                                    <li class="active"><a value="{{$key}}" onclick="searchTaxonomy(this, {{$index+1}})">{{$val['text']}}</a></li>
+                                                @else
+                                                    <li><a value="{{$key}}" onclick="searchTaxonomy(this, {{$index+1}})">{{$val['text']}}</a></li>
+                                                @endif
+                                            @else
+                                                <li><a value="{{$key}}" onclick="searchTaxonomy(this, {{$index+1}})">{{$val['text']}}</a></li>
+                                            @endif
                                         @endforeach
                                     </ul>
                                 </div>
@@ -311,7 +362,7 @@
     }
 
     function searchTaxonomy(e, key) {
-        $('[name="taxo_' + key + '"]').val($(e).attr('value'));
+        $('[id="taxo_' + key + '"]').val($(e).attr('value'));
         $('.taxo_'+key+'_xe_text').text($(e).text());
 
         $(e).closest('.dropdown-menu').find('li').removeClass('active');

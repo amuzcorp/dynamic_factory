@@ -879,36 +879,59 @@ class DynamicFactorySettingController extends BaseController
         $data = $request->except('_token');
         foreach($data as $id => $value){
             if(strpos($id, 'taxo_', 0) === 0) {
-                if($value) {
-                    $category_items[] = $value;
+                foreach($value as $val) {
+                    if(isset($val)) {
+                        $category_id = explode("_",$id);
+                        if(is_array($val)){
+                            $category_items[$category_id[1]] = $val;
+                        }else{
+                            if(!isset($category_items[$category_id[1]])) $category_items[$category_id[1]] = [];
+                            $category_items[$category_id[1]][] = $val;
+                        }
+                    }
                 }
             }
         }
 
         if(count($category_items) > 0) {
-            $query->leftJoin(
-                'df_taxonomy',
-                sprintf('%s.%s', $query->getQuery()->from, 'id'),
-                '=',
-                sprintf('%s.%s', 'df_taxonomy', 'target_id')
-            );
+//            $query->leftJoin(
+//                'df_taxonomy',
+//                sprintf('%s.%s', $query->getQuery()->from, 'id'),
+//                '=',
+//                sprintf('%s.%s', 'df_taxonomy', 'target_id')
+//            );
+            $from = $query->getQuery()->from;
+            foreach($category_items as $category_id => $selected_items){
+                $table_name = "taxonomy_{$category_id}";
+                $query->leftJoin("df_taxonomy as " . $table_name, function($leftJoin) use($from,$table_name,$category_id) {
+                    $leftJoin->on(sprintf('%s.%s', $from, 'id'),'=',sprintf('%s.%s', $table_name, 'target_id'))
+                        ->where($table_name . ".category_id",$category_id);
+                });
+            }
         }
 
         if(array_get($data, 'taxOr') == 'Y') {
-            $query->where(function ($q) use ($category_items, $data) {
-                foreach($category_items as $item_id) {
-                    $categoryItem = CategoryItem::find($data);
-                    if ($categoryItem !== null) {
-                        $q->orWhere('df_taxonomy.item_ids', 'like', '%"' . $item_id . '"%');
-                    }
-                }
-            });
-        } else {
-            foreach($category_items as $item_id) {
-                $categoryItem = CategoryItem::find($data);
-                if ($categoryItem !== null) {
-                    $query = $query->where('df_taxonomy.item_ids', 'like', '%"' . $item_id . '"%');
-                }
+//            $query->where(function ($q) use ($category_items, $data) {
+//                foreach($category_items as $item_id) {
+//                    dd($item_id);
+//                    $categoryItem = CategoryItem::find($data);
+//                    if ($categoryItem !== null) {
+//                        $q->orWhere('df_taxonomy.item_ids', 'like', '%"' . $item_id . '"%');
+//                    }
+//                }
+//            });
+            foreach($category_items as $category_id => $selected_items){
+                $table_name = "taxonomy_{$category_id}";
+                $query->orWhere(function($q) use ($table_name,$selected_items){
+                    foreach($selected_items as $item_id) $q->where($table_name . '.item_ids', 'like', '%"' . (int) $item_id . '"%');
+                });
+            }
+        }else{
+            foreach($category_items as $category_id => $selected_items){
+                $table_name = "taxonomy_{$category_id}";
+                $query->where(function($q) use ($table_name,$selected_items){
+                    foreach($selected_items as $item_id) $q->where($table_name . '.item_ids', 'like', '%"' . (int) $item_id . '"%');
+                });
             }
         }
 
