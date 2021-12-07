@@ -205,6 +205,11 @@ class DynamicFactoryDocumentHandler
 
     public function makeWhere(Builder $query, Request $request, ConfigEntity $config)
     {
+        if($request->get('document_ids') != null && $request->get('document_ids') != ''){
+            $documentIDs = is_array($request->get('document_ids')) ? $request->get('document_ids') : json_dec($request->get('document_ids'));
+            $query = $query->whereIn('id', $documentIDs);
+        }
+
         if ($request->get('title_pure_content') != null && $request->get('title_pure_content') !== '') {
             $query = $query->whereNested(function ($query) use ($request) {
                 $query->where('title', 'like', sprintf('%%%s%%', $request->get('title_pure_content')))
