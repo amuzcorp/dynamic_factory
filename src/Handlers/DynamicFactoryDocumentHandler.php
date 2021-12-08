@@ -4,6 +4,7 @@ namespace Overcode\XePlugin\DynamicFactory\Handlers;
 
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
 use Overcode\XePlugin\DynamicFactory\Components\Modules\Cpt\CptModule;
 use Overcode\XePlugin\DynamicFactory\Exceptions\AlreadyExistFavoriteHttpException;
 use Overcode\XePlugin\DynamicFactory\Exceptions\NotFoundFavoriteHttpException;
@@ -298,8 +299,32 @@ class DynamicFactoryDocumentHandler
             $query = $query->where('created_at', '<=', $request->get('end_created_at') . ' 23:59:59');
         }
 
-        if ($searchTagName = $request->get('searchTag')) {
-            $targetTags = \XeTag::similar($searchTagName, 15, $config->get('boardId'));
+        // Tag 검색
+        if ($request->get('searchTag')) {
+            //JSON 인코딩 체크
+            if(is_array($request->get('searchTag'))) {
+                $searchTagName = $request->get('searchTag');
+            } else {
+                json_decode($request->get('searchTag'));
+                if (json_last_error() === 0) {
+                    $searchTagName = json_dec($request->get('searchTag'));
+                } else {
+                    $searchTagName = $request->get('searchTag');
+                }
+            }
+
+            $targetTags = new Collection;
+
+            if(is_array($searchTagName)) {
+                foreach($searchTagName as $tagName) {
+                    $tags = \XeTag::similar($tagName, 15, $config->get('boardId'));
+                    foreach($tags as $tag) {
+                        $targetTags->push($tag);
+                    }
+                }
+            } else {
+                $targetTags = \XeTag::similar($searchTagName, 15, $config->get('boardId'));
+            }
 
             $tagUsingBoardItemIds = [];
             foreach ($targetTags as $targetTag) {
