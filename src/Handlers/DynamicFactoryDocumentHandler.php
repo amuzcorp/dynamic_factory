@@ -211,6 +211,23 @@ class DynamicFactoryDocumentHandler
             $query = $query->whereIn('id', $documentIDs);
         }
 
+        //검색한 ID의 문서가 Related 된 문서만 조회
+        if($request->get('belong_document_id') != null && $request->get('belong_document_id') != ''){
+            $target_field = $request->get('target_field') ?: '';
+            $target_document = $request->get('target_document') ?: '';
+            if($target_field !== '' && $target_document !== '' ) {
+                $targetDocument = CptDocument::where('id', $request->get('belong_document_id'))->first();
+
+                $targetDocumentIds = [];
+                if($targetDocument) {
+                    $targetDocumentIds = $targetDocument->belongDocument($target_field, $target_document)->pluck('id');
+                }
+                if(count($targetDocumentIds) !== 0) {
+                    $query->whereIn('id', $targetDocumentIds);
+                }
+            }
+        }
+
         if ($request->get('title_pure_content') != null && $request->get('title_pure_content') !== '') {
             $query = $query->whereNested(function ($query) use ($request) {
                 $query->where('title', 'like', sprintf('%%%s%%', $request->get('title_pure_content')))
