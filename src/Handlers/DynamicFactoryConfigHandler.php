@@ -276,10 +276,11 @@ class DynamicFactoryConfigHandler
      * 해당 CPT 의 에디터를 ckEditor 로 설정한다.
      *
      * @param $instanceId
+     * @param $editor
      */
-    public function addEditor($instanceId)
+    public function addEditor($instanceId, $editor = 'editor/ckeditor@ckEditor')
     {
-        $inputs = [$instanceId => 'editor/ckeditor@ckEditor'];
+        $inputs = [$instanceId => $editor];
         $oldConfig = $this->configManager->get('editors')->getPureAll();
         $inputs = array_merge($oldConfig, $inputs);
 

@@ -295,8 +295,16 @@ class Plugin extends AbstractPlugin
 
         // 해당 cpt_id 로 config 를 가져와서 없으면 타 플러그인에서 불러온 config 값으로 생성해준다.
         if ($config === null || !isset($config)) {
+
+            $editor = null;
+            if(isset($this->df_config[$cpt_id]['editor'])) {
+                if($this->df_config[$cpt_id]['editor'] === 'editor/ckeditor@ckEditor' || $this->df_config[$cpt_id]['editor'] === 'editor/xpressengine@textarea') {
+                    $editor = $this->df_config[$cpt_id]['editor'];
+                }
+            }
+
             $dfConfigHandler->addConfig($this->df_config[$cpt_id], $configName);
-            $dfConfigHandler->addEditor($cpt_id);   //기본 에디터 ckEditor 로 설정
+            $dfConfigHandler->addEditor($cpt_id, $editor);   //기본 에디터 ckEditor 로 설정
         }
     }
 
