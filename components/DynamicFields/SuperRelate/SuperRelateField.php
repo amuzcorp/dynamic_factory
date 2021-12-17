@@ -88,7 +88,8 @@ class SuperRelateField extends AbstractType
     {
         return view('dynamic_factory::components/DynamicFields/SuperRelate/views/setting',[
             'config' => $config,
-            'iids' => $this->getInstanceIds()
+            'iids' => $this->getInstanceIds(),
+            'groups' => app('amuz.usertype.handler')->getUserGroups()
         ]);
     }
 
