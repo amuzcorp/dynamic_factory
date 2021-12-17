@@ -369,7 +369,7 @@ class Plugin extends AbstractPlugin
 
             Route::post('/rending_store_cpt_document', ['as' => 'widget.rending_store_cpt_document', 'uses' => 'DynamicFactorySettingController@storeRendingCptDocument']);
         });
-        Route::get('/userSearch/{keyword?}', ['as' => 'dyFac.user.search', 'uses' => 'App\Http\Controllers\User\Settings\UserController@search']);
+        Route::get('/userSearch/{keyword?}', ['as' => 'dyFac.user.search', 'uses' => 'Overcode\XePlugin\DynamicFactory\Controllers\UserController@search']);
 
         Route::settings(static::getId() . "/taxonomy", function() {
             Route::group([
