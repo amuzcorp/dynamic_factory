@@ -237,8 +237,8 @@ var Category = (function (XE, $, Tree) {
      * @return {string}
      */
     getFormTemplate: function (obj) {
-console.log('▽ getFormTemplate function - obj ▽');
-console.log(obj);
+// console.log('▽ getFormTemplate function - obj ▽');
+// console.log(obj);
       var wordKeyProp = obj.hasOwnProperty('wordLangKey') ? 'data-lang-key="' + obj.wordLangKey + '"' : ''
       var descriptionKeyProp = obj.hasOwnProperty('descriptionLangKey') ? 'data-lang-key="' + obj.descriptionLangKey + '"' : ''
 
