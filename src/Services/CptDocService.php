@@ -56,6 +56,17 @@ class CptDocService
             if ($isManager == false) {
                 $query->where('user_id', auth()->user()->getId());
             }
+        } elseif($config->get('useGroupConsultation') === true) {
+            $cptPermission = app('overcode.df.permission');
+            $isManager = Gate::allows(
+                $cptPermission::ACTION_MANAGE,
+                new Instance($cptPermission->name($config->get('instanceId')))
+            ) ? true : false;
+            if ($isManager == false) {
+                $user_groups = auth()->user()->groups->pluck('id') ?: [];
+                $groupInUsers = \XeDB::table('user_group_user')->whereIn('group_id', $user_groups)->groupBy('user_id')->pluck('user_id');
+                $query->whereIn('user_id',$groupInUsers);
+            }
         }
 
         $dfConfig = app('overcode.df.configHandler')->getConfig($config->get('cpt_id'));

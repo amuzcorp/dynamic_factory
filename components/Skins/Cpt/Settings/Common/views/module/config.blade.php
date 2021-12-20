@@ -83,7 +83,7 @@
                                         <div class="col-sm-6">
                                             <div class="form-group">
                                                 <div class="clearfix">
-                                                    <label>{{xe_trans('board::useConsultation')}} <small>{{xe_trans('board::useConsultationDescription')}} </small></label>
+                                                    <label>{{xe_trans('board::useConsultation')}} <small>관리권한이 없는 회원은 자신이 쓴 글만 보이도록 하는 기능입니다.<br>단 상담기능 사용시 비회원 글쓰기는 자동으로 금지됩니다. <span class="text-danger">그룹상담보다 우선 됩니다.</span></small></label>
                                                     <div class="checkbox pull-right">
                                                         <label>
                                                             <input type="checkbox" class="inheritCheck" data-target="useConsultation" @if($config->getPure('useConsultation') === null) checked="checked" @endif />{{ xe_trans('xe::inheritMode') }}
@@ -93,6 +93,23 @@
                                                 <select id="" name="useConsultation" class="form-control" @if($config->getPure('useConsultation') === null) disabled="disabled" @endif>
                                                     <option value="true" {!! $config->get('useConsultation') == true ? 'selected="selected"' : '' !!} >{{xe_trans('xe::use')}}</option>
                                                     <option value="false" {!! $config->get('useConsultation') == false ? 'selected="selected"' : '' !!} >{{xe_trans('xe::disuse')}}</option>
+                                                </select>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-sm-6">
+                                            <div class="form-group">
+                                                <div class="clearfix">
+                                                    <label>그룹상담 <small>관리권한이 없는 회원은 회원이 소속된 그룹이 쓴 글만 보이도록 하는 기능입니다.<br> 상담기능을 사용 안함으로 설정 시 적용됩니다.  </small></label>
+                                                    <div class="checkbox pull-right">
+                                                        <label>
+                                                            <input type="checkbox" class="inheritCheck" data-target="useGroupConsultation" @if($config->getPure('useGroupConsultation') === null) checked="checked" @endif />비활성화
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                                <select id="" name="useGroupConsultation" class="form-control" @if($config->getPure('useGroupConsultation') === null) disabled="disabled" @endif>
+                                                    <option value="true" {!! $config->get('useGroupConsultation') == true ? 'selected="selected"' : '' !!} >{{xe_trans('xe::use')}}</option>
+                                                    <option value="false" {!! $config->get('useGroupConsultation') == false ? 'selected="selected"' : '' !!} >{{xe_trans('xe::disuse')}}</option>
                                                 </select>
                                             </div>
                                         </div>
