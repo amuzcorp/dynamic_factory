@@ -6,6 +6,7 @@ use Overcode\XePlugin\DynamicFactory\Handlers\DynamicFactoryTaxonomyHandler;
 use Overcode\XePlugin\DynamicFactory\Models\CptDocument;
 use Overcode\XePlugin\DynamicFactory\Models\DfSlug;
 use XePresenter;
+use Xpressengine\Category\Models\CategoryItem;
 use Xpressengine\Http\Request;
 use Auth;
 
@@ -54,6 +55,31 @@ class DynamicFactoryController extends Controller
         $taxonomies = app('overcode.df.taxonomyHandler')->getTaxonomies($cpt_id);
         foreach($taxonomies as $key => $taxonomy) {
             $taxonomies[$key]->name = xe_trans($taxonomy->name);
+        }
+        return XePresenter::makeApi([
+            'taxonomies' => $taxonomies
+        ]);
+    }
+
+    /**
+     * TAXO_ID 에 해당하는 하위 텍소노미를 정리하여 json 으로 반환
+     * route('dyFac.child.taxonomies')
+     *
+     * @param Request $request
+     * @return mixed
+     */
+    public function getChildTaxonomies(Request $request) {
+        $taxo_id = $request->get('taxo_id');
+
+        $taxonomies = CategoryItem::where('parent_id', $taxo_id)->get();
+
+        foreach($taxonomies as $key => $taxonomy) {
+            $taxonomies[$key]->word = xe_trans($taxonomy->word);
+            $taxonomies[$key]->description = xe_trans($taxonomy->description);
+            $taxonomies[$key]->child = false;
+            if(CategoryItem::where('parent_id', $taxonomy->id)->count() > 0) {
+                $taxonomies[$key]->child = true;
+            }
         }
         return XePresenter::makeApi([
             'taxonomies' => $taxonomies

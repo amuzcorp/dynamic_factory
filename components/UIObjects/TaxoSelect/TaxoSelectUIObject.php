@@ -13,6 +13,7 @@
  */
 namespace Overcode\XePlugin\DynamicFactory\Components\UIObjects\TaxoSelect;
 
+use Xpressengine\Category\Models\CategoryItem;
 use Xpressengine\UIObject\AbstractUIObject;
 use View;
 
@@ -73,12 +74,22 @@ class TaxoSelectUIObject extends AbstractUIObject
             $args['text'] = '';
         } else {
             $selectedItem = self::getSelectedItem($args['items'], $args['value'], $args['template']);
-            $args['selectedItem'] = $selectedItem;
-            if ($selectedItem) {
-                $args['text'] = isset($selectedItem['text']) ? $selectedItem['text'] : '';
+            if($args['template'] !== 'depth') {
+                $args['selectedItem'] = $selectedItem;
+                if ($selectedItem) {
+                    $args['text'] = isset($selectedItem['text']) ? $selectedItem['text'] : '';
+                } else {
+                    $args['value'] = '';
+                    $args['text'] = '';
+                }
             } else {
-                $args['value'] = '';
-                $args['text'] = '';
+                $args['selectedItem'] = $selectedItem;
+                if ($selectedItem) {
+                    $args['text'] = isset($selectedItem['text']) ? $selectedItem['text'] : '';
+                } else {
+                    $args['value'] = '';
+                    $args['text'] = '';
+                }
             }
         }
 
@@ -94,10 +105,42 @@ class TaxoSelectUIObject extends AbstractUIObject
         // 멀티 select 일때
         if($args['template'] === 'multi_select') {
             $blade = 'taxoMultiSelect';
-
-
         }
 
+        if($args['template'] === 'depth') {
+            $blade = 'taxoDepthSelect';
+
+            $args['childItem'] = [];
+            if(isset($args['selectedItem'])) {
+                if (count($args['selectedItem']) > 0) {
+                    $sub_categories = [];
+                    $selectedItemCollection = [];
+                    foreach ($args['value'] as $value) {
+                        $selectedItemCollection[$value] = CategoryItem::where('id', $value)->first();
+                    }
+                    $args['selectedItemCollection'] = $selectedItemCollection;
+                    foreach ($args['selectedItem'] as $key => $item) {
+                        if ($item['child'] == true) {
+                            $getItems = CategoryItem::where('parent_id', $item['value'])->get();
+
+                            foreach ($getItems as $getItem) {
+                                $getItem['child'] = false;
+                                if (CategoryItem::where('parent_id', $getItem->id)->count() > 0) {
+                                    $getItem['child'] = true;
+                                }
+                            }
+
+                            $sub_categories[$item['value']] = $getItems;
+                        }
+                    }
+
+                    $args['childItem'] = $sub_categories;
+                }
+            } else {
+                $args['selectedItem'] = [];
+                $args['selectedItemCollection'] = [];
+            }
+        }
         return View::make('dynamic_factory::components/UIObjects/TaxoSelect/'. $blade, $args)->render();
     }
 
@@ -130,6 +173,29 @@ class TaxoSelectUIObject extends AbstractUIObject
                 }
             }
 
+            return $selectItems;
+
+        } else if($template === 'depth') {
+
+            // 멀티 선택일때
+            $selectItems = [];
+            foreach ($items as $item) {
+                if (in_array($item['value'], $selectedValue)) {
+                    // category item id 를 key 로 사용한다.
+                    $selectItems[$item['value']] = [
+                        'value' => $item['value'],
+                        'text' => $item['text'],
+                        'child' => self::hasChildren($item),
+                        'parent' => CategoryItem::where('id', $item['value'])->first()->parent_id ?: 0
+                    ];
+                }
+                if (self::hasChildren($item)) {
+                    $selectedItem = self::getSelectedItem(self::getChildren($item), $selectedValue, $template);
+                    if ($selectedItem) {
+                        $selectItems = array_merge($selectItems, $selectedItem);
+                    }
+                }
+            }
             return $selectItems;
 
         } else {
@@ -198,4 +264,15 @@ class TaxoSelectUIObject extends AbstractUIObject
         ];
         return View::make('dynamic_factory::components/UIObjects/TaxoSelect/taxoMultiSelectItem', $args)->render();
     }
+
+    public static function renderDepthList ($items, $value = null)
+    {
+        $args = [
+            'items' => $items,
+            'selectedItemValue' => $value
+        ];
+
+        return View::make('dynamic_factory::components/UIObjects/TaxoSelect/taxoDepthSelectItem', $args)->render();
+    }
+
 }

@@ -41,6 +41,7 @@
                                 <select class="form-control" name="template">
                                     <option value="select" @if($cpt_cate_extra->template === 'select') selected="selected" @endif>Single Select</option>
                                     <option value="multi_select" @if($cpt_cate_extra->template === 'multi_select') selected="selected" @endif>Multi Select</option>
+                                    <option value="depth" @if($cpt_cate_extra->template === 'depth') selected="selected" @endif>depth</option>
                                 </select>
                             </div>
                         </div>
