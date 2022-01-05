@@ -104,7 +104,6 @@ class DynamicFactoryTaxonomyHandler
 
                     $category = $this->categoryHandler->createCate(['name' => $langKey]);
                     $category_id = $category->id;
-
                     $this->addCategoryItemForOut($category, $cate['items']);
 
                     $cateExtra = new CategoryExtra();
