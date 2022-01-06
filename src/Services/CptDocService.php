@@ -92,15 +92,15 @@ class CptDocService
         $currentPage = $paginate->currentPage();
         $count = 0;
 
+
+        $taxonomyHandler = app('overcode.df.taxonomyHandler');
+        $categoryHandler = app('xe.category');
+
         foreach($paginate as $item) {
             if(!app('overcode.df.documentHandler')->hasFavorite($item->id, \Auth::user()->getId())) $item->has_favorite = 0;
             else $item->has_favorite = 1;
-        }
 
-        if($request->get('taxonomies') && $request->get('taxonomies') === 'Y'){
-            $taxonomyHandler = app('overcode.df.taxonomyHandler');
-            $categoryHandler = app('xe.category');
-            foreach($paginate as $item) {
+            if($request->get('taxonomies','N') == 'Y') {
                 $selectedTaxonomies = $taxonomyHandler->getItemOnlyTargetId($item->id);
                 foreach($selectedTaxonomies as $taxonomy) {
                     $cate = $categoryHandler->cates()->find($taxonomy->category_id);
