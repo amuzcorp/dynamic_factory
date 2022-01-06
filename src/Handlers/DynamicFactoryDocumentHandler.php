@@ -250,6 +250,11 @@ class DynamicFactoryDocumentHandler
             $query = $query->where('user_id', $request->get('user_id'));
         }
 
+        if($request->get('user_ids') != null && $request->get('user_ids') != ''){
+            $userIds = is_array($request->get('user_ids')) ? $request->get('user_ids') : json_dec($request->get('user_ids'));
+            $query = $query->whereIn('user_id', $userIds);
+        }
+
         // 이 배열은 category_id 가 key 가 되고 item_id를 val에 배열로 넣는다.
         $category_items = [];
 
