@@ -85,16 +85,18 @@ class CptDocService
 
         $query->GroupBy('documents.id');
 
-        $perPage = $request->get('perPage') ?: $config->get('perPage') ?: '20';
-        $paginate = $query->paginate($perPage)->appends($request->except('page'));
+        $perPage = $request->get('perPage',20);
 
+        $paginate = $query->paginate($perPage)->appends($request->except('page'));
         $total = $paginate->total();
         $currentPage = $paginate->currentPage();
         $count = 0;
 
 
+        //arrange items
         $taxonomyHandler = app('overcode.df.taxonomyHandler');
         $categoryHandler = app('xe.category');
+        $dfDocumentHandler = app('overcode.df.documentHandler');
 
         foreach($paginate as $item) {
             if(!app('overcode.df.documentHandler')->hasFavorite($item->id, \Auth::user()->getId())) $item->has_favorite = 0;
@@ -112,12 +114,9 @@ class CptDocService
                 }
                 $item->selectedTaxonomies = $selectedTaxonomies;
             }
-        }
 
-        //getThumbnail
-        if($request->get('thumbnail') && $request->get('thumbnail') === 'Y') {
-            $dfDocumentHandler = app('overcode.df.documentHandler');
-            foreach($paginate as $item) {
+            //getThumbnail
+            if($request->get('thumbnail','N')== 'Y') {
                 if($dfDocumentHandler->getThumb($item->id)) $item->thumbnail = $dfDocumentHandler->getThumb($item->id);
             }
         }
