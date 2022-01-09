@@ -435,7 +435,7 @@ class DynamicFactoryTaxonomyHandler
         foreach($dynamicFields as $field_name => $field)
             $query = df($group, $field_name)->get($query);
 
-        return CategoryItem::setQuery($query)->get();
+        return CategoryItem::setQuery($query)->orderBy('ordering')->get();
     }
 
     /**
