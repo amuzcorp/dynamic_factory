@@ -16,10 +16,14 @@ use Gate;
 class CptDocService
 {
     protected $handler;
+    protected $xeMedia;
+    protected $xeStorage;
 
     public function __construct(DynamicFactoryDocumentHandler $documentHandler)
     {
         $this->handler = $documentHandler;
+        $this->xeMedia = app('xe.media');
+        $this->xeStorage = app('xe.storage');
     }
 
     /**
@@ -97,6 +101,7 @@ class CptDocService
         $taxonomyHandler = app('overcode.df.taxonomyHandler');
         $categoryHandler = app('xe.category');
         $dfDocumentHandler = app('overcode.df.documentHandler');
+        $fieldTypes = $this->getFieldTypes($dfConfig);
 
         foreach($paginate as $item) {
             if(!app('overcode.df.documentHandler')->hasFavorite($item->id, \Auth::user()->getId())) $item->has_favorite = 0;
@@ -119,8 +124,26 @@ class CptDocService
             if($request->get('thumbnail','N')== 'Y') {
                 if($dfDocumentHandler->getThumb($item->id)) $item->thumbnail = $dfDocumentHandler->getThumb($item->id);
             }
-        }
 
+            foreach ($fieldTypes as $fieldTypeConfig) {
+                $field_id = $fieldTypeConfig->get('id');
+                switch($fieldTypeConfig->get('typeId')){
+                    case "fieldType/dynamic_field_extend@MediaLibrary" :
+                        $image_urls = [];
+                        foreach(json_dec($item->{$field_id . "_column"}) as $fileId){
+                            $file = $this->xeStorage->find($fileId);
+
+                            //등록된 파일이 미디어이면,
+                            if($this->xeMedia->is($file)){
+                                $mediaFile = $this->xeMedia->make($file);
+                                $image_urls[$fileId] = $mediaFile->url();
+                            }
+                        }
+                        $item->{$field_id . "_urls"} = $image_urls;
+                        break;
+                }
+            }
+        }
 
         // 순번 필드를 추가하여 transform
         $paginate->getCollection()->transform(function ($paginate) use ($total, $perPage, $currentPage, &$count) {
