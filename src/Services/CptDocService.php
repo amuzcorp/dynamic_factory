@@ -131,7 +131,7 @@ class CptDocService
                     case "fieldType/dynamic_field_extend@MediaLibrary" :
                         $image_urls = [];
                         $files = json_dec($item->{$field_id . "_column"});
-                        if(count($files) > 0){
+                        if(is_array($files) && count($files) > 0){
                             foreach($files as $fileId){
                                 $file = $this->xeStorage->find($fileId);
 
