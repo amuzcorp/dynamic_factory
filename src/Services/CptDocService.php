@@ -130,13 +130,16 @@ class CptDocService
                 switch($fieldTypeConfig->get('typeId')){
                     case "fieldType/dynamic_field_extend@MediaLibrary" :
                         $image_urls = [];
-                        foreach(json_dec($item->{$field_id . "_column"}) as $fileId){
-                            $file = $this->xeStorage->find($fileId);
+                        $files = json_dec($item->{$field_id . "_column"});
+                        if(count($files) > 0){
+                            foreach($files as $fileId){
+                                $file = $this->xeStorage->find($fileId);
 
-                            //등록된 파일이 미디어이면,
-                            if($this->xeMedia->is($file)){
-                                $mediaFile = $this->xeMedia->make($file);
-                                $image_urls[$fileId] = $mediaFile->url();
+                                //등록된 파일이 미디어이면,
+                                if($this->xeMedia->is($file)){
+                                    $mediaFile = $this->xeMedia->make($file);
+                                    $image_urls[$fileId] = $mediaFile->url();
+                                }
                             }
                         }
                         $item->{$field_id . "_urls"} = $image_urls;
