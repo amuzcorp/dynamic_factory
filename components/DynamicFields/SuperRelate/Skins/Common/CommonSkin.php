@@ -114,9 +114,15 @@ class CommonSkin extends AbstractSkin
             $s_group = sprintf('documents_%s', array_get($args, 'instance_id'));
         }
 
+        if(!isset($args['id'])) {
+            $id = $args[$this->config->get('id').'_s_id'];
+        } else {
+            $id = $args['id'];
+        }
+
         $params = [
             'field_id' => $this->config->get('id'),
-            's_id' => $args['id'],
+            's_id' => $id,
             's_group' => $s_group
         ];
 
