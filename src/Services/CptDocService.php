@@ -129,6 +129,9 @@ class CptDocService
                 $field_id = $fieldTypeConfig->get('id');
                 switch($fieldTypeConfig->get('typeId')){
                     case "fieldType/dynamic_field_extend@MediaLibrary" :
+
+                        if(!$item->{$field_id . "_column"} || $item->{$field_id . "_column"} === "") break;
+
                         $image_urls = [];
                         $files = json_dec($item->{$field_id . "_column"});
                         if(is_array($files) && count($files) > 0){
