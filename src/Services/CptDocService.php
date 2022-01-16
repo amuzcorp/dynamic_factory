@@ -85,7 +85,9 @@ class CptDocService
         //check controlled visible
         $sql = $query->toSql();
         $controlled_visible = false;
-        foreach(['status','visible','approved','display'] as $visible) if(strpos($sql, $visible) === true) $controlled_visible = true;
+        foreach(['status','visible','approved','display'] as $visible){
+            if(stripos($sql, $visible) !== false) $controlled_visible = true;
+        }
         if(!$controlled_visible) $query->visible();
 
         $query->GroupBy('documents.id');
