@@ -83,9 +83,7 @@ class CptDocService
         $this->handler->makeOrder($query, $request, $config);
 
         $sql = $query->toSql();
-        $is_controlled_visible = false;
-        foreach(['status','visible','approved'] as $visible) if(strpos($sql, $visible) !== false) $is_controlled_visible = true;
-        if(!$is_controlled_visible) $query->visible();
+        foreach(['status','visible','approved'] as $visible) if(strpos($sql, $visible) === false) $query->visible();
 
         $query->GroupBy('documents.id');
 

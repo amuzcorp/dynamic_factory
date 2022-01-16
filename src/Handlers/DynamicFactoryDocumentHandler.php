@@ -206,13 +206,15 @@ class DynamicFactoryDocumentHandler
 
     public function makeWhere(Builder $query, Request $request, ConfigEntity $config)
     {
-        if($request->get('document_ids') != null && $request->get('document_ids') != ''){
+        if($request->get('status','') != '') $query->whereIn('status',$request->get('status',''));
+
+        if($request->get('document_ids','') != ''){
             $documentIDs = is_array($request->get('document_ids')) ? $request->get('document_ids') : json_dec($request->get('document_ids'));
-            $query = $query->whereIn('id', $documentIDs);
+            $query->whereIn('id', $documentIDs);
         }
 
         //검색한 ID의 문서가 Related 된 문서만 조회
-        if($request->get('belong_document_id') != null && $request->get('belong_document_id') != ''){
+        if($request->get('belong_document_id','') != ''){
             $target_field = $request->get('target_field') ?: '';
             $target_document = $request->get('target_document') ?: '';
             if($target_field !== '' && $target_document !== '' ) {
@@ -228,31 +230,27 @@ class DynamicFactoryDocumentHandler
             }
         }
 
-        if ($request->get('title_pure_content') != null && $request->get('title_pure_content') !== '') {
-            $query = $query->whereNested(function ($query) use ($request) {
-                $query->where('title', 'like', sprintf('%%%s%%', $request->get('title_pure_content')))
+        if ($request->get('title_pure_content','') !== '') {
+            $query->whereNested(function ($q) use ($request) {
+                $q->where('title', 'like', sprintf('%%%s%%', $request->get('title_pure_content')))
                     ->orWhere('pure_content', 'like', sprintf('%%%s%%', $request->get('title_pure_content')));
             });
         }
 
-        if ($request->get('title_content') != null && $request->get('title_content') !== '') {
-            $query = $query->whereNested(function ($query) use ($request) {
-                $query->where('title', 'like', sprintf('%%%s%%', $request->get('title_content')))
+        if ($request->get('title_content','') !== '') {
+            $query->whereNested(function ($q) use ($request) {
+                $q->where('title', 'like', sprintf('%%%s%%', $request->get('title_content')))
                     ->orWhere('content', 'like', sprintf('%%%s%%', $request->get('title_content')));
             });
         }
 
-        if ($request->get('writer') != null && $request->get('writer') !== '') {
-            $query = $query->where('writer', $request->get('writer'));
-        }
+        if ($request->get('writer','') !== '') $query->where('writer', $request->get('writer'));
 
-        if ($request->get('user_id') !== null && $request->get('user_id') !== '') {
-            $query = $query->where('user_id', $request->get('user_id'));
-        }
+        if ($request->get('user_id','') !== '') $query = $query->where('user_id', $request->get('user_id'));
 
-        if($request->get('user_ids') != null && $request->get('user_ids') != ''){
+        if($request->get('user_ids','') != ''){
             $userIds = is_array($request->get('user_ids')) ? $request->get('user_ids') : json_dec($request->get('user_ids'));
-            $query = $query->whereIn('user_id', $userIds);
+            $query->whereIn('user_id', $userIds);
         }
 
         // 이 배열은 category_id 가 key 가 되고 item_id를 val에 배열로 넣는다.
@@ -286,7 +284,7 @@ class DynamicFactoryDocumentHandler
             }
         }
 
-        if(array_get($data, 'taxOr') == 'Y') {
+        if(array_get($data, 'taxOr', 'N') == 'Y') {
             $query->where(function ($q) use ($category_items, $data) {
                 foreach($category_items as $item_id) {
                     $categoryItem = CategoryItem::find($data);
@@ -313,13 +311,8 @@ class DynamicFactoryDocumentHandler
             }
         }*/
 
-        if ($request->get('start_created_at') != null && $request->get('start_created_at') !== '') {
-            $query = $query->where('created_at', '>=', $request->get('start_created_at') . ' 00:00:00');
-        }
-
-        if ($request->get('end_created_at') != null && $request->get('end_created_at') !== '') {
-            $query = $query->where('created_at', '<=', $request->get('end_created_at') . ' 23:59:59');
-        }
+        if ($request->get('start_created_at','') !== '') $query->where('created_at', '>=', $request->get('start_created_at') . ' 00:00:00');
+        if ($request->get('end_created_at','') !== '') $query = $query->where('created_at', '<=', $request->get('end_created_at') . ' 23:59:59');
 
         // Tag 검색
         if ($request->get('searchTag')) {
