@@ -82,8 +82,11 @@ class CptDocService
         $this->handler->makeWhere($query, $request, $config);
         $this->handler->makeOrder($query, $request, $config);
 
+        //check controlled visible
         $sql = $query->toSql();
-        foreach(['status','visible','approved'] as $visible) if(strpos($sql, $visible) === false) $query->visible();
+        $controlled_visible = false;
+        foreach(['status','visible','approved','display'] as $visible) if(strpos($sql, $visible) === true) $controlled_visible = true;
+        if(!$controlled_visible) $query->visible();
 
         $query->GroupBy('documents.id');
 
