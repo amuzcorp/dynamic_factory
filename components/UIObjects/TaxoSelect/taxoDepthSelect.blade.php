@@ -19,7 +19,7 @@
                     str = ` <div id="${name}_${sub_item_count}_form"><label>${title}</label>
                             <div class="xe-dropdown __xe-dropdown-form">
                                 <select class="form-control" name="${name}_select_${sub_item_count}" onchange="selectCategory('${name}', this, 'sub', ${sub_item_count + 1})">
-                                   <option value="0_0">${title} 카테고리를 선택해주세요</option>`;
+                                   <option value="0_0">${title} 전체</option>`;
                     var child = 0;
                     for(let i = 0; i < response.length; i++) {
                         if(response[i].child === true) {
@@ -63,7 +63,7 @@
     <div class="xe-dropdown __xe-dropdown-form">
 
         <select class="form-control" name="{{$name}}_select_0" onchange="selectCategory('{{$name}}', this, 'first', 1)">
-            <option value="0_0">카테고리를 선택해주세요</option>
+            <option value="0_0">전체</option>
             @foreach($items as $item)
                 <option value="{{$item['value']}}_{{TaxoSelectUIObject::hasChildren($item) ? 1 : 0}}" @if(isset($value[0]) && (int) $value[0] === (int)$item['value']) selected="" @endif>{{$item['text']}}</option>
             @endforeach
@@ -78,7 +78,7 @@
                 <label>{{xe_trans($selectedItemCollection[$key]->word)}}</label>
                 <div class="xe-dropdown __xe-dropdown-form">
                     <select class="form-control" name="{{$name}}_select_{{$index}}" onchange="selectCategory('{{$name}}', this, 'sub', {{$index + 1}})">
-                        <option value="0_0">{{xe_trans($selectedItemCollection[$key]->word)}} 카테고리를 선택해주세요</option>
+                        <option value="0_0">{{xe_trans($selectedItemCollection[$key]->word)}} 전체</option>
                         @foreach($child_items as $item)
                             <option value="{{$item->id}}_{{$item->child === true ? 1 : 0}}" @if(in_array((string) $item->id, $value)) selected @endif>{{xe_trans($item->word)}}</option>
                         @endforeach

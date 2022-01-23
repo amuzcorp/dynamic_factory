@@ -38,6 +38,36 @@ class SuperRelateField extends AbstractType
     }
 
     /**
+     * get dynamic field type table name
+     *
+     * @return string
+     */
+    public function getPureTableName()
+    {
+        return self::TABLE_NAME;
+    }
+
+    /**
+     * get dynamic field table name
+     *
+     * @return string
+     */
+    public function getTableName()
+    {
+        return $this->getPureTableName();
+    }
+
+    /**
+     * get dynamic field revision table name
+     *
+     * @return string
+     */
+    public function getRevisionTableName()
+    {
+        return 'revision_' . $this->getPureTableName();
+    }
+
+    /**
      * return columns
      *
      * @return ColumnEntity[]

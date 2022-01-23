@@ -1,6 +1,6 @@
 <div class="board_read">
     <div class="read_header">
-        <span class="category">카테고리스</span>
+        <span class="category">카테고리</span>
         <h1><a href="#">{!! $item->title !!}</a></h1>
 
         <div class="more_info">
