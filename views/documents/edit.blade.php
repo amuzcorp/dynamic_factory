@@ -50,13 +50,6 @@
                     @endif
                 </div>
             </div>
-            <div class="col-12">
-                <div class="clearfix">
-                    <button type="submit" class="btn btn-primary"><i class="xi-download"></i>저장</button>
-                    <button type="button" id="delBtn" class="btn btn-danger pull-right" data-url="{{ route('dyFac.setting.remove_cpt_documents', ['id' => $item->id]) }}"><i class="xi-close-square"></i> 완전 삭제</button>
-                    <button type="button" id="trashBtn" class="btn btn-warning pull-right" data-url="{{ route('dyFac.setting.trash_cpt_documents', ['id' => $item->id]) }}"><i class="xi-trash"></i> 휴지통</button>
-                </div>
-            </div>
         </div>
 
         <div class="col-sm-4 col-md-4 col-lg-3 col-xl-2">
@@ -84,7 +77,12 @@
                     </div>
                 </div>
             </div>
-
+            <div class="text-right" style="margin-bottom:15px;">
+                <div class="pull-left">
+                <button type="button" id="trashBtn" class="xe-btn xe-btn-danger-outline" data-url="{{ route('dyFac.setting.trash_cpt_documents', ['id' => $item->id]) }}"><i class="xi-trash"></i> 휴지통</button>
+                </div>
+                <button type="submit" class="btn btn-primary"><i class="xi-redo"></i> 업데이트</button>
+            </div>
             @if(count($taxonomies) > 0)
                 <div class="panel">
                     <div class="panel-heading"><h4>카테고리</h4></div>

@@ -50,7 +50,6 @@
                 @endif
                 </div>
             </div>
-            <button type="submit" class="btn btn-primary"><i class="xi-download"></i>저장</button>
         </div>
 
         <div class="col-sm-4 col-md-4 col-lg-3 col-xl-2">
@@ -74,6 +73,10 @@
                         {!! uio('uiobject/df@user_select', []) !!}
                     </div>
                 </div>
+            </div>
+
+            <div class="text-right" style="margin-bottom:15px;">
+                <button type="submit" class="btn btn-primary"><i class="xi-save"></i> 저장</button>
             </div>
 
             @if(count($taxonomies) > 0)
