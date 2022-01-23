@@ -26,10 +26,16 @@ class DynamicFactoryTaxonomyHandler
 
     protected $dfService;
 
+    protected $xeMedia;
+
+    protected $xeStorage;
+
     public function __construct()
     {
         $this->categoryHandler = app('xe.category');
         $this->dfConfigHandler = app('overcode.df.configHandler');
+        $this->xeMedia = app('xe.media');
+        $this->xeStorage = app('xe.storage');
     }
 
     public function createTaxonomy($inputs)
@@ -435,7 +441,32 @@ class DynamicFactoryTaxonomyHandler
         foreach($dynamicFields as $field_name => $field)
             $query = df($group, $field_name)->get($query);
 
-        return CategoryItem::setQuery($query)->orderBy('ordering')->get();
+        $categoryItems = CategoryItem::setQuery($query)->orderBy('ordering')->get();
+        foreach($categoryItems as $key => $item){
+            foreach($dynamicFields as $field_id => $field){
+                switch($field->getId()){
+                    case "fieldType/dynamic_field_extend@MediaLibrary" :
+                        if(!$item[$field_id . "_column"] || $item[$field_id . "_column"] === "") break;
+                        $image_urls = [];
+                        $files = json_dec($item[$field_id . "_column"]);
+                        if(is_array($files) && count($files) > 0){
+                            foreach($files as $fileId){
+                                $file = $this->xeStorage->find($fileId);
+
+                                //등록된 파일이 미디어이면,
+                                if($this->xeMedia->is($file)){
+                                    $mediaFile = $this->xeMedia->make($file);
+                                    $image_urls[$fileId] = $mediaFile->url();
+                                }
+                            }
+                        }
+                        $item[$field_id . "_urls"] = $image_urls;
+                        break;
+                }
+            }
+            $categoryItems[$key] = $item;
+        }
+        return $categoryItems;
     }
 
     /**
