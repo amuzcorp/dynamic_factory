@@ -1,3 +1,4 @@
+{{ dd($item) }}
 <div class="board_read">
     <div class="read_header">
         <span class="category">카테고리</span>

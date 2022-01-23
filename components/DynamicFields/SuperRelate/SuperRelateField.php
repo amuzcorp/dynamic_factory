@@ -3,6 +3,7 @@
 namespace Overcode\XePlugin\DynamicFactory\Components\DynamicFields\SuperRelate;
 
 use Illuminate\Database\Query\Builder;
+use Illuminate\Database\Query\JoinClause;
 use Illuminate\Database\Schema\Blueprint;
 use Overcode\XePlugin\DynamicFactory\Models\CptDocument;
 use Overcode\XePlugin\DynamicFactory\Models\SuperRelate;
@@ -288,16 +289,31 @@ class SuperRelateField extends AbstractType
         $type = $this->handler->getRegisterHandler()->getType($this->handler, $config->get('typeId'));
         $tablePrefix = $this->handler->connection()->getTablePrefix();
 
-        $rawString = sprintf('%s.*', $tablePrefix . $baseTable);
-        // doc 에 filed_id 가 있어야 update 가능
-        $rawString .= sprintf(', null as '.$config->get('id').'_srf_chg, null as hidden_%s', $config->get('id'));
-
-        foreach ($type->getColumns() as $key => $column) {
-            $key = $config->get('id') . '_' . $column->name;
-            $rawString .= sprintf(' ,null as %s', $key);
+        $createTableName = $type->getTableName();
+        if ($query->hasDynamicTable($config->get('group') . '_' . $config->get('id')) === true) {
+            return $query;
         }
 
-        $query->addSelect(\DB::raw($rawString));
+        $rawString = sprintf('%s.*', $tablePrefix . $baseTable);
+        foreach ($type->getColumns() as $column) {
+            $key = $config->get('id') . '_' . $column->name;
+
+            $rawString .= sprintf(', %s.%s as %s', $tablePrefix . $config->get('id'), $column->name, $key);
+        }
+        $rawString .= sprintf(', null as '.$config->get('id').'_srf_chg, null as hidden_%s', $config->get('id'));
+
+        $query->leftJoin(
+            sprintf('%s as %s', $createTableName, $config->get('id')),
+            function (JoinClause $join) use ($createTableName, $config, $baseTable) {
+                $join->on(
+                    sprintf('%s.%s', $baseTable, $config->get('joinColumnName')),
+                    '=',
+                    sprintf('%s.s_id', $config->get('id'))
+                )->where($config->get('id') . '.field_id', $config->get('id'));
+            }
+        )->selectRaw($rawString);
+
+        $query->setDynamicTable($config->get('group') . '_' . $config->get('id'));
 
         return $query;
     }
