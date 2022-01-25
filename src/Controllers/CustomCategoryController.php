@@ -176,10 +176,12 @@ class CustomCategoryController extends CategoryController
 
             $selectParam = ['field_id'=>$id, 'target_id'=>$request->get('id'), 'group'=>$group];
 
-            //TODO 미디어 라이브러리는 선택한 이미지가 없고 수정전에 선택한 이미지가 있을 경우 해당 이미지 정보를 삭제
+            //TODO 미디어 라이브러리는 선택한 이미지가 없고 수정전에 선택한 이미지가 있을 경우 "column = null" 로 업데이트
             if($field_type_id === 'fieldType/dynamic_field_extend@MediaLibrary') {
                 if(!isset($insertParam['column'])) {
-                    \XeDB::table($fieldType->getTableName())->where($selectParam)->delete();
+                    if(\XeDB::table($fieldType->getTableName())->where($selectParam)->first()) {
+                        \XeDB::table($fieldType->getTableName())->where($selectParam)->update(['column' => null]);
+                    }
                 }
             }
 
