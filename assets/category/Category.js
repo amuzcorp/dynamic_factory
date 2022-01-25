@@ -136,6 +136,7 @@ var Category = (function (XE, $, Tree) {
         var item = $content.data('item')
 // console.log(item.dfs);
         if (!$this.data('open')) {
+          $('.__category_body').find('.__xe_content_body').empty()
           var formData = {
             title: XE.Lang.trans('xe::edit'), // 편집
             wordLangKey: item.word,
@@ -179,7 +180,6 @@ var Category = (function (XE, $, Tree) {
             type: 'add',
             parentId: $this.closest('.item-content').data('item').id
           }
-
           $content.find('.__xe_content_body').html(_this.getFormTemplate(formData))
           $content.find('.lang-editor-box').each(function () {
             window.langEditorBoxRender($(this)) // @FIXME
