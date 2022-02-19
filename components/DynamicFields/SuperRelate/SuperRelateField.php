@@ -160,10 +160,6 @@ class SuperRelateField extends AbstractType
 
         $is_user = ($config->get('r_instance_id') == 'user');
 
-        if ($args[$config->get('joinColumnName')] === '' || $args[$config->get('joinColumnName')] === null) {
-            return null;
-        }
-
         $insertParam = [];
         $insertParam['field_id'] = $config->get('id');
         $insertParam['s_id'] = $args[$config->get('joinColumnName')];
