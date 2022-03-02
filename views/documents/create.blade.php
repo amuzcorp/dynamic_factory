@@ -3,6 +3,11 @@
         <h2 class="pull-left">{{ $cpt->cpt_name }} 추가</h2>
     </div>
 @endsection
+<style>
+    .xe_content p, .cke_editable p {
+        margin: 0 0 8px !important;
+    }
+</style>
 
 <form method="post" action="{{ route('dyFac.setting.store_cpt_document') }}" enctype="multipart/form-data">
     {!! csrf_field() !!}

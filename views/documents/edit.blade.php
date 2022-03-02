@@ -3,7 +3,11 @@
         <h2 class="pull-left">{{ $cpt->cpt_name }} 수정</h2>
     </div>
 @endsection
-
+<style>
+    .xe_content p, .cke_editable p {
+        margin: 0 0 8px !important;
+    }
+</style>
 <form method="post" action="{{ route('dyFac.setting.update_cpt_document') }}" enctype="multipart/form-data">
     {!! csrf_field() !!}
     <input type="hidden" name="cpt_id" value="{{ $cpt->cpt_id }}" />
