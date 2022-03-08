@@ -371,6 +371,8 @@ class Plugin extends AbstractPlugin
             Route::get('/rending_store_result', ['as' => 'document.rending_store_result', 'uses' => 'DynamicFactoryController@rendingCptDocument']);
 
             Route::post('/rending_store_cpt_document', ['as' => 'widget.rending_store_cpt_document', 'uses' => 'DynamicFactorySettingController@storeRendingCptDocument']);
+
+            Route::post('/trash_cpt_document', ['as' => 'trash_cpt_documents', 'uses' => 'DynamicFactoryController@trashDocuments']);
         });
         Route::get('/userSearch/{keyword?}', ['as' => 'dyFac.user.search', 'uses' => 'Overcode\XePlugin\DynamicFactory\Controllers\UserController@search']);
 

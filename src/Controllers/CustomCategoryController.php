@@ -170,9 +170,20 @@ class CustomCategoryController extends CategoryController
                     $insertParam[$column->name] = is_array($request->{$key}) ? json_encode($request->{$key}) : $request->{$key};
                 }
             }
+            $field_type_id = $fieldType->getConfig()->get('typeId');
+
             $tableName = $fieldType->getTableName();
 
             $selectParam = ['field_id'=>$id, 'target_id'=>$request->get('id'), 'group'=>$group];
+
+            //TODO 미디어 라이브러리는 선택한 이미지가 없고 수정전에 선택한 이미지가 있을 경우 "column = null" 로 업데이트
+            if($field_type_id === 'fieldType/dynamic_field_extend@MediaLibrary') {
+                if(!isset($insertParam['column'])) {
+                    if(\XeDB::table($fieldType->getTableName())->where($selectParam)->first()) {
+                        \XeDB::table($fieldType->getTableName())->where($selectParam)->update(['column' => null]);
+                    }
+                }
+            }
 
             $df = \XeDB::table($tableName)->where($selectParam)->first();
             if($df === null) {

@@ -221,6 +221,24 @@ class CptModuleController extends Controller
         return $this->show($service, $request, $cptPermissionHandler, $menuUrl, $slug->target_id);
     }
 
+    public function showByItemId(
+        CptDocService $service,
+        Request $request,
+        CptPermissionHandler $cptPermission,
+        $menuUrl,
+        $itemId
+    ) {
+        if ($this->config->get('urlType') !== 'documentId') {
+            $slug = DfSlug::where('target_id', $itemId)->where('instance_id', $this->config->get('cpt_id'))->first();
+
+            if ($slug === null) {
+                throw new NotFoundDocumentException;
+            }
+            return redirect(instance_route('slug', ['slug' => $slug->slug]));
+        }
+        return $this->show($service, $request, $cptPermission, $menuUrl, $itemId);
+    }
+
     public function create(
         CptDocService $service,
         Request $request,

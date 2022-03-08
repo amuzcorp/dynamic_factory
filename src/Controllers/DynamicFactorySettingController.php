@@ -934,8 +934,7 @@ class DynamicFactorySettingController extends BaseController
                 });
             }
         }
-
-        $query->GroupBy('documents.id');
+        $query->GroupBy('documents.id')->select('documents.*');
 
         //필터 검색
         /*if ($state = $request->get('search_state')) {

@@ -54,8 +54,10 @@
         @if($value !== "")
             @foreach($value as $key => $val)
                 @if($key > 0)
-                    <input type="hidden" id="{{$name}}_{{$index}}_value" name="{{$name}}[]" value="{{$val}}" />
-                    @php $index += 1; @endphp
+                    @if($val !== "0")
+                        <input type="hidden" id="{{$name}}_{{$index}}_value" name="{{$name}}[]" value="{{$val}}" />
+                        @php $index += 1; @endphp
+                    @endif
                 @endif
             @endforeach
         @endif

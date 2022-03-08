@@ -170,4 +170,37 @@ class DynamicFactoryController extends Controller
         return \XePresenter::make('dynamic_factory::views.documents.document_write_widget_result', compact('status', 'after_work', 'result'));
     }
 
+    /**
+     * 휴지통으로
+     *
+     * @param Request $request
+     * @return mixed
+     * @throws \Exception
+     */
+    public function trashDocuments(Request $request)
+    {
+        $documentIds = $request->get('id');
+        $documentIds = is_array($documentIds) ? $documentIds : [$documentIds];
+
+        $cptDocService = app('overcode.doc.service');
+
+        \XeDB::beginTransaction();
+        try {
+            $cptDocService->trash($documentIds);
+        }catch (\Exception $e) {
+            \XeDB::rollback();
+
+            throw $e;
+        }
+        \XeDB::commit();
+
+        \Session::flash('alert', ['type' => 'success', 'message' => xe_trans('xe::deleted')]);
+
+        $presenter = app('xe.presenter');
+        $cptUrlHandler = app('overcode.df.url');
+        $presenter->share('cptUrlHandler', $cptUrlHandler);
+
+        return $presenter->makeApi([]);
+    }
+
 }

@@ -136,6 +136,7 @@ var Category = (function (XE, $, Tree) {
         var item = $content.data('item')
 // console.log(item.dfs);
         if (!$this.data('open')) {
+          $('.__category_body').find('.__xe_content_body').empty()
           var formData = {
             title: XE.Lang.trans('xe::edit'), // 편집
             wordLangKey: item.word,
@@ -179,7 +180,6 @@ var Category = (function (XE, $, Tree) {
             type: 'add',
             parentId: $this.closest('.item-content').data('item').id
           }
-
           $content.find('.__xe_content_body').html(_this.getFormTemplate(formData))
           $content.find('.lang-editor-box').each(function () {
             window.langEditorBoxRender($(this)) // @FIXME
@@ -371,6 +371,8 @@ var Category = (function (XE, $, Tree) {
      * @memberof Category
      */
     save: function (item) {
+      var that = this
+      var $this = $(this)
       $('button').prop('disabled', true)
       XE.ajax({
         url: _config[item.type],
@@ -379,7 +381,31 @@ var Category = (function (XE, $, Tree) {
         data: item,
         success: function (data) {
           // console.log(data);
-          location.reload();
+          //TODO 텍소노미 업데이트 시 새로고침 안 하도록 수정
+          if(item.type === 'add') {
+
+            $('.__xe_item_wrap').removeClass('open');
+            $('.panel').find('.lang-editor-box').each(function () {
+              window.langEditorBoxRender($(this)) // @FIXME
+            });
+
+            var $parent = $('.__category_body');
+            var isRoot = true;
+
+            $('.item-container', $parent).remove();
+            that.load({
+              $parent: $('.__category_body'),
+              isRoot: isRoot
+            });
+
+            XE.toast('success', '카테고리를 추가 했습니다.');
+
+          } else {
+            XE.toast('success', '변경한 내용을 저장 했습니다.');
+          }
+
+          // location.reload();
+
           /*$('button').prop('disabled', false)
 
           switch (item.type) {
@@ -559,7 +585,7 @@ var Category = (function (XE, $, Tree) {
           var $parent = $('.__category_body')
           var isRoot = true
           $('.item-container', $parent).remove()
-
+          XE.toast('success', '선택한 카테고리를 삭제 했습니다');
           that.load({
             $parent: $parent,
             isRoot: isRoot
@@ -593,6 +619,7 @@ var Category = (function (XE, $, Tree) {
             $parent: $parent,
             isRoot: isRoot
           })
+          XE.toast('success', '선택한 카테고리 및 하위 카테고리를 모두 삭제 했습니다.');
         }
       })
     },
