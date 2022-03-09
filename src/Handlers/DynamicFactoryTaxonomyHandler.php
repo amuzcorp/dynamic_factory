@@ -207,7 +207,7 @@ class DynamicFactoryTaxonomyHandler
         return $this->categoryHandler->cates()->find($category_id);
     }
 
-    public function getCategoryItemsTree($category_id)
+    public function getCategoryItemsTree($category_id, $withKey = false)
     {
         $items = [];
 
@@ -218,14 +218,17 @@ class DynamicFactoryTaxonomyHandler
                 'text' => xe_trans($categoryItem->word),
                 'children' => $this->getCategoryItemChildrenData($categoryItem)
             ];
-
-            $items[$categoryItem->id] = array_merge($categoryItem->toArray(),$categoryItemData);
+            if($withKey){
+                $items[$categoryItem->id] = array_merge($categoryItem->toArray(),$categoryItemData);
+            }else{
+                $items[] = array_merge($categoryItem->toArray(),$categoryItemData);
+            }
         }
 
         return collect($items);
     }
 
-    public function getCategoryItemChildrenData($categoryItem)
+    public function getCategoryItemChildrenData($categoryItem, $withKey = false)
     {
         $categoryItems = $this->getCategoryItemAttributes($categoryItem->category_id,null,$categoryItem->id);
 
@@ -234,10 +237,14 @@ class DynamicFactoryTaxonomyHandler
             $categoryItemData = [
                 'value' => $categoryItem->id,
                 'text' => xe_trans($categoryItem->word),
-                'children' => $this->getCategoryItemChildrenData($categoryItem)
+                'children' => $this->getCategoryItemChildrenData($categoryItem, $withKey)
             ];
 
-            $items[$categoryItem->id] = array_merge($categoryItem->toArray(),$categoryItemData);
+            if($withKey){
+                $items[$categoryItem->id] = array_merge($categoryItem->toArray(),$categoryItemData);
+            }else{
+                $items[] = array_merge($categoryItem->toArray(),$categoryItemData);
+            }
         }
         return $items;
     }
