@@ -74,6 +74,13 @@ class TaxoSelectUIObject extends AbstractUIObject
             $args['text'] = '';
         } else {
             $selectedItem = self::getSelectedItem($args['items'], $args['value'], $args['template']);
+            if(count($selectedItem) > 0) {
+                $data = [];
+                foreach($selectedItem as $value) {
+                    $data[$value['value']] = $value;
+                }
+                $selectedItem = $data;
+            }
             if($args['template'] !== 'depth') {
                 $args['selectedItem'] = $selectedItem;
                 if ($selectedItem) {
