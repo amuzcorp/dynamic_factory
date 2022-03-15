@@ -209,7 +209,7 @@ foreach($data as $id => $value){
                                         @else
                                             <td style="padding:8px;">
                                                 @if ($columnName === 'title')
-                                                    <a href="{{ route('dyFac.setting.'.$cpt->cpt_id, ['type' => 'edit', 'doc_id' => $doc->id]) }}">
+                                                    <a href="{{ route('dyFac.setting.'.$cpt->cpt_id, ['type' => 'edit', 'doc_id' => $doc->id]) }}" class="xe-btn xe-btn-positive-outline">
                                                         {!! $doc->title == null ? '<span style="font-style: italic; color:#999;">[제목없음]</span>' : $doc->title !!}
                                                     </a>
                                                 @elseif ($columnName === 'writer')

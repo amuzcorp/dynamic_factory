@@ -960,19 +960,27 @@ class DynamicFactorySettingController extends BaseController
         $config = $this->configHandler->getConfig($cpt_id);
         $column_labels = $this->configHandler->getColumnLabels($config);
 
+        $taxonomyHandler = app('overcode.df.taxonomyHandler');
+        $taxonomies = $taxonomyHandler->getTaxonomies($cpt_id);
+
         $formOrder = [
             'no',
             'doc_id',
             'email',
             'cpt_status'
         ];
-
         $excels[] = [
             'no' => '넘버',
             'doc_id' => '문서 ID',
             'email' => '작성자 이메일',
             'cpt_status' => '공개 속성',
         ];
+
+        foreach($taxonomies as $taxonomy) {
+
+            $formOrder[] = 'taxo_'. $taxonomy->id;
+            $excels[0]['taxo_'. $taxonomy->id] = xe_trans($taxonomy->name);
+        }
 
         foreach($config['formColumns'] as $index => $column) {
             /**
@@ -997,6 +1005,7 @@ class DynamicFactorySettingController extends BaseController
                     $excels[0]['hidden_'.$column] = $label.' 리스트';
                 } else {
                     foreach($fieldType->getColumns() as $key => $type) {
+                        if($key === 'raw_data' || $key === 'logic_builder') continue;
                         $formOrder[] = $column.'_'.$key;
                         if($key === 'start') {
                             $text = ' 시작';
@@ -1059,6 +1068,13 @@ class DynamicFactorySettingController extends BaseController
             $relateCptId = '';
             foreach($test as $key => $val) {
 
+                if(strpos($val,"taxo_") !== false) {
+                    $category_id = (int) str_replace('taxo_', '', $val);
+                    $categories = app('overcode.df.taxonomyHandler')->getItemOnlyTargetId($data->id)->where('category_id', $category_id)->pluck('id');
+                    $excels[$inx][$val] = str_replace(',', '|', json_enc($categories));
+                    continue;
+                }
+
                 if($val === 'no') {
                     $excels[$inx][$val] = $inx + 1;
                     continue;
@@ -1110,7 +1126,6 @@ class DynamicFactorySettingController extends BaseController
                     }
                     $excels[$inx][$val] = $doc_items[$val];
                 }
-
             }
         }
 
@@ -1130,6 +1145,11 @@ class DynamicFactorySettingController extends BaseController
         };
 
         return \Illuminate\Support\Facades\Response::stream($callback, 200, $headers);
+    }
+
+    public function isJson($string) {
+        json_decode($string);
+        return json_last_error() === JSON_ERROR_NONE;
     }
 
     public function uploadCSV(Request $request) {
@@ -1179,7 +1199,11 @@ class DynamicFactorySettingController extends BaseController
             $relateCptId = '';
             for($i = 0; $i < count($forms[0]); $i++) {
                 //다운로드할때 <br>로 바뀐 \r\n 원상복구
-                if($forms[0][$i] === 'content') {
+                if(strpos($forms[0][$i],"taxo_") !== false) {
+                    $category_id = (int) str_replace('taxo_', '', $forms[0][$i]);
+                    $params[$index]['cate_item_id_'.$category_id] = json_dec(str_replace('|', ',', $val[$i]));
+                }
+                else if($forms[0][$i] === 'content') {
                     $params[$index][$forms[0][$i]] = str_replace('<br>', "\r\n", $val[$i]);
                 }
                 //RelateCPT [field ID] + _srf_chg 필드가 존재하면 field ID 기록
@@ -1219,15 +1243,15 @@ class DynamicFactorySettingController extends BaseController
 
         XeDB::beginTransaction();
         try {
-            foreach ($params as $val) {
+            foreach ($params as $key => $val) {
                 //문서에 기록된 CPT ID
                 $target_cpt_id = $cpt_id;
 
                 //기록된 doc_id 로 작성된 CPT 문서가 있는지 체크
                 $cptDocument = CptDocument::division($target_cpt_id)->where('instance_id',$target_cpt_id)->where('id', $val['doc_id'])->first();
-                foreach($val as $key => $value) {
-                    if(substr( $key, (strlen($key) - 7), strlen($key) ) === "_column" && $val[$key] === "") {
-                        unset($val[$key]);
+                foreach($val as $doc_key => $value) {
+                    if(substr( $doc_key, (strlen($doc_key) - 7), strlen($doc_key) ) === "_column" && $val[$doc_key] === "") {
+                        unset($val[$doc_key]);
                     }
                 }
 
