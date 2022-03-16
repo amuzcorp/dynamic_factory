@@ -595,4 +595,18 @@ class DynamicFactoryTaxonomyHandler
         $items = XeDB::table('category_item')->whereIn('id', $poi)->get();
         return $items;
     }
+
+    public function getDocumentSelectTaxonomyItems($category_id, $doc_id) {
+        $category_ids = XeDB::table('df_taxonomy')->where('target_id', $doc_id)->where('category_id', $category_id)->first();
+        $items = [];
+
+        if($category_ids) {
+            foreach(json_dec($category_ids->item_ids) as $category_item) {
+                $item = $this->getItemOnlyTargetId($doc_id)->where('category_id', $category_id)->where('id', $category_item)->first();
+                $items[] = $item;
+            }
+        }
+
+        return new Collection($items);
+    }
 }
