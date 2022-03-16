@@ -207,46 +207,44 @@ class DynamicFactoryTaxonomyHandler
         return $this->categoryHandler->cates()->find($category_id);
     }
 
-    public function getCategoryItemsTree($category_id, $withKey = false)
+    public function getCategoryItemsTree($category_id)
     {
         $items = [];
 
-        $categoryItems = $this->getCategoryItemAttributes($category_id,null,null);
+        $categoryItems = CategoryItem::where('category_id', $category_id)
+            ->where('parent_id', null)
+            ->orderBy('ordering')->get();
         foreach ($categoryItems as $categoryItem) {
             $categoryItemData = [
                 'value' => $categoryItem->id,
                 'text' => xe_trans($categoryItem->word),
                 'children' => $this->getCategoryItemChildrenData($categoryItem)
             ];
-            if($withKey){
-                $items[$categoryItem->id] = array_merge($categoryItem->toArray(),$categoryItemData);
-            }else{
-                $items[] = array_merge($categoryItem->toArray(),$categoryItemData);
-            }
+
+            $items[$categoryItem->id] = $categoryItemData;
         }
 
         return collect($items);
     }
 
-    public function getCategoryItemChildrenData($categoryItem, $withKey = false)
+    public function getCategoryItemChildrenData(CategoryItem $categoryItem)
     {
-        $categoryItems = $this->getCategoryItemAttributes($categoryItem->category_id,null,$categoryItem->id);
+        $children = $categoryItem->getChildren();
 
-        $items = [];
-        foreach ($categoryItems as $categoryItem) {
-            $categoryItemData = [
-                'value' => $categoryItem->id,
-                'text' => xe_trans($categoryItem->word),
-                'children' => $this->getCategoryItemChildrenData($categoryItem, $withKey)
-            ];
-
-            if($withKey){
-                $items[$categoryItem->id] = array_merge($categoryItem->toArray(),$categoryItemData);
-            }else{
-                $items[] = array_merge($categoryItem->toArray(),$categoryItemData);
-            }
+        if($children->isEmpty() === true) {
+            return [];
         }
-        return $items;
+
+        $childrenData = [];
+        foreach ($children as $child) {
+            $childrenData[] = [
+                'value' => $child->id,
+                'text' =>xe_trans($child->word),
+                'children' => $this->getCategoryItemChildrenData($child)
+            ];
+        }
+
+        return $childrenData;
     }
 
     public function getTaxonomyItems($category_id)
@@ -407,7 +405,6 @@ class DynamicFactoryTaxonomyHandler
     public function getTaxFieldGroup($category_id)
     {
         $categoryExtra = $this->getCategoryExtra($category_id);
-        if(!$categoryExtra) return false;
         $slug = $categoryExtra->slug;
         $group = 'tax_' . $slug;
 
@@ -417,7 +414,6 @@ class DynamicFactoryTaxonomyHandler
     public function getCategoryFieldTypes($category_id)
     {
         $group = $this->getTaxFieldGroup($category_id);
-        if(!$group) return;
 
         $dynamicFieldHandler = app('xe.dynamicField');
         $dynamicFields = $dynamicFieldHandler->gets($group);
@@ -434,7 +430,7 @@ class DynamicFactoryTaxonomyHandler
     /**
      * category_id 로 item 리스트를 만들고 확장 변수 view 에 필요한 변수들을 붙여서 반환
      */
-    public function getCategoryItemAttributes($category_id, $group = null, $parent = false)
+    public function getCategoryItemAttributes($category_id, $group = null)
     {
         $group = ($group == null) ? $this->getTaxFieldGroup($category_id) : $group;
 
@@ -442,8 +438,6 @@ class DynamicFactoryTaxonomyHandler
         $dynamicFields = $dynamicFieldHandler->gets($group);
 
         $query = CategoryItem::getQuery()->where('category_id',$category_id);
-        if($parent !== false) $query->where('parent_id',$parent);
-
         foreach($dynamicFields as $field_name => $field)
             $query = df($group, $field_name)->get($query);
 
