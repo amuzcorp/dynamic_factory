@@ -174,6 +174,10 @@ foreach($data as $id => $value){
                                 @elseif($columnName === 'booked')
                                     <th>결제상태</th>
                                     <th>예약금액</th>
+                                @elseif(strpos($columnName, 'taxo_') !== false)
+                                    <th>
+                                        {{xe_trans(app('xe.category')->cates()->find(str_replace('taxo_', '', $columnName))->name)}}
+                                    </th>
                                 @else
                                     <th>{{ xe_trans($column_labels[$columnName]) }}</th>
                                 @endif
@@ -206,6 +210,25 @@ foreach($data as $id => $value){
                                                     {!! $doc->{$columnName} !!}
                                                 </td>
                                             @endif
+                                        @elseif(strpos($columnName, 'taxo_') !== false)
+                                            <td>
+                                                @php
+                                                    $finedCategories = app('overcode.df.taxonomyHandler')->getDocumentSelectTaxonomyItems((int) str_replace('taxo_', '', $columnName), $doc->id);
+                                                @endphp
+                                                @if(count($finedCategories) > 0)
+                                                    @php $target_id = $finedCategories[0]->id @endphp
+                                                    @foreach($finedCategories as $finedCategory)
+                                                        @php if(!$finedCategory) continue; @endphp
+                                                        <a href="#" onclick="return false;">
+                                                            <span class="xe-badge xe-primary-outline cursor" onclick="clickTaxonomyBadge({{(int) str_replace('taxo_', '', $columnName)}}, {{$target_id}})">
+                                                                {{xe_trans($finedCategory->word)}}
+                                                            </span>
+                                                        </a>
+                                                    @endforeach
+                                                @else
+                                                    <span class="xe-badge xe-danger-outline">선택없음</span>
+                                                @endif
+                                            </td>
                                         @else
                                             <td style="padding:8px;">
                                                 @if ($columnName === 'title')
@@ -369,6 +392,11 @@ foreach($data as $id => $value){
 
     function searchTaxoOr(e) {
         $('[name="taxOr"]').val($(e).attr('value'));
+        $('#__xe_search_form').submit();
+    }
+
+    function clickTaxonomyBadge(category_id, id) {
+        $('[id="taxo_'+category_id+'"]').val(id);
         $('#__xe_search_form').submit();
     }
 

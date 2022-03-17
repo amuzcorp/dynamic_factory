@@ -483,6 +483,11 @@ class DynamicFactorySettingController extends BaseController
         } elseif ($request->get('search_target') == 'title_pure_content') {
             $searchTargetWord = 'titleAndContent';
         }
+        $listColumns = $config['listColumns'];
+        foreach($taxonomies as $taxonomy) {
+            $taxonomySet[] = 'taxo_'.$taxonomy->id;
+        }
+        $config['listColumns'] = array_merge($taxonomySet, $listColumns);
 
         return $this->presenter->make($cpt->blades['list'],[
             'cpt' => $cpt,
