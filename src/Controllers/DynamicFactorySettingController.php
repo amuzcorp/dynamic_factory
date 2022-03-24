@@ -1130,7 +1130,7 @@ class DynamicFactorySettingController extends BaseController
                     $category_id = (int) str_replace('taxo_', '', $val);
                     $categories = app('overcode.df.taxonomyHandler')->getItemOnlyTargetId($data->id)->where('category_id', $category_id)->pluck('id');
 //                    $excels[$inx][$val] = json_enc($categories);
-                    $excels[$inx][$val] = str_replace(',', '|', json_enc($categories));
+                    $excels[$inx][$val] = json_enc($categories);
                     continue;
                 }
 
@@ -1157,7 +1157,7 @@ class DynamicFactorySettingController extends BaseController
                         $excels[$inx][$relateCptId.'_srf_chg'] = 1;
                         $excels[$inx][$val] = '[]';
                     } else {
-                        $excels[$inx][$val] = str_replace(',', '|', json_enc($item_realteCptData));
+                        $excels[$inx][$val] = json_enc($item_realteCptData);
                     }
                 }
                 /* Relate Cpt 데이터 기록 json encode */
@@ -1188,22 +1188,17 @@ class DynamicFactorySettingController extends BaseController
             }
         }
 
-        $callback = function () use ($headerText, $excels) {
-            $file = fopen('php://output', 'w');
+        header("Content-Type:text/csv; charset=utf-8");
+        header("Content-Disposition:attachment;filename=".$cpt->menu_name."_".date('Y_m_d H_i_s').".csv");
+        header("Pragma: no-cache");
+        header("Expires: 0");
+        $file = fopen('php://output', 'w');
+        fputcsv($file, $formOrder);
 
-            fputs($file, $bom = (chr(0xEF) . chr(0xBB) . chr(0xBF)));
-
-            fwrite($file, $headerText."\n");
-            foreach ($excels as $data) {
-                foreach($data as $key => $val) {
-                    fwrite($file, $val . ",");
-                }
-                fwrite($file, "\n");
-            }
-            fclose($file);
-        };
-
-        return \Illuminate\Support\Facades\Response::stream($callback, 200, $headers);
+        foreach($excels as $item) {
+            fputcsv($file, $item);
+        }
+        return redirect('/')->with('alert', ['type' => 'success', 'message' => 'Complete']);
     }
 
     public function isJson($string) {
@@ -1260,7 +1255,8 @@ class DynamicFactorySettingController extends BaseController
                 //다운로드할때 <br>로 바뀐 \r\n 원상복구
                 if(strpos($forms[0][$i],"taxo_") !== false) {
                     $category_id = (int) str_replace('taxo_', '', $forms[0][$i]);
-                    $params[$index]['cate_item_id_'.$category_id] = json_dec(str_replace('|', ',', $val[$i]));
+//                    $params[$index]['cate_item_id_'.$category_id] = json_dec(str_replace('|', ',', $val[$i]));
+                    $params[$index]['cate_item_id_'.$category_id] = json_dec($val[$i]);
                 }
                 else if($forms[0][$i] === 'content') {
                     $params[$index][$forms[0][$i]] = str_replace('<br>', "\r\n", $val[$i]);
@@ -1272,11 +1268,14 @@ class DynamicFactorySettingController extends BaseController
                 }
                 //CSV에 기록된 RelateCPT ID 정보 json decode
                 else if($forms[0][$i] === 'hidden_'.$relateCptId) {
-                    if($val[$i] !== '') {
-                        $val[$i] = str_replace('|', ',', $val[$i]);
-//                        $params[$index][$forms[0][$i]] = json_dec($val[$i]);
+                    if($val[$i] === '') {
+                        $params[$index][$forms[0][$i]] = '[]';
                     }
-                    else $params[$index][$forms[0][$i]] = '[]';
+//                    if($val[$i] !== '') {
+//                        $val[$i] = str_replace('|', ',', $val[$i]);
+//                        $params[$index][$forms[0][$i]] = json_dec($val[$i]);
+//                    }
+//                    else $params[$index][$forms[0][$i]] = '[]';
                 }
                 //calendar 기록 양식에 맞게 컨버트 [ 0 => 일자 , 1 => 시간 (시:분) ]
                 else if(strpos($forms[0][$i],"_date_start") !== false || strpos($forms[0][$i],"_date_end") !== false) {
