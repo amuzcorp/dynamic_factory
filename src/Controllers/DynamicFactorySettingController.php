@@ -817,6 +817,12 @@ class DynamicFactorySettingController extends BaseController
         $query = $query->onlyTrashed();
         $documentIds = $query->pluck('id');
 
+        if(count($documentIds) < 1) {
+            Session::flash('alert', ['type' => 'danger', 'message' => '삭제 가능한 문서가 없습니다']);
+
+            return $this->presenter->makeApi([]);
+        }
+
         if(count($documentIds) > 400) {
             $documentLists = array_chunk($documentIds->toArray(), 400);
         } else {
