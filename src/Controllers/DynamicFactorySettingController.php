@@ -599,7 +599,7 @@ class DynamicFactorySettingController extends BaseController
 
     public function getCptDocuments($request, $cpt, $config)
     {
-        $perPage = $request->get('perPage', 20);
+        $perPage = (int) $request->get('perPage', '20');
 
         $query = $this->dfService->getItemsWhereQuery(array_merge($request->all(), [
             'force' => true,
@@ -781,6 +781,53 @@ class DynamicFactorySettingController extends BaseController
         XeDB::beginTransaction();
         try {
             $this->cptDocService->remove($documentIds);
+        }catch (\Exception $e) {
+            XeDB::rollback();
+
+            throw $e;
+        }
+        XeDB::commit();
+
+        Session::flash('alert', ['type' => 'success', 'message' => xe_trans('xe::processed')]);
+
+        return $this->presenter->makeApi([]);
+    }
+
+    /**
+     * 문서를 전체 삭제
+     *
+     * @param Request $request
+     * @return mixed
+     * @throws \Exception
+     */
+    public function removeAllDocuments(Request $request)
+    {
+        $cpt_id = $request->get('cpt_id');
+        if($cpt_id == null) {
+            $cpts = app('overcode.df.service')->getItemsAll();
+            foreach ($cpts as $cpt) {
+                $cpt_ids[] = $cpt->cpt_id;
+            }
+        }else{
+            $cpt_ids = [$cpt_id];
+        }
+
+        $query = CptDocument::whereIn('instance_id', $cpt_ids);
+        //삭제된 문서만 조회
+        $query = $query->onlyTrashed();
+        $documentIds = $query->pluck('id');
+
+        if(count($documentIds) > 400) {
+            $documentLists = array_chunk($documentIds->toArray(), 400);
+        } else {
+            $documentLists[] = $documentIds;
+        }
+
+        XeDB::beginTransaction();
+        try {
+            foreach($documentLists as $lists) {
+                $this->cptDocService->remove($lists);
+            }
         }catch (\Exception $e) {
             XeDB::rollback();
 
@@ -1076,6 +1123,7 @@ class DynamicFactorySettingController extends BaseController
                 if(strpos($val,"taxo_") !== false) {
                     $category_id = (int) str_replace('taxo_', '', $val);
                     $categories = app('overcode.df.taxonomyHandler')->getItemOnlyTargetId($data->id)->where('category_id', $category_id)->pluck('id');
+//                    $excels[$inx][$val] = json_enc($categories);
                     $excels[$inx][$val] = str_replace(',', '|', json_enc($categories));
                     continue;
                 }
@@ -1220,7 +1268,7 @@ class DynamicFactorySettingController extends BaseController
                 else if($forms[0][$i] === 'hidden_'.$relateCptId) {
                     if($val[$i] !== '') {
                         $val[$i] = str_replace('|', ',', $val[$i]);
-                        $params[$index][$forms[0][$i]] = json_dec($val[$i]);
+//                        $params[$index][$forms[0][$i]] = json_dec($val[$i]);
                     }
                     else $params[$index][$forms[0][$i]] = '[]';
                 }
@@ -1267,8 +1315,8 @@ class DynamicFactorySettingController extends BaseController
                 if($val['email'] !== '') {
                     $user = XeUser::where('email', $val['email'])->first();
                     if($user) {
-                        $val['user_id'] = \Auth::user()->id;
-                        $val['writer'] = \Auth::user()->display_name;
+                        $val['user_id'] = $user->id;
+                        $val['writer'] = $user->display_name;
                     }
                 }
 
@@ -1312,7 +1360,7 @@ class DynamicFactorySettingController extends BaseController
 
                 //CPT 문서가 존재하고 doc ID가 있으면 update
                 if($cptDocument) app('overcode.df.service')->updateCptDocument($inputs);
-                else app('overcode.df.service')->storeCptDocument($inputs);
+                else $in = app('overcode.df.service')->storeCptDocument($inputs);
             }
             //exception
         } catch (\Exception $e) {
