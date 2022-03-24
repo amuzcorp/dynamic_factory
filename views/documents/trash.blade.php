@@ -20,6 +20,7 @@
                         <div class="btn-group __xe_function_buttons" role="group" aria-label="...">
                             <button type="button" class="btn btn-default __xe_button" data-mode="restore">{{xe_trans('xe::restore')}}</button>
                             <button type="button" class="btn btn-default __xe_button" data-mode="destroy">{{xe_trans('xe::destroy')}}</button>
+                            <button type="button" class="btn btn-default __xe_button" data-mode="destroy_all">전체삭제</button>
                         </div>
                     </div>
                     <div class="pull-right">
@@ -47,7 +48,8 @@
                 </div>
                 <div class="panel-body">
                     <form class="__xe_form_list" method="post">
-                        <input type="hidden" name="_token" value="{{ csrf_token() }}">
+                        <input type="hidden" name="_token" value="{{ csrf_token() }}" />
+                        <input type="hidden" name="cpt_id" value="{{$cpt_id}}" />
                         <table class="table">
                             <thead>
                             <tr>
@@ -149,18 +151,21 @@
 
             var mode = $(this).attr('data-mode'), flag = false;
 
-            $('input.__xe_checkbox').each(function () {
-                if ($(this).is(':checked')) {
-                    flag = true;
-                }
-            });
+            if(mode !== 'destroy_all') {
+                $('input.__xe_checkbox').each(function () {
+                    if ($(this).is(':checked')) {
+                        flag = true;
+                    }
+                });
 
-            if (flag !== true) {
-                alert('select document');
-                return;
+                if (flag !== true) {
+                    alert('select document');
+                    return;
+                }
             }
 
-            if(mode == 'destroy' && !confirm('이 동작은 되돌릴 수 없습니다. 계속 하시겠습니까?')) return false;
+            if(mode === 'destroy' && !confirm('이 동작은 되돌릴 수 없습니다. 계속 하시겠습니까?')) return false;
+            if(mode === 'destroy_all' && !confirm('이 동작은 되돌릴 수 없습니다. 계속 하시겠습니까?')) return false;
 
             var $f = $('.__xe_form_list');
             $('<input>').attr('type', 'hidden').attr('name', 'redirect').val(location.href).appendTo($f);
@@ -176,6 +181,10 @@
         },
         destroy: function ($f) {
             $f.attr('action', '{{ route('dyFac.setting.remove_cpt_documents') }}');
+            send($f);
+        },
+        destroy_all: function ($f) {
+            $f.attr('action', '{{ route('dyFac.setting.remove_all_cpt_documents') }}');
             send($f);
         },
     };
