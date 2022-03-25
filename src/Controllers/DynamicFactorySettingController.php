@@ -484,6 +484,7 @@ class DynamicFactorySettingController extends BaseController
             $searchTargetWord = 'titleAndContent';
         }
         $listColumns = $config['listColumns'];
+        $taxonomySet = [];
         foreach($taxonomies as $taxonomy) {
             $taxonomySet[] = 'taxo_'.$taxonomy->id;
         }
