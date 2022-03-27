@@ -989,7 +989,7 @@ class DynamicFactorySettingController extends BaseController
             foreach($category_items as $category_id => $selected_items){
                 $table_name = "taxonomy_{$category_id}";
                 $query->where(function($q) use ($table_name,$selected_items){
-                    foreach($selected_items as $item_id) $q->where($table_name . '.item_ids', 'like', '%"' . (int) $item_id . '"%');
+                    foreach($selected_items as $item_id) $q->where($table_name . '.item_ids', 'like', '%' . $item_id . '%');
                 });
             }
         }
@@ -1256,22 +1256,27 @@ class DynamicFactorySettingController extends BaseController
                 //다운로드할때 <br>로 바뀐 \r\n 원상복구
                 if(strpos($forms[0][$i],"taxo_") !== false) {
                     $category_id = (int) str_replace('taxo_', '', $forms[0][$i]);
-//                    $params[$index]['cate_item_id_'.$category_id] = json_dec(str_replace('|', ',', $val[$i]));
-                    $params[$index]['cate_item_id_'.$category_id] = json_dec($val[$i]);
+                    $params[$index]['cate_item_id_'.$category_id] = json_dec(str_replace('|', ',', $val[$i]));
+                    //$params[$index]['cate_item_id_'.$category_id] = json_dec($val[$i]);
                 }
                 else if($forms[0][$i] === 'content') {
                     $params[$index][$forms[0][$i]] = str_replace('<br>', "\r\n", $val[$i]);
                 }
                 //RelateCPT [field ID] + _srf_chg 필드가 존재하면 field ID 기록
+                else if(strpos($forms[0][$i],"_t_id")) {
+                    $relateId = str_replace('_t_id', '', $forms[0][$i]);
+                    $params[$index][$relateId.'_srf_chg'] = 1;
+                    $params[$index]['hidden_'.$relateId][] = $val[$i];
+                }
                 else if(strpos($forms[0][$i],"_srf_chg")) {
-                    $relateCptId = str_replace('_srf_chg', '', $forms[0][$i]);
-                    $params[$index][$forms[0][$i]] = $val[$i];
+//                    $relateCptId = str_replace('_srf_chg', '', $forms[0][$i]);
+//                    $params[$index][$forms[0][$i]] = $val[$i];
                 }
                 //CSV에 기록된 RelateCPT ID 정보 json decode
                 else if($forms[0][$i] === 'hidden_'.$relateCptId) {
-                    if($val[$i] === '') {
-                        $params[$index][$forms[0][$i]] = '[]';
-                    }
+//                    if($val[$i] === '') {
+//                        $params[$index][$forms[0][$i]] = '[]';
+//                    }
 //                    if($val[$i] !== '') {
 //                        $val[$i] = str_replace('|', ',', $val[$i]);
 //                        $params[$index][$forms[0][$i]] = json_dec($val[$i]);
