@@ -142,8 +142,13 @@ class CptDocService
                 $item->selectedTaxonomyItems = $result;
             }
 
+            if($request->get('withOutColumns','') != ''){
+                $removeColumns = explode(",",$request->get('withOutColumns',''));
+                foreach($removeColumns as $targetColumn) unset($item->{$targetColumn});
+            }
+
             //getThumbnail
-            if($request->get('thumbnail','N')== 'Y') {
+            if($request->get('thumbnail','N') == 'Y') {
                 if($dfDocumentHandler->getThumb($item->id)) $item->thumbnail = $dfDocumentHandler->getThumb($item->id);
             }
 
