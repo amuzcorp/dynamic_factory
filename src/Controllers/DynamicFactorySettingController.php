@@ -1075,7 +1075,7 @@ class DynamicFactorySettingController extends BaseController
                         } else if($key === 'num') {
                             $text = ' 숫자만';
                         } else if($key === 'boolean') {
-                            $text = ' 택1 (1, 0)';
+                            $text = ' 택1 (1 or 0)';
                         } else if($key === 'postcode') {
                             $text = ' 우편번호';
                         } else if($key === 'address1') {
@@ -1253,10 +1253,20 @@ class DynamicFactorySettingController extends BaseController
 
             $relateCptId = '';
             for($i = 0; $i < count($forms[0]); $i++) {
+
+                if(count($val) !== count($forms[0])) {
+                    break;
+                }
+
                 //다운로드할때 <br>로 바뀐 \r\n 원상복구
                 if(strpos($forms[0][$i],"taxo_") !== false) {
                     $category_id = (int) str_replace('taxo_', '', $forms[0][$i]);
-                    $params[$index]['cate_item_id_'.$category_id] = json_dec(str_replace('|', ',', $val[$i]));
+
+                    $decode = [];
+                    if(strpos($val[$i], ',') !== false) $decode = json_dec($val[$i]);
+                    else if(strpos($val[$i] , '|') !== false) $decode = json_dec(str_replace('|', ',', $val[$i]));
+
+                    $params[$index]['cate_item_id_'.$category_id] = $decode;
                     //$params[$index]['cate_item_id_'.$category_id] = json_dec($val[$i]);
                 }
                 else if($forms[0][$i] === 'content') {
