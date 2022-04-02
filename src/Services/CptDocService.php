@@ -106,25 +106,49 @@ class CptDocService
         $dfDocumentHandler = app('overcode.df.documentHandler');
         $fieldTypes = $this->getFieldTypes($dfConfig);
 
+        if($request->get('taxonomies','N') == 'Y') {
+            $archives = [];
+            $archive = $taxonomyHandler->getTaxonomies($config->get('cpt_id'));
+            foreach($archive as $taxonomy){
+                $archives[$taxonomy->extra->slug] = $taxonomy;
+                $items = $taxonomyHandler->getCategoryItemAttributes($taxonomy->id)->keyBy('id');
+                foreach($items as $item){
+                    $item->word = xe_trans($item->word);
+                    $item->description = xe_trans($item->description);
+                }
+                $archives[$taxonomy->extra->slug]->items = $items;
+            }
+            //텍소노미를 붙이기 전에 부모 <-> 자식간의 데이터를 오버라이드 하여 싱크해준다.
+            $archives = arrangeTaxonomyItemsOverride($archives);
+        }
+
         foreach($paginate as $item) {
             if(!app('overcode.df.documentHandler')->hasFavorite($item->id, \Auth::user()->getId())) $item->has_favorite = 0;
             else $item->has_favorite = 1;
 
             if($request->get('taxonomies','N') == 'Y') {
-                $selectedTaxonomies = $taxonomyHandler->getItemOnlyTargetId($item->id);
-                foreach($selectedTaxonomies as $taxonomy) {
-                    $cate = $categoryHandler->cates()->find($taxonomy->category_id);
-                    $category_Extra = CategoryExtra::where('category_id', $taxonomy->category_id)->first();
-                    $taxonomy->category_slug = $category_Extra->slug;
-                    $taxonomy->parent_cate_name = xe_trans($cate->name);
-                    $taxonomy->word = xe_trans($taxonomy->word);
-                    $taxonomy->description = xe_trans($taxonomy->description);
+                $selectedTaxonomyItems = $taxonomyHandler->getItemOnlyTargetId($item->id);
+                $result = [];
+                foreach($selectedTaxonomyItems as $taxonomyItem) {
+                    $category_Extra = CategoryExtra::where('category_id', $taxonomyItem->category_id)->first();
+                    $taxonomyItem->category_slug = $category_Extra->slug;
+
+                    $archive = $archives[$taxonomyItem->category_slug];
+                    $taxonomyItem->parent_cate_name = xe_trans($archive->name);
+
+                    if(!isset($result[$taxonomyItem->category_slug])) $result[$taxonomyItem->category_slug] = [];
+                    $result[$taxonomyItem->category_slug][] = array_merge((array)$taxonomyItem,$archive->items[$taxonomyItem->id]);
                 }
-                $item->selectedTaxonomies = $selectedTaxonomies;
+                $item->selectedTaxonomyItems = $result;
+            }
+
+            if($request->get('withOutColumns','') != ''){
+                $removeColumns = explode(",",$request->get('withOutColumns',''));
+                foreach($removeColumns as $targetColumn) unset($item->{$targetColumn});
             }
 
             //getThumbnail
-            if($request->get('thumbnail','N')== 'Y') {
+            if($request->get('thumbnail','N') == 'Y') {
                 if($dfDocumentHandler->getThumb($item->id)) $item->thumbnail = $dfDocumentHandler->getThumb($item->id);
             }
 

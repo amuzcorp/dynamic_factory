@@ -215,8 +215,8 @@ foreach($data as $id => $value){
                                                 @php
                                                     $finedCategories = app('overcode.df.taxonomyHandler')->getDocumentSelectTaxonomyItems((int) str_replace('taxo_', '', $columnName), $doc->id);
                                                 @endphp
-                                                @if(count($finedCategories) > 0)
-                                                    @php $target_id = $finedCategories[0]->id @endphp
+                                                @if(count($finedCategories) > 0 && $finedCategories[0] !== null)
+                                                    @php $target_id = $finedCategories[0]->id; @endphp
                                                     @foreach($finedCategories as $finedCategory)
                                                         @php if(!$finedCategory) continue; @endphp
                                                         <a href="#" onclick="return false;">
