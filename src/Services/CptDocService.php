@@ -136,10 +136,10 @@ class CptDocService
                     $archive = $archives[$taxonomyItem->category_slug];
                     $taxonomyItem->parent_cate_name = xe_trans($archive->name);
 
-                    if(!isset($result[$taxonomyItem->category_slug])) $result[$taxonomyItem->category_slug] = [];
-                    $result[$taxonomyItem->category_slug][] = array_merge((array)$taxonomyItem,$archive->items[$taxonomyItem->id]);
+//                    if(!isset($result[$taxonomyItem->category_slug])) $result[$taxonomyItem->category_slug] = [];
+                    $result[] = array_merge((array)$taxonomyItem,$archive->items[$taxonomyItem->id]);
                 }
-                $item->selectedTaxonomyItems = $result;
+                $item->selectedTaxonomies = $result;
             }
 
             if($request->get('withOutColumns','') != ''){

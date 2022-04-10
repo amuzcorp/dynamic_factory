@@ -17,7 +17,7 @@
         <!-- /LIST HEADER -->
         </thead>
         <tbody>
-        @if (count($paginate) == 0)
+        @if (count($paginate ?: []) == 0)
             <!-- NO ARTICLE -->
             <tr class="no_article">
                 <!-- [D] 컬럼수에 따라 colspan 적용 -->
@@ -30,7 +30,7 @@
         @endif
 
         <!-- LIST -->
-        @foreach($paginate as $item)
+        @foreach($paginate ?: [] as $item)
             <tr>
                 <td>{{ $item->seq }}</td>
             @foreach($dfConfig['listColumns'] as $columnName)
@@ -71,6 +71,7 @@
 </div>
 
 <div class="board_footer">
+    @if($paginate)
     <!-- PAGINATAION PC-->
     {!! $paginate->render('dynamic_factory::components.Skins.Cpt.Common.views.default-pagination') !!}
     <!-- /PAGINATION PC-->
@@ -78,5 +79,6 @@
     <!-- PAGINATAION Mobile -->
     {!! $paginate->render('dynamic_factory::components.Skins.Cpt.Common.views.simple-pagination') !!}
     <!-- /PAGINATION Mobile -->
+    @endif
 </div>
 <div class="bd_dimmed"></div>

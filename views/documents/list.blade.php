@@ -126,6 +126,20 @@ foreach($data as $id => $value){
                                 </div>
                             @endforeach
 
+                            <div class="input-group-btn __xe_btn_per_page">
+                                <input type="hidden" name="perPage" value="{{ Request::get('perPage') }}">
+                                <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false"><span class="__xe_text">{{Request::has('perPage') && Request::get('perPage') != '20' ? Request::get('perPage') : '아이템수'}}</span> <span class="caret"></span></button>
+                                <ul class="dropdown-menu" role="menu">
+                                    <li @if(Request::get('perPage') == '20') class="active" @endif><a href="#" value="20">20</a></li>
+                                    <li @if(Request::get('perPage') == '30') class="active" @endif><a href="#" value="30">30</a></li>
+                                    <li @if(Request::get('perPage') == '40') class="active" @endif><a href="#" value="40">40</a></li>
+                                    <li @if(Request::get('perPage') == '60') class="active" @endif><a href="#" value="60">60</a></li>
+                                    <li @if(Request::get('perPage') == '80') class="active" @endif><a href="#" value="80">80</a></li>
+                                    <li @if(Request::get('perPage') == '100') class="active" @endif><a href="#" value="100">100</a></li>
+                                    <li @if(Request::get('perPage') == '200') class="active" @endif><a href="#" value="200">200</a></li>
+                                    <li @if(Request::get('perPage') == '300') class="active" @endif><a href="#" value="300">300</a></li>
+                                </ul>
+                            </div>
 
                             <div class="input-group-btn __xe_btn_order_type">
                                 <input type="hidden" name="order_type" value="{{ Request::get('order_type') }}">
@@ -214,9 +228,12 @@ foreach($data as $id => $value){
                                             <td>
                                                 @php
                                                     $finedCategories = app('overcode.df.taxonomyHandler')->getDocumentSelectTaxonomyItems((int) str_replace('taxo_', '', $columnName), $doc->id);
+                                                    if($finedCategories === null) $finedCategories = [];
                                                 @endphp
-                                                @if(count($finedCategories) > 0 && $finedCategories[0] !== null)
-                                                    @php $target_id = $finedCategories[0]->id; @endphp
+                                                @if(count($finedCategories) > 0)
+                                                    @if(isset($finedCategories[0]->id))
+
+                                                    @php $target_id = $finedCategories[0]->id @endphp
                                                     @foreach($finedCategories as $finedCategory)
                                                         @php if(!$finedCategory) continue; @endphp
                                                         <a href="#" onclick="return false;">
@@ -225,6 +242,9 @@ foreach($data as $id => $value){
                                                             </span>
                                                         </a>
                                                     @endforeach
+                                                        @else
+                                                        <span class="xe-badge xe-danger-outline">선택없음</span>
+                                                    @endif
                                                 @else
                                                     <span class="xe-badge xe-danger-outline">선택없음</span>
                                                 @endif
@@ -353,6 +373,18 @@ foreach($data as $id => $value){
             $(this).closest('li').addClass('active');
         });
 
+        $('.__xe_btn_per_page .dropdown-menu a').click(function (e) {
+            e.preventDefault();
+
+            $('[name="perPage"]').val($(this).attr('value'));
+            $('.__xe_btn_per_page .__xe_text').text($(this).text());
+
+            $(this).closest('.dropdown-menu').find('li').removeClass('active');
+            $(this).closest('li').addClass('active');
+
+            $('#__xe_search_form').submit();
+        });
+
         $('.__xe_btn_order_type .dropdown-menu a').click(function (e) {
             e.preventDefault();
 
@@ -397,7 +429,7 @@ foreach($data as $id => $value){
 
     function clickTaxonomyBadge(category_id, id) {
         $('[id="taxo_'+category_id+'"]').val(id);
-        $('#__xe_search_form').submit();
+        // $('#__xe_search_form').submit();
     }
 
     function searchTaxonomy(e, key) {
