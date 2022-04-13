@@ -229,6 +229,22 @@ class DynamicFactoryTaxonomyHandler
         return collect($items);
     }
 
+    public function getChildTaxonomies($parent_id) {
+
+        $taxonomies = CategoryItem::where('parent_id', $parent_id)->get();
+
+        foreach($taxonomies as $key => $taxonomy) {
+            $taxonomies[$key]->word = xe_trans($taxonomy->word);
+            $taxonomies[$key]->description = xe_trans($taxonomy->description);
+            $taxonomies[$key]->child = false;
+            if(CategoryItem::where('parent_id', $taxonomy->id)->count() > 0) {
+                $taxonomies[$key]->child = true;
+            }
+        }
+        return collect($taxonomies);
+    }
+
+
     public function getCategoryItemChildrenData($categoryItem, $withKey = false)
     {
         $categoryItems = $this->getCategoryItemAttributes($categoryItem->category_id,null,$categoryItem->id);

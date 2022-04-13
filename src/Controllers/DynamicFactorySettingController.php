@@ -989,7 +989,7 @@ class DynamicFactorySettingController extends BaseController
             foreach($category_items as $category_id => $selected_items){
                 $table_name = "taxonomy_{$category_id}";
                 $query->where(function($q) use ($table_name,$selected_items){
-                    foreach($selected_items as $item_id) $q->where($table_name . '.item_ids', 'like', '%' . $item_id . '%');
+                    foreach($selected_items as $item_id) $q->where($table_name . '.item_ids', 'like', '%"' . (int) $item_id . '"%');
                 });
             }
         }

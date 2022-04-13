@@ -27,6 +27,16 @@ foreach($data as $id => $value){
     <small>{{ $cpt->description }}</small>
 @endsection
 
+<style>
+    .badge_a_tag {
+        text-decoration: auto !important;
+    }
+    .badge_a_tag:hover span {
+        background-color: #277ed3;
+        color: #ffffff;
+    }
+</style>
+
 <div class="row">
     <div class="col-sm-12">
         <div class="admin-tab-info">
@@ -84,24 +94,34 @@ foreach($data as $id => $value){
                                     <li @if(Request::get('taxOr') === 'Y') class="active" @endif><a value="Y" onclick="searchTaxoOr(this)">카테고리 포함</a></li>
                                 </ul>
                             </div>
+
+                            <div id="click_badge_taxonomy" style="display: none;"></div>
                             @foreach($taxonomies as $index => $taxonomy)
                                 @php
                                     $taxo_item = app('overcode.df.taxonomyHandler')->getCategoryItemsTree($taxonomy->id);
+                                    $taxonomyIds = array_column($taxo_item->toArray(), 'id');
                                 @endphp
                                 <div class="input-group-btn __xe_btn_taxo_item">
-                                    @if(isset($category_items[(string) $taxonomy->id]))
-                                        @foreach($category_items[(string) $taxonomy->id] as $key => $category)
-                                            <input type="hidden" name="{{'taxo_'.$taxonomy->id}}[]" id="{{'taxo_'.$taxonomy->id}}" value="{{$category}}">
-                                        @endforeach
-                                    @else
-                                        <input type="hidden" name="{{'taxo_'.$taxonomy->id}}[]" id="{{'taxo_'.$taxonomy->id}}" value="">
-                                    @endif
-
+                                    <div id="{{'taxo_'.$taxonomy->id.'_selected'}}">
+                                        @if(isset($category_items[(string) $taxonomy->id]))
+                                            <input type="hidden" name="{{'taxo_'.$taxonomy->id}}[]" id="{{'taxo_'.$taxonomy->id}}" value="{{$category_items[(string) $taxonomy->id][0]}}">
+                                        @else
+                                            <input type="hidden" name="{{'taxo_'.$taxonomy->id}}[]" id="{{'taxo_'.$taxonomy->id}}" value="">
+                                        @endif
+                                    </div>
                                     <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
                                         @if(isset($category_items[(string) $taxonomy->id]))
-                                            <span class="taxo_{{($index + 1)}}_xe_text">
-                                            {{$taxo_item[$category_items[(string) $taxonomy->id][0]]['text']}}
-                                        </span>
+                                            @php
+                                                $searchIndex = array_search( (int) $category_items[(string) $taxonomy->id][0], $taxonomyIds);
+                                            @endphp
+
+                                            @if($searchIndex !== false)
+                                                <span class="taxo_{{($index + 1)}}_xe_text">
+                                                    {{$taxo_item[$searchIndex]['text']}}
+                                                </span>
+                                            @else
+                                                <span class="taxo_{{($index + 1)}}_xe_text">{{xe_trans($taxonomy->name).' 조회'}}</span>
+                                            @endif
                                         @else
                                             <span class="taxo_{{($index + 1)}}_xe_text">{{xe_trans($taxonomy->name).' 조회'}}</span>
                                         @endif
@@ -112,25 +132,87 @@ foreach($data as $id => $value){
                                         @foreach($taxo_item as $key => $val)
                                             @if(isset($category_items[(string) $taxonomy->id]))
                                                 @if(in_array((string) $val['value'], $category_items[(string) $taxonomy->id]))
-                                                    <li class="active"><a value="{{$key}}" onclick="searchTaxonomy(this, {{$taxonomy->id}})">{{$val['text']}}</a></li>
+                                                    <li class="active"><a value="{{$val['id']}}" onclick="searchTaxonomy(this, {{$taxonomy->id}})">{{$val['text']}}</a></li>
                                                 @else
-                                                    <li><a value="{{$key}}" onclick="searchTaxonomy(this, {{$taxonomy->id}})">{{$val['text']}}</a></li>
+                                                    <li><a value="{{$val['id']}}" onclick="searchTaxonomy(this, {{$taxonomy->id}})">{{$val['text']}}</a></li>
                                                 @endif
                                             @else
-                                                <li><a value="{{$key}}" onclick="searchTaxonomy(this, {{$taxonomy->id}})">{{$val['text']}}</a></li>
+                                                <li><a value="{{$val['id']}}" onclick="searchTaxonomy(this, {{$taxonomy->id}})">{{$val['text']}}</a></li>
                                             @endif
 
-                                                @php $index++; @endphp
+                                            @php $index++; @endphp
                                         @endforeach
                                     </ul>
                                 </div>
+
+                                @if($taxonomy->extra->template === 'depth')
+                                    @php
+                                        $child_index = 0;
+                                    @endphp
+                                    @if(isset($category_items[(string) $taxonomy->id]))
+                                        @foreach($category_items[(string) $taxonomy->id] as $childIndex => $childId)
+                                            @php
+                                                $child_index++;
+                                                $selectedCategory = $category_items[(string) $taxonomy->id];
+                                                $childTaxonomies = app('overcode.df.taxonomyHandler')->getChildTaxonomies($childId);
+                                                $childIds = array_column($childTaxonomies->toArray(), 'id');
+                                                $categoryItem = app('overcode.df.taxonomyHandler')->getCategoryItem($childId);
+
+                                            @endphp
+                                            @if(count($childTaxonomies) > 0)
+                                                <div class="input-group-btn __xe_btn_taxo_item">
+                                                    <div class="{{'taxo_'.$taxonomy->id.'_selected_child'}}">
+                                                        @if(isset($selectedCategory[$childIndex + 1]))
+                                                            <input type="hidden" name="{{'taxo_'.$taxonomy->id}}[]" id="{{'taxo_'. $taxonomy->id .'_'. $child_index .'_child'}}" value="{{$category_items[(string) $taxonomy->id][$childIndex + 1]}}">
+                                                        @else
+                                                            <input type="hidden" name="{{'taxo_'.$taxonomy->id}}[]" id="{{'taxo_'. $taxonomy->id .'_'. $child_index .'_child'}}" value="">
+                                                        @endif
+                                                    </div>
+
+                                                    <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                                                        @if(isset($selectedCategory[$childIndex + 1]))
+                                                            @php
+                                                                $childItem = app('overcode.df.taxonomyHandler')->getCategoryItem($selectedCategory[$childIndex + 1]);
+                                                            @endphp
+                                                            <span class="taxo_{{($index + 1)}}_{{$child_index}}_xe_text">
+                                                                {{xe_trans($childItem->word)}}
+                                                            </span>
+                                                        @else
+                                                            <span class="taxo_{{($index + 1)}}_{{$child_index}}_xe_text">{{xe_trans($categoryItem->word).' 조회'}}</span>
+                                                        @endif
+                                                        <span class="caret"></span>
+                                                    </button>
+                                                    <ul class="dropdown-menu" role="menu">
+                                                        <li @if(!isset($selectedCategory[$childIndex + 1])) class="active" @endif><a value="" onclick="searchChildTaxonomy(this, {{$taxonomy->id}}, {{$child_index}})">전체</a></li>
+                                                        @foreach($childTaxonomies as $key => $val)
+                                                            @if(isset($selectedCategory[$childIndex + 1]))
+                                                                @if((string) $val->id === $selectedCategory[$childIndex + 1])
+                                                                    <li class="active"><a value="{{$val->id}}" onclick="searchChildTaxonomy(this, {{$taxonomy->id}}, {{$child_index}})">{{$val->word}}</a></li>
+                                                                @else
+                                                                    <li><a value="{{$val->id}}" onclick="searchChildTaxonomy(this, {{$taxonomy->id}}, {{$child_index}})">{{$val->word}}</a></li>
+                                                                @endif
+                                                            @else
+                                                                <li><a value="{{$val->id}}" onclick="searchChildTaxonomy(this, {{$taxonomy->id}}, {{$child_index}})">{{$val->word}}</a></li>
+                                                            @endif
+                                                        @endforeach
+                                                    </ul>
+                                                </div>
+                                            @endif
+                                        @endforeach
+                                    @endif
+                                @endif
                             @endforeach
 
                             <div class="input-group-btn __xe_btn_per_page">
                                 <input type="hidden" name="perPage" value="{{ Request::get('perPage') }}">
-                                <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false"><span class="__xe_text">{{Request::has('perPage') && Request::get('perPage') != '20' ? Request::get('perPage') : '아이템수'}}</span> <span class="caret"></span></button>
+                                <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                                    <span class="__xe_text">
+                                        {{Request::has('perPage') && Request::get('perPage') != '20' && Request::get('perPage') != '' ? Request::get('perPage') : '아이템수'}}
+                                    </span>
+                                    <span class="caret"></span>
+                                </button>
                                 <ul class="dropdown-menu" role="menu">
-                                    <li @if(Request::get('perPage') == '20') class="active" @endif><a href="#" value="20">20</a></li>
+                                    <li @if(Request::get('perPage') == '20' || Request::get('perPage') == '') class="active" @endif><a href="#" value="20">20</a></li>
                                     <li @if(Request::get('perPage') == '30') class="active" @endif><a href="#" value="30">30</a></li>
                                     <li @if(Request::get('perPage') == '40') class="active" @endif><a href="#" value="40">40</a></li>
                                     <li @if(Request::get('perPage') == '60') class="active" @endif><a href="#" value="60">60</a></li>
@@ -228,23 +310,28 @@ foreach($data as $id => $value){
                                             <td>
                                                 @php
                                                     $finedCategories = app('overcode.df.taxonomyHandler')->getDocumentSelectTaxonomyItems((int) str_replace('taxo_', '', $columnName), $doc->id);
-                                                    if($finedCategories === null) $finedCategories = [];
                                                 @endphp
-                                                @if(count($finedCategories) > 0)
-                                                    @if(isset($finedCategories[0]->id))
-
-                                                    @php $target_id = $finedCategories[0]->id @endphp
+                                                @if(count($finedCategories) > 0 && $finedCategories[0] !== null)
+                                                    @php
+                                                        $target_id = $finedCategories[0]->id;
+                                                        $finedCategoryIds = array_column($finedCategories->toArray(), 'id');
+                                                        $findedCategoryIndex = 0;
+                                                    @endphp
                                                     @foreach($finedCategories as $finedCategory)
-                                                        @php if(!$finedCategory) continue; @endphp
-                                                        <a href="#" onclick="return false;">
-                                                            <span class="xe-badge xe-primary-outline cursor" onclick="clickTaxonomyBadge({{(int) str_replace('taxo_', '', $columnName)}}, {{$target_id}})">
+                                                        @php
+                                                            if(!$finedCategory) continue;
+                                                            $finedCategoryIdsText = implode(',',array_slice($finedCategoryIds, 0, $findedCategoryIndex + 1));
+                                                        @endphp
+                                                        <a class="badge_a_tag" href="#" onclick="return false;">
+                                                            <span class="xe-badge xe-primary-outline cursor"
+                                                                  onclick="clickTaxonomyBadge({{(int) str_replace('taxo_', '', $columnName)}}, '{{$finedCategoryIdsText}}')">
                                                                 {{xe_trans($finedCategory->word)}}
                                                             </span>
                                                         </a>
+                                                        @php
+                                                            $findedCategoryIndex++;
+                                                        @endphp
                                                     @endforeach
-                                                        @else
-                                                        <span class="xe-badge xe-danger-outline">선택없음</span>
-                                                    @endif
                                                 @else
                                                     <span class="xe-badge xe-danger-outline">선택없음</span>
                                                 @endif
@@ -428,8 +515,23 @@ foreach($data as $id => $value){
     }
 
     function clickTaxonomyBadge(category_id, id) {
-        $('[id="taxo_'+category_id+'"]').val(id);
-        // $('#__xe_search_form').submit();
+        var ids = JSON.parse("[" + id + "]");
+        var str = '';
+        for(let i = 0; i < document.getElementsByClassName('taxo_' + category_id + '_selected_child').length; i++) {
+            if(document.getElementsByClassName('taxo_' + category_id + '_selected_child')[i])
+                document.getElementsByClassName('taxo_' + category_id + '_selected_child')[i].innerHTML = '';
+        }
+        for(let i = 0; i < ids.length; i++) {
+            if(i === 0) {
+                if(document.getElementById('taxo_' + category_id + '_selected'))
+                    document.getElementById('taxo_' + category_id + '_selected').innerHTML = '';
+                str += `<input type="hidden" name="${'taxo_' + category_id}[]" value="${ids[i]}" />`;
+            } else {
+                str += `<input type="hidden" name="${'taxo_' + category_id}[]" value="${ids[i]}" />`;
+            }
+        }
+        document.getElementById('click_badge_taxonomy').innerHTML = str;
+        $('#__xe_search_form').submit();
     }
 
     function searchTaxonomy(e, key) {
@@ -438,6 +540,25 @@ foreach($data as $id => $value){
         $(e).closest('.dropdown-menu').find('li').removeClass('active');
         $(e).closest('li').addClass('active');
 
+        if(document.getElementById('taxo_' + key + '_selected'))
+            document.getElementById('taxo_' + key + '_selected').innerHTML = '';
+
+        for(let i = 0; i < document.getElementsByClassName('taxo_' + key + '_selected_child').length; i++) {
+            if(document.getElementsByClassName('taxo_' + key + '_selected_child')[i])
+                document.getElementsByClassName('taxo_' + key + '_selected_child')[i].innerHTML = '';
+        }
+
+        var str = `<input type="hidden" name="${'taxo_' + key}[]" value="${ $(e).attr('value') }" />`;
+        document.getElementById('taxo_' + key + '_selected').innerHTML = str;
+
+        $('#__xe_search_form').submit();
+    }
+
+    function searchChildTaxonomy(e, key, child) {
+        $('[id="taxo_' + key + '_' + child + '_child"]').val($(e).attr('value'));
+        $('.taxo_'+key+'_'+child+'_xe_text').text($(e).text());
+        $(e).closest('.dropdown-menu').find('li').removeClass('active');
+        $(e).closest('li').addClass('active');
         $('#__xe_search_form').submit();
     }
 
