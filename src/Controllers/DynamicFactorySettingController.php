@@ -993,6 +993,20 @@ class DynamicFactorySettingController extends BaseController
                 });
             }
         }
+
+        if($request->get('userGroup') && $request->get('userGroup') !== '') {
+            $userGroup_id = $request->get('userGroup');
+            $from = $query->getQuery()->from;
+            $table_name = 'user_group_user';
+            $query->leftJoin($table_name, function($leftJoin) use($from, $table_name, $userGroup_id) {
+                $leftJoin->on(sprintf('%s.%s', $from, 'user_id'),'=',sprintf('%s.%s', $table_name, 'user_id'));
+            });
+
+            $query->where(function($q) use ($table_name,$userGroup_id){
+                $q->where($table_name . '.group_id', $userGroup_id);
+            });
+        }
+
         $query->GroupBy('documents.id')->select('documents.*');
 
         //필터 검색
