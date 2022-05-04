@@ -112,6 +112,11 @@ class CptModuleController extends Controller
 
         $site_key = \XeSite::getCurrentSiteKey();
 
+        $isWritable = Gate::allows(
+            CptPermissionHandler::ACTION_CREATE,
+            new Instance($cptPermissionHandler->name($this->instanceId))
+        );
+
         $dfConfig = app('overcode.df.configHandler')->getConfig($cpt_id);
         $column_labels = app('overcode.df.configHandler')->getColumnLabels($dfConfig);
 
@@ -136,7 +141,8 @@ class CptModuleController extends Controller
             'column_labels' => $column_labels,
             'taxonomies' => $taxonomies,
             'categories' => $categories,
-            'imageHandler' => $imageHandler
+            'imageHandler' => $imageHandler,
+            'isWritable' => $isWritable
         ]);
     }
 

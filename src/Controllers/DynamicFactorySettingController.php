@@ -5,6 +5,7 @@ use Carbon\Carbon;
 use Illuminate\Http\Request as SymfonyRequest;
 use Illuminate\Http\Response;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Collection;
 use Overcode\XePlugin\DynamicFactory\Models\DfSlug;
 use Overcode\XePlugin\DynamicFactory\Models\User as XeUser;
 use Symfony\Component\HttpKernel\Exception\HttpException;
@@ -1024,10 +1025,46 @@ class DynamicFactorySettingController extends BaseController
         return $query;
     }
 
-    public function downloadCSV($cpt_id) {
-        $docData = CptDocument::division($cpt_id)->where('instance_id', $cpt_id)->where('type', $cpt_id)->get();
+    public function downloadCSV($cpt_id, Request $request) {
+        $count = CptDocument::division($cpt_id)->where('instance_id', $cpt_id)->where('type', $cpt_id)->count();
+        if($count === 0) return redirect()->back()->with('alert', ['type' => 'danger', 'message' => '문서를 하나 이상 작성 후 다운로드 해주세요.']);
 
-        if(count($docData) === 0) return redirect()->back()->with('alert', ['type' => 'danger', 'message' => '문서를 하나 이상 작성 후 다운로드 해주세요.']);
+        $query = $this->dfService->getItemsWhereQuery(array_merge($request->all(), [
+            'force' => true,
+            'cpt_id' => $cpt_id
+        ]));
+
+        $config = $this->configHandler->getConfig($cpt_id);
+
+        // 검색 조건 추가
+        $query = $this->makeWhere($query, $request);
+        // 정렬
+        $orderType = $request->get('order_type', '');
+
+        //TODO orderBy 오류 있어서 임시 제거
+        //TODO 부산경총 오류
+        if ($orderType == '') {
+            // order_type 이 없을때만 dyFac Config 의 정렬을 우선 적용한다.
+            $orders = $config->get('orders', []);
+            foreach ($orders as $order) {
+                $arr_order = explode('|@|',$order);
+                $sort = 'asc';
+                if($arr_order[1] === 'asc') $sort = 'desc';
+                $query->orderBy($arr_order[0], $sort);
+            }
+            $query->orderBy('head', 'asc');
+        } elseif ($orderType == 'assent_count') {
+            $query->orderBy('assent_count', 'asc')->orderBy('head', 'asc');
+        } elseif ($orderType == 'recently_created') {
+            $query->orderBy(CptDocument::CREATED_AT, 'asc')->orderBy('head', 'asc');
+        } elseif ($orderType == 'recently_published') {
+            $query->orderBy('published_at', 'asc')->orderBy('head', 'asc');
+        } elseif ($orderType == 'recently_updated') {
+            $query->orderBy(CptDocument::UPDATED_AT, 'asc')->orderBy('head', 'asc');
+        }
+
+        $docData = $query->get();
+        if(count($docData) === 0) return redirect()->back()->with('alert', ['type' => 'danger', 'message' => '조회된 문서가 0개 입니다']);
         $cpt = app('overcode.df.service')->getItem($cpt_id);
 
         $config = $this->configHandler->getConfig($cpt_id);
@@ -1050,7 +1087,6 @@ class DynamicFactorySettingController extends BaseController
         ];
 
         foreach($taxonomies as $taxonomy) {
-
             $formOrder[] = 'taxo_'. $taxonomy->id;
             $excels[0]['taxo_'. $taxonomy->id] = xe_trans($taxonomy->name);
         }
@@ -1136,7 +1172,7 @@ class DynamicFactorySettingController extends BaseController
         $test = explode(',', $headerText);
 
         foreach($docData as $index => $data) {
-            $inx = $index + 1;
+            $inx = $index;
             $doc_items = $data->getAttributes();
             $relateCptId = '';
             foreach($test as $key => $val) {
@@ -1207,13 +1243,21 @@ class DynamicFactorySettingController extends BaseController
         header("Content-Disposition:attachment;filename=".$cpt->menu_name."_".date('Y_m_d H_i_s').".csv");
         header("Pragma: no-cache");
         header("Expires: 0");
+
+        //fopen 전 이거 넣어야 한글 안 깨짐
+        echo "\xEF\xBB\xBF";
+
         $file = fopen('php://output', 'w');
         fputcsv($file, $formOrder);
 
         foreach($excels as $item) {
             fputcsv($file, $item);
         }
-        return redirect('/')->with('alert', ['type' => 'success', 'message' => 'Complete']);
+
+        $output = stream_get_contents($file);
+        fclose($file);
+
+        return $output;
     }
 
     public function isJson($string) {

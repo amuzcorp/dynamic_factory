@@ -345,6 +345,12 @@ class DynamicFactoryTaxonomyHandler
                     ];
                 }
 
+                $taxonomyIds = [];
+                foreach($dfTaxonomy['item_ids'] as $id) {
+                    $taxonomyIds[] = (string) $id;
+                }
+                $dfTaxonomy['item_ids'] = $taxonomyIds;
+
                 if ($dfTaxonomy['item_ids'] != $taxonomyItemId) {
                     $dfTaxonomy['item_ids'] = $taxonomyItemId;
                 }

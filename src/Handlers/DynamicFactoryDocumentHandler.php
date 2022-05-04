@@ -231,6 +231,59 @@ class DynamicFactoryDocumentHandler
             }
         }
 
+        //!!!!!!검색어 검색!!!!!!
+        if($request->get('search_keyword', '') !== '') {
+            if ($request->get('search_target') == 'title') {
+                $query = $query->where(
+                    'title',
+                    'like',
+                    sprintf('%%%s%%', implode('%', explode(' ', $request->get('search_keyword'))))
+                );
+            }
+
+            if ($request->get('search_target') == 'pure_content') {
+                $query = $query->where(
+                    'pure_content',
+                    'like',
+                    sprintf('%%%s%%', implode('%', explode(' ', $request->get('search_keyword'))))
+                );
+            }
+
+            if ($request->get('search_target') == 'title_pure_content') {
+                $query = $query->whereNested(function ($query) use ($request) {
+                    $query->where(
+                        'title',
+                        'like',
+                        sprintf('%%%s%%', implode('%', explode(' ', $request->get('search_keyword'))))
+                    )->orWhere(
+                        'pure_content',
+                        'like',
+                        sprintf('%%%s%%', implode('%', explode(' ', $request->get('search_keyword'))))
+                    );
+                });
+            }
+
+            if ($request->get('search_target') == 'writer') {
+                $query = $query->where('writer', 'like', sprintf('%%%s%%', $request->get('search_keyword')));
+            }
+            //작성자 ID 검색
+            if ($request->get('search_target') == 'writerId') {
+                $writers = \XeUser::where(
+                    'email',
+                    'like',
+                    '%' . $request->get('search_keyword') . '%'
+                )->selectRaw('id')->get();
+
+                $writerIds = [];
+                foreach ($writers as $writer) {
+                    $writerIds[] = $writer['id'];
+                }
+
+                $query = $query->whereIn('user_id', $writerIds);
+            }
+        }
+        //!!!!!!검색어 검색!!!!!!
+
         if ($request->get('title_pure_content','') !== '') {
             $query->whereNested(function ($q) use ($request) {
                 $q->where('title', 'like', sprintf('%%%s%%', $request->get('title_pure_content')))
