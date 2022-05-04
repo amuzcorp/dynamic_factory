@@ -410,7 +410,7 @@ class DynamicFactoryDocumentHandler
         }
 
         $query->getProxyManager()->wheres($query->getQuery(), $request->all());
-
+        $query->GroupBy('documents.id')->select('documents.*');
         return $query;
     }
 
