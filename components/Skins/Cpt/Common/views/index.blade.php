@@ -75,7 +75,7 @@ foreach($data as $id => $value){
 </style>
 <div class="board_header">
     <div class="pull-right">
-        <form id="__xe_search_form" action="{{ $cptUrlHandler->get('index') }}" class="input-group search-group">
+        <form id="search_forms" action="{{ $cptUrlHandler->get('index') }}" class="input-group search-group">
             <input type="hidden" name="taxOr" value="{{Request::get('taxOr')}}">
             <select class="form-control">
                 <option @if(Request::get('taxOr') !== 'Y' || !Request::has('taxOr')) selected @endif value="N" >카테고리 일치</option>
@@ -159,7 +159,7 @@ foreach($data as $id => $value){
                 @endif
             @endforeach
 
-            <select class="form-control" name="perPage" onchange="$('#__xe_search_form').submit();">
+            <select class="form-control" name="perPage" onchange="$('#search_forms').submit();">
                 <option value="20" @if(Request::get('perPage') == '20' || !Request::has('perPage')) selected @endif>아이템수</option>
                 <option value="10"  @if(Request::get('order_type') == '10') selected @endif>10</option>
                 <option value="15"  @if(Request::get('order_type') == '15') selected @endif>15</option>
@@ -168,7 +168,7 @@ foreach($data as $id => $value){
                 <option value="100"  @if(Request::get('order_type') == '100') selected @endif>100</option>
             </select>
 
-            <select class="form-control" name="search_target" onchange="$('#__xe_search_form').submit();">
+            <select class="form-control" name="search_target" onchange="$('#search_forms').submit();">
                 <option value="" @if(Request::get('search_target') == '' || !Request::has('search_target')) class="active" @endif>{{xe_trans('board::select')}}</option>
                 <option value="" @if(Request::get('search_target') == 'title_pure_content') class="active" @endif>{{xe_trans('board::titleAndContent')}}</option>
                 <option value="" @if(Request::get('search_target') == 'title') class="active" @endif>{{xe_trans('board::title')}}</option>
@@ -287,11 +287,11 @@ foreach($data as $id => $value){
         var str = `<input type="hidden" name="${'taxo_' + key}[]" value="${ e.value }" />`;
         document.getElementById('taxo_' + key + '_selected').innerHTML = str;
 
-        $('#__xe_search_form').submit();
+        $('#search_forms').submit();
     }
 
     function searchChildTaxonomy(e, key, child) {
         $('[id="taxo_' + key + '_' + child + '_child"]').val(e.value);
-        $('#__xe_search_form').submit();
+        $('#search_forms').submit();
     }
 </script>
