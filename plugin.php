@@ -12,6 +12,7 @@ use Overcode\XePlugin\DynamicFactory\Handlers\DynamicFactoryTaxonomyHandler;
 use Overcode\XePlugin\DynamicFactory\Handlers\CptModuleConfigHandler;
 use Overcode\XePlugin\DynamicFactory\Handlers\CptUrlHandler;
 use Overcode\XePlugin\DynamicFactory\Handlers\TaxoModuleConfigHandler;
+use Overcode\XePlugin\DynamicFactory\Models\CategoryExtra;
 use Overcode\XePlugin\DynamicFactory\Models\CptTaxonomy;
 use Overcode\XePlugin\DynamicFactory\Services\CptDocService;
 use Overcode\XePlugin\DynamicFactory\Services\DynamicFactoryService;
@@ -182,6 +183,20 @@ class Plugin extends AbstractPlugin
         $this->registerCategoryRoute();
 
         $this->interceptDynamicField();
+        $cpt_trash_lang = [
+            'ko' => '휴지통',
+            'en' => 'Trash'
+        ];
+        $cpt_trash_lang_code = 'cpt_trash_name';
+        $this->setLocaleLanguege( $cpt_trash_lang_code, $cpt_trash_lang );
+    }
+
+    public function setLocaleLanguege($langCode, $langArray) {
+        $locales = \XeLang::getLocales();
+        foreach($locales as $locale) {
+            if(isset($langArray[$locale]))
+                \XeLang::save($langCode, $locale, $langArray[$locale], true);
+        }
     }
 
     protected function loadCpts()
@@ -221,22 +236,34 @@ class Plugin extends AbstractPlugin
                 \XeRegister::push('df_df', $cpt->cpt_id, $cpt->document_dynamic_field);
             }
 
+            if(isset($cpt->lang_menu_name) && $cpt->lang_menu_name !== '' && xe_trans($cpt->lang_menu_name) !== $cpt->lang_menu_name) {
+                $menu_name = $cpt->lang_menu_name;
+            } else {
+                $menu_name = $cpt->menu_name;
+            }
+
             //set admin menus
             $display = isset($cpt->display) ? $cpt->display : true;
             \XeRegister::push('settings/menu', $cpt->menu_path . $cpt->cpt_id, [
-                'title' => $cpt->menu_name,
+                'title' => $menu_name,
                 'description' => $cpt->description,
                 'display' => $display,
                 'ordering' => $cpt->menu_order
             ]);
             \XeRegister::push('settings/menu', $cpt->menu_path . $cpt->cpt_id . '.articles', [
-                'title' => $cpt->menu_name,
+                'title' => $menu_name,
                 'description' => $cpt->description,
                 'display' => $display,
                 'ordering' => 100
             ]);
+
+            $trashName = '휴지통';
+            if(xe_trans('cpt_trash_name') !== 'cpt_trash_name') {
+                $trashName = 'cpt_trash_name';
+            }
+
             \XeRegister::push('settings/menu', $cpt->menu_path . $cpt->cpt_id . '.trash', [
-                'title' => '휴지통',
+                'title' => $trashName,
                 'display' => $display,
                 'ordering' => 1000
             ]);
@@ -267,8 +294,15 @@ class Plugin extends AbstractPlugin
             //get Taxonomy
             $taxonomies = CptTaxonomy::where('cpt_id',$cpt->cpt_id)->where('site_key',$site_key)->get();
             foreach($taxonomies as $taxonomy){
+                $cpt_cate_extra = CategoryExtra::where('category_id', $taxonomy->category->id)->where('site_key', \XeSite::getCurrentSiteKey())->first();
+                if(xe_trans($cpt_cate_extra->slug) !== $cpt_cate_extra->slug) {
+                    $title = $cpt_cate_extra->slug;
+                } else {
+                    $title = $taxonomy->category->name;
+                }
+
                 \XeRegister::push('settings/menu', $cpt->menu_path . $cpt->cpt_id . '.' . $taxonomy->category_id, [
-                    'title' => xe_trans($taxonomy->category->name),
+                    'title' => $title,
                     'display' => $display,
                     'ordering' => 500 + (int) $taxonomy->category_id
                 ]);
