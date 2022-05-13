@@ -241,6 +241,22 @@ class DynamicFactoryDocumentHandler
                 );
             }
 
+            if ($request->get('search_target') == 'title_start') {
+                $query = $query->where(
+                    'title',
+                    'like',
+                    sprintf('%s%%', implode('%', explode(' ', $request->get('search_keyword'))))
+                );
+            }
+
+            if ($request->get('search_target') == 'title_end') {
+                $query = $query->where(
+                    'title',
+                    'like',
+                    sprintf('%%%s', implode('%', explode(' ', $request->get('search_keyword'))))
+                );
+            }
+
             if ($request->get('search_target') == 'pure_content') {
                 $query = $query->where(
                     'pure_content',

@@ -169,12 +169,14 @@ foreach($data as $id => $value){
             </select>
 
             <select class="form-control" name="search_target" onchange="$('#search_forms').submit();">
-                <option value="" @if(Request::get('search_target') == '' || !Request::has('search_target')) class="active" @endif>{{xe_trans('board::select')}}</option>
-                <option value="" @if(Request::get('search_target') == 'title_pure_content') class="active" @endif>{{xe_trans('board::titleAndContent')}}</option>
-                <option value="" @if(Request::get('search_target') == 'title') class="active" @endif>{{xe_trans('board::title')}}</option>
-                <option value="" @if(Request::get('search_target') == 'pure_content') class="active" @endif>{{xe_trans('board::content')}}</option>
-                <option value="" @if(Request::get('search_target') == 'writer') class="active" @endif>{{xe_trans('board::writer')}}</option>
-                <option value="" @if(Request::get('search_target') == 'writeId') class="active" @endif>{{xe_trans('board::writerId')}}</option>
+                <option value="" @if(Request::get('search_target') == '' || !Request::has('search_target')) selected @endif>{{xe_trans('board::select')}}</option>
+                <option value="title_pure_content" @if(Request::get('search_target') == 'title_pure_content') selected @endif>{{xe_trans('board::titleAndContent')}}</option>
+                <option value="title" @if(Request::get('search_target') == 'title') selected @endif>{{xe_trans('board::title')}}</option>
+                <option value="title_start" @if(Request::get('search_target') == 'title_start') selected @endif>{{xe_trans('board::title')}}시작일치</option>
+                <option value="title_end" @if(Request::get('search_target') == 'title_end') selected @endif>{{xe_trans('board::title')}}끝일치</option>
+                <option value="pure_content" @if(Request::get('search_target') == 'pure_content') selected @endif>{{xe_trans('board::content')}}</option>
+                <option value="writer" @if(Request::get('search_target') == 'writer') selected @endif>{{xe_trans('board::writer')}}</option>
+                <option value="writeId" @if(Request::get('search_target') == 'writeId') selected @endif>{{xe_trans('board::writerId')}}</option>
             </select>
             <input type="text" name="search_keyword" class="form-control" aria-label="Text input with dropdown button" placeholder="{{xe_trans('xe::enterKeyword')}}" value="{{Request::get('search_keyword')}}">
             <button class="btn-link btn btn-outline-info">
