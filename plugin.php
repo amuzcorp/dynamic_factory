@@ -183,20 +183,6 @@ class Plugin extends AbstractPlugin
         $this->registerCategoryRoute();
 
         $this->interceptDynamicField();
-        $cpt_trash_lang = [
-            'ko' => '휴지통',
-            'en' => 'Trash'
-        ];
-        $cpt_trash_lang_code = 'cpt_trash_name';
-        $this->setLocaleLanguege( $cpt_trash_lang_code, $cpt_trash_lang );
-    }
-
-    public function setLocaleLanguege($langCode, $langArray) {
-        $locales = \XeLang::getLocales();
-        foreach($locales as $locale) {
-            if(isset($langArray[$locale]))
-                \XeLang::save($langCode, $locale, $langArray[$locale], true);
-        }
     }
 
     protected function loadCpts()
@@ -257,13 +243,8 @@ class Plugin extends AbstractPlugin
                 'ordering' => 100
             ]);
 
-            $trashName = '휴지통';
-            if(xe_trans('cpt_trash_name') !== 'cpt_trash_name') {
-                $trashName = 'cpt_trash_name';
-            }
-
             \XeRegister::push('settings/menu', $cpt->menu_path . $cpt->cpt_id . '.trash', [
-                'title' => $trashName,
+                'title' => 'dyFac::trash',
                 'display' => $display,
                 'ordering' => 1000
             ]);

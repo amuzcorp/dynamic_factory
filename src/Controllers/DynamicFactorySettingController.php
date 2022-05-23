@@ -5,7 +5,6 @@ use Carbon\Carbon;
 use Illuminate\Http\Request as SymfonyRequest;
 use Illuminate\Http\Response;
 use Illuminate\Http\UploadedFile;
-use Illuminate\Support\Collection;
 use Overcode\XePlugin\DynamicFactory\Models\DfSlug;
 use Overcode\XePlugin\DynamicFactory\Models\User as XeUser;
 use Symfony\Component\HttpKernel\Exception\HttpException;
@@ -106,6 +105,8 @@ class DynamicFactorySettingController extends BaseController
         foreach ($cpts as $cpt) {
             $categories = $this->dfService->getCategories($cpt->cpt_id);
             $cpt->categories = $categories;
+            //관리자 화면 로딩속도 개선을위해
+            unset($cpt->content, $cpt->pure_content);
         }
 
         $cpts_from_plugin = $this->dfService->getItemsFromPlugin();
@@ -476,7 +477,7 @@ class DynamicFactorySettingController extends BaseController
 
         $taxonomies = app('overcode.df.taxonomyHandler')->getTaxonomies($cpt->cpt_id);
 
-        $cptDocs = $this->getCptDocuments($request, $cpt, $config);
+        $cptDocs = $this->getCptDocuments($request, $cpt, $config, true);
 
         $searchTargetWord = $request->get('search_target');
         if ($request->get('search_target') == 'pure_content') {
@@ -599,9 +600,9 @@ class DynamicFactorySettingController extends BaseController
         return redirect()->route('dyFac.document.rending_store_result', ['status' => 'success', 'result' => $document, 'after_work' => $after_work]);
     }
 
-    public function getCptDocuments($request, $cpt, $config)
+    public function getCptDocuments($request, $cpt, $config, $withOutContent = false)
     {
-        $perPage = (int) $request->get('perPage', '20');
+        $perPage = (int) $request->get('perPage', '10');
 
         $query = $this->dfService->getItemsWhereQuery(array_merge($request->all(), [
             'force' => true,
@@ -632,6 +633,10 @@ class DynamicFactorySettingController extends BaseController
             $query->orderBy('published_at', 'desc')->orderBy('head', 'desc');
         } elseif ($orderType == 'recently_updated') {
             $query->orderBy(CptDocument::UPDATED_AT, 'desc')->orderBy('head', 'desc');
+        }
+
+        if($withOutContent){
+            $query->select('documents.id','documents.title','documents.instance_id','documents.type','documents.user_id','documents.user_id','documents.read_count','documents.comment_count','documents.locale','documents.approved','documents.published','documents.status','documents.locale','documents.created_at','documents.updated_at','documents.published_at','documents.deleted_at','documents.ipaddress','documents.site_key');
         }
 
         $paginate = $query->paginate($perPage, ['*'], 'page')->appends($request->except('page'));
@@ -1066,7 +1071,6 @@ class DynamicFactorySettingController extends BaseController
         $docData = $query->get();
         if(count($docData) === 0) return redirect()->back()->with('alert', ['type' => 'danger', 'message' => '조회된 문서가 0개 입니다']);
         $cpt = app('overcode.df.service')->getItem($cpt_id);
-
         $config = $this->configHandler->getConfig($cpt_id);
         $column_labels = $this->configHandler->getColumnLabels($config);
 
@@ -1076,17 +1080,20 @@ class DynamicFactorySettingController extends BaseController
         $formOrder = [
             'no',
             'doc_id',
+            'name',
             'email',
             'cpt_status'
         ];
         $excels[] = [
             'no' => '넘버',
             'doc_id' => '문서 ID',
+            'name' => '작성자 이름',
             'email' => '작성자 이메일',
             'cpt_status' => '공개 속성',
         ];
 
         foreach($taxonomies as $taxonomy) {
+
             $formOrder[] = 'taxo_'. $taxonomy->id;
             $excels[0]['taxo_'. $taxonomy->id] = xe_trans($taxonomy->name);
         }
@@ -1115,6 +1122,7 @@ class DynamicFactorySettingController extends BaseController
                 } else {
                     foreach($fieldType->getColumns() as $key => $type) {
                         if($key === 'raw_data' || $key === 'logic_builder') continue;
+                        if($column === 'builded') continue;
                         $formOrder[] = $column.'_'.$key;
                         if($key === 'start') {
                             $text = ' 시작';
@@ -1184,14 +1192,21 @@ class DynamicFactorySettingController extends BaseController
                     $excels[$inx][$val] = json_enc($categories);
                     continue;
                 }
-
+                $writer_data = XeUser::where('id', $doc_items['user_id'])->first();
                 if($val === 'no') {
                     $excels[$inx][$val] = $inx + 1;
                     continue;
                 }
 
                 if($val === 'email') {
-                    $excels[$inx][$val] = \Auth::user()->email;
+                    if($writer_data) $excels[$inx][$val] = $writer_data->email;
+                    else $excels[$inx][$val] = '대상회원 정보가 없습니다';
+                    continue;
+                }
+
+                if($val === 'name') {
+                    if($writer_data) $excels[$inx][$val] = $writer_data->display_name;
+                    else $excels[$inx][$val] = '대상회원 정보가 없습니다';
                     continue;
                 }
 
