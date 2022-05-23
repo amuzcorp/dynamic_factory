@@ -5,6 +5,7 @@ namespace Overcode\XePlugin\DynamicFactory\Controllers;
 use App\Http\Controllers\Controller;
 use Exception;
 use Illuminate\Database\Eloquent\Builder;
+use Overcode\XePlugin\DynamicFactory\Models\User as XeUser;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use XeDB;
 use XePresenter;
@@ -65,10 +66,13 @@ class UserController extends Controller
             return XePresenter::makeApi([]);
         }
 
+        $userList = XeUser::where('display_name', 'like', '%'.$keyword.'%')->pluck('id');
         $query = $users->query()->where('display_name', 'like', '%'.$keyword.'%');
 
         if(is_array($user_groups) || count($user_groups) !== 0) {
-            $groupInUsers = \XeDB::table('user_group_user')->whereIn('group_id', $user_groups)->groupBy('user_id')->pluck('user_id');
+            $groupInUsers = [];
+            if(is_array($userList) || count($userList) !== 0)
+                $groupInUsers = \XeDB::table('user_group_user')->whereIn('group_id', $user_groups)->whereIn('user_id', $userList)->groupBy('user_id')->pluck('user_id');
             $query->whereIn('id', $groupInUsers);
         }
         $matchedUserList = $query->paginate(null, ['id', 'display_name', 'email'])->items();
