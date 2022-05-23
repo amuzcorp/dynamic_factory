@@ -34,7 +34,7 @@
                type="checkbox" id="{{$group->id}}"
                name="user_groups[]"
                value="{{$group->id}}"
-               @if($config != null && array_get($config->get('user_groups'),$group->id))
+               @if($config && in_array($group->id, $config->get('user_groups')))
                    checked
                @endif >
         <label class="form-check-label" for="{{$group->id}}" style="font-weight: normal"> {{xe_trans($group->name)}}</label>
