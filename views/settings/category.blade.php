@@ -1,18 +1,18 @@
 @section('page_title')
-    <h2>카테고리 목록</h2>
+    <h2>{{xe_trans('dyFac::category_title')}}</h2>
 @stop
 
 @section('page_description')
-    <small>사용자 정의 문서와 연동하여 사용하는 카테고리 관리 페이지 입니다.</small>
+    <small>{{xe_trans('dyFac::category_description')}}</small>
 @endsection
 <div class="row">
     <div class="col-sm-12">
         <div class="panel-group">
             <div class="panel">
                 <div class="panel-heading">
-                    <div class="pull-left"><h4>생성된 카테고리 목록</h4></div>
+                    <div class="pull-left"><h4>{{xe_trans('dyFac::gen_category_list')}}</h4></div>
                     <div class="pull-right">
-                        <a href="{{ route('dyFac.setting.create_taxonomy') }}" class="xe-btn xe-btn-primary">새 카테고리 추가</a>
+                        <a href="{{ route('dyFac.setting.create_taxonomy') }}" class="xe-btn xe-btn-primary">{{xe_trans('dyFac::create_new_category')}}</a>
                     </div>
                 </div>
                 <div class="panel-body">
@@ -21,10 +21,10 @@
                         <tr>
                             <th>#</th>
                             <th>ID</th>
-                            <th>카테고리 명</th>
-                            <th>템플릿</th>
-                            <th>사용중인 유형</th>
-                            <th>관리</th>
+                            <th>{{xe_trans('dyFac::category_name')}}</th>
+                            <th>{{xe_trans('dyFac::template')}}</th>
+                            <th>{{xe_trans('dyFac::use_types')}}</th>
+                            <th>{{xe_trans('xe::management')}}</th>
                         </tr>
                         </thead>
                         <tbody>

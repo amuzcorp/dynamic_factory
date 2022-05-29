@@ -105,6 +105,8 @@ class DynamicFactorySettingController extends BaseController
         foreach ($cpts as $cpt) {
             $categories = $this->dfService->getCategories($cpt->cpt_id);
             $cpt->categories = $categories;
+            //관리자 화면 로딩속도 개선을위해
+            unset($cpt->content, $cpt->pure_content);
         }
 
         $cpts_from_plugin = $this->dfService->getItemsFromPlugin();
@@ -475,7 +477,7 @@ class DynamicFactorySettingController extends BaseController
 
         $taxonomies = app('overcode.df.taxonomyHandler')->getTaxonomies($cpt->cpt_id);
 
-        $cptDocs = $this->getCptDocuments($request, $cpt, $config);
+        $cptDocs = $this->getCptDocuments($request, $cpt, $config, true);
 
         $searchTargetWord = $request->get('search_target');
         if ($request->get('search_target') == 'pure_content') {
@@ -598,9 +600,9 @@ class DynamicFactorySettingController extends BaseController
         return redirect()->route('dyFac.document.rending_store_result', ['status' => 'success', 'result' => $document, 'after_work' => $after_work]);
     }
 
-    public function getCptDocuments($request, $cpt, $config)
+    public function getCptDocuments($request, $cpt, $config, $withOutContent = false)
     {
-        $perPage = (int) $request->get('perPage', '20');
+        $perPage = (int) $request->get('perPage', '10');
 
         $query = $this->dfService->getItemsWhereQuery(array_merge($request->all(), [
             'force' => true,
@@ -631,6 +633,10 @@ class DynamicFactorySettingController extends BaseController
             $query->orderBy('published_at', 'desc')->orderBy('head', 'desc');
         } elseif ($orderType == 'recently_updated') {
             $query->orderBy(CptDocument::UPDATED_AT, 'desc')->orderBy('head', 'desc');
+        }
+
+        if($withOutContent){
+            $query->select('documents.id','documents.title','documents.instance_id','documents.type','documents.user_id','documents.user_id','documents.read_count','documents.comment_count','documents.locale','documents.approved','documents.published','documents.status','documents.locale','documents.created_at','documents.updated_at','documents.published_at','documents.deleted_at','documents.ipaddress','documents.site_key');
         }
 
         $paginate = $query->paginate($perPage, ['*'], 'page')->appends($request->except('page'));
@@ -989,10 +995,24 @@ class DynamicFactorySettingController extends BaseController
             foreach($category_items as $category_id => $selected_items){
                 $table_name = "taxonomy_{$category_id}";
                 $query->where(function($q) use ($table_name,$selected_items){
-                    foreach($selected_items as $item_id) $q->where($table_name . '.item_ids', 'like', '%' . $item_id . '%');
+                    foreach($selected_items as $item_id) $q->where($table_name . '.item_ids', 'like', '%"' . (int) $item_id . '"%');
                 });
             }
         }
+
+        if($request->get('userGroup') && $request->get('userGroup') !== '') {
+            $userGroup_id = $request->get('userGroup');
+            $from = $query->getQuery()->from;
+            $table_name = 'user_group_user';
+            $query->leftJoin($table_name, function($leftJoin) use($from, $table_name, $userGroup_id) {
+                $leftJoin->on(sprintf('%s.%s', $from, 'user_id'),'=',sprintf('%s.%s', $table_name, 'user_id'));
+            });
+
+            $query->where(function($q) use ($table_name,$userGroup_id){
+                $q->where($table_name . '.group_id', $userGroup_id);
+            });
+        }
+
         $query->GroupBy('documents.id')->select('documents.*');
 
         //필터 검색
@@ -1010,12 +1030,47 @@ class DynamicFactorySettingController extends BaseController
         return $query;
     }
 
-    public function downloadCSV($cpt_id) {
-        $docData = CptDocument::division($cpt_id)->where('instance_id', $cpt_id)->where('type', $cpt_id)->get();
+    public function downloadCSV($cpt_id, Request $request) {
+        $count = CptDocument::division($cpt_id)->where('instance_id', $cpt_id)->where('type', $cpt_id)->count();
+        if($count === 0) return redirect()->back()->with('alert', ['type' => 'danger', 'message' => '문서를 하나 이상 작성 후 다운로드 해주세요.']);
 
-        if(count($docData) === 0) return redirect()->back()->with('alert', ['type' => 'danger', 'message' => '문서를 하나 이상 작성 후 다운로드 해주세요.']);
+        $query = $this->dfService->getItemsWhereQuery(array_merge($request->all(), [
+            'force' => true,
+            'cpt_id' => $cpt_id
+        ]));
+
+        $config = $this->configHandler->getConfig($cpt_id);
+
+        // 검색 조건 추가
+        $query = $this->makeWhere($query, $request);
+        // 정렬
+        $orderType = $request->get('order_type', '');
+
+        //TODO orderBy 오류 있어서 임시 제거
+        //TODO 부산경총 오류
+        if ($orderType == '') {
+            // order_type 이 없을때만 dyFac Config 의 정렬을 우선 적용한다.
+            $orders = $config->get('orders', []);
+            foreach ($orders as $order) {
+                $arr_order = explode('|@|',$order);
+                $sort = 'asc';
+                if($arr_order[1] === 'asc') $sort = 'desc';
+                $query->orderBy($arr_order[0], $sort);
+            }
+            $query->orderBy('head', 'asc');
+        } elseif ($orderType == 'assent_count') {
+            $query->orderBy('assent_count', 'asc')->orderBy('head', 'asc');
+        } elseif ($orderType == 'recently_created') {
+            $query->orderBy(CptDocument::CREATED_AT, 'asc')->orderBy('head', 'asc');
+        } elseif ($orderType == 'recently_published') {
+            $query->orderBy('published_at', 'asc')->orderBy('head', 'asc');
+        } elseif ($orderType == 'recently_updated') {
+            $query->orderBy(CptDocument::UPDATED_AT, 'asc')->orderBy('head', 'asc');
+        }
+
+        $docData = $query->get();
+        if(count($docData) === 0) return redirect()->back()->with('alert', ['type' => 'danger', 'message' => '조회된 문서가 0개 입니다']);
         $cpt = app('overcode.df.service')->getItem($cpt_id);
-
         $config = $this->configHandler->getConfig($cpt_id);
         $column_labels = $this->configHandler->getColumnLabels($config);
 
@@ -1025,12 +1080,14 @@ class DynamicFactorySettingController extends BaseController
         $formOrder = [
             'no',
             'doc_id',
+            'name',
             'email',
             'cpt_status'
         ];
         $excels[] = [
             'no' => '넘버',
             'doc_id' => '문서 ID',
+            'name' => '작성자 이름',
             'email' => '작성자 이메일',
             'cpt_status' => '공개 속성',
         ];
@@ -1065,6 +1122,7 @@ class DynamicFactorySettingController extends BaseController
                 } else {
                     foreach($fieldType->getColumns() as $key => $type) {
                         if($key === 'raw_data' || $key === 'logic_builder') continue;
+                        if($column === 'builded') continue;
                         $formOrder[] = $column.'_'.$key;
                         if($key === 'start') {
                             $text = ' 시작';
@@ -1122,7 +1180,7 @@ class DynamicFactorySettingController extends BaseController
         $test = explode(',', $headerText);
 
         foreach($docData as $index => $data) {
-            $inx = $index + 1;
+            $inx = $index;
             $doc_items = $data->getAttributes();
             $relateCptId = '';
             foreach($test as $key => $val) {
@@ -1134,14 +1192,21 @@ class DynamicFactorySettingController extends BaseController
                     $excels[$inx][$val] = json_enc($categories);
                     continue;
                 }
-
+                $writer_data = XeUser::where('id', $doc_items['user_id'])->first();
                 if($val === 'no') {
                     $excels[$inx][$val] = $inx + 1;
                     continue;
                 }
 
                 if($val === 'email') {
-                    $excels[$inx][$val] = \Auth::user()->email;
+                    if($writer_data) $excels[$inx][$val] = $writer_data->email;
+                    else $excels[$inx][$val] = '대상회원 정보가 없습니다';
+                    continue;
+                }
+
+                if($val === 'name') {
+                    if($writer_data) $excels[$inx][$val] = $writer_data->display_name;
+                    else $excels[$inx][$val] = '대상회원 정보가 없습니다';
                     continue;
                 }
 
@@ -1193,13 +1258,21 @@ class DynamicFactorySettingController extends BaseController
         header("Content-Disposition:attachment;filename=".$cpt->menu_name."_".date('Y_m_d H_i_s').".csv");
         header("Pragma: no-cache");
         header("Expires: 0");
+
+        //fopen 전 이거 넣어야 한글 안 깨짐
+        echo "\xEF\xBB\xBF";
+
         $file = fopen('php://output', 'w');
         fputcsv($file, $formOrder);
 
         foreach($excels as $item) {
             fputcsv($file, $item);
         }
-        return redirect('/')->with('alert', ['type' => 'success', 'message' => 'Complete']);
+
+        $output = stream_get_contents($file);
+        fclose($file);
+
+        return $output;
     }
 
     public function isJson($string) {
