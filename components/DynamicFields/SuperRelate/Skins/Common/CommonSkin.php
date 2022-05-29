@@ -127,7 +127,7 @@ class CommonSkin extends AbstractSkin
         ];
 
         if($target_is_user) {
-            $items = SuperRelate::Select('user.id as r_id', 'user.display_name as r_name')->where($params)
+            $items = SuperRelate::Select('user.email as r_email', 'user.id as r_id', 'user.display_name as r_name')->where($params)
                 ->leftJoin('user', sprintf('%s.t_id',$tableName), '=', 'user.id')->get();
         }else {
             $items = SuperRelate::Select('documents.id as r_id', 'documents.title as r_name')->where($params)

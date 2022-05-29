@@ -11,6 +11,7 @@ use Overcode\XePlugin\DynamicFactory\Exceptions\NotFoundFavoriteHttpException;
 use Overcode\XePlugin\DynamicFactory\Models\CptDocument;
 use Overcode\XePlugin\DynamicFactory\Models\DfFavorite;
 use Overcode\XePlugin\DynamicFactory\Models\DfThumb;
+use Overcode\XePlugin\DynamicFactory\Models\User as XeUser;
 use Xpressengine\Category\Models\CategoryItem;
 use Xpressengine\Config\ConfigEntity;
 use Xpressengine\Counter\Counter;
@@ -215,17 +216,25 @@ class DynamicFactoryDocumentHandler
         }
 
         //검색한 ID의 문서가 Related 된 문서만 조회
-        if($request->get('belong_document_id','') != ''){
+        if($request->get('belong_document_id','') != '') {
+            $belong_document_id = $request->get('belong_document_id');
             $target_field = $request->get('target_field') ?: '';
             $target_document = $request->get('target_document') ?: '';
-            if($target_field !== '' && $target_document !== '' ) {
-                $targetDocument = CptDocument::where('id', $request->get('belong_document_id'))->first();
-
+            $target_type = $request->get('target_type') ?: '';
+            if ($target_field !== '' && $target_document !== '') {
                 $targetDocumentIds = [];
-                if($targetDocument) {
-                    $targetDocumentIds = $targetDocument->belongDocument($target_field, $target_document)->pluck('id');
+                if ($target_type === 'user') {
+                    $targetDocument = XeUser::where('id', $belong_document_id)->first();
+                    if ($targetDocument) {
+                        $targetDocumentIds = $targetDocument->hasDocument($target_field, $target_document)->pluck('id');
+                    }
+                } else {
+                    $targetDocument = CptDocument::where('id', $belong_document_id)->first();
+                    if ($targetDocument) {
+                        $targetDocumentIds = $targetDocument->belongDocument($target_field, $target_document)->pluck('id');
+                    }
                 }
-                if(count($targetDocumentIds) !== 0) {
+                if (count($targetDocumentIds) !== 0) {
                     $query->whereIn('id', $targetDocumentIds);
                 }
             }

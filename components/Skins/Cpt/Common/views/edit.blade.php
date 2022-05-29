@@ -14,6 +14,18 @@
     '/assets/vendor/bootstrap/css/bootstrap.min.css',
 ])->load() }}
 
+{{ XeFrontend::js('/assets/core/widgetbox/js/widgetbox.js')->appendTo("head")->load() }}
+
+{{ XeFrontend::js('assets/vendor/bootstrap/js/bootstrap.min.js')->load() }}
+{{ XeFrontend::js('assets/vendor/jqueryui/jquery-ui.min.js')->appendTo("head")->load() }}
+
+
+{{ XeFrontend::css('https://cdn.jsdelivr.net/npm/xeicon@2.3/xeicon.min.css')->load() }}
+{{ XeFrontend::css([
+    '/assets/vendor/jqueryui/jquery-ui.min.css',
+    '/assets/vendor/bootstrap/css/bootstrap.min.css',
+])->load() }}
+
 @if($config->get('useTag') === true)
     {{ XeFrontend::js('plugins/board/assets/js/BoardTags.js')->appendTo('body')->load() }}
 @endif

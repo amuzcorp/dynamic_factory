@@ -169,6 +169,7 @@ class SuperRelateField extends AbstractType
         $insertParam['t_type'] = $is_user ? 'user' : 'document';
 
         $doc_ids = array_get($args, sprintf('hidden_%s', $config->get('id')), []);  // relate doc ids
+        if(!is_array($doc_ids)) $doc_ids = json_dec($doc_ids);
         foreach($doc_ids as $key => $id) {
             $insertParam['t_id'] = $id;
             $insertParam['ordering'] = $key;
@@ -231,6 +232,7 @@ class SuperRelateField extends AbstractType
         $insertParam['t_type'] = $is_user ? 'user' : 'document';
 
         $doc_ids = array_get($args, sprintf('hidden_%s', $config->get('id')), []);  // relate doc ids
+        if(!is_array($doc_ids)) $doc_ids = json_dec($doc_ids);
 
         foreach ($doc_ids as $key => $id) {
             if(!$id) continue;

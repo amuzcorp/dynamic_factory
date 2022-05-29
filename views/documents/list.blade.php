@@ -56,8 +56,8 @@ foreach($data as $id => $value){
                     </div>
                     <form id="uploadCSV" action="{{route('dyFac.setting.uploadCSV')}}" method="post" enctype="multipart/form-data">
                         {!! csrf_field() !!}
-                        <input type="hidden" name="cpt_id" value="{{$cpt->cpt_id}}">
                         <div class="pull-right">
+                            <input type="hidden" name="cpt_id" value="{{$cpt->cpt_id}}">
                             <label class="xe-btn xe-btn-warning-outline">
                                 <i class="xi-icon xi-plus"></i> CSV 등록
                                 <input type="file" class="__xe_file xe-hidden" name="csv_file" accept=".csv" onchange="uploadCSV(this)">
@@ -564,6 +564,7 @@ foreach($data as $id => $value){
 
     function uploadCSV(item) {
         if($('input[name=csv_file]').val()) {
+            $('#uploadCSV').attr('action', "{{route('dyFac.setting.uploadCSV')}}");
             $('#uploadCSV').submit();
         }
     }
