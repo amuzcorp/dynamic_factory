@@ -435,7 +435,8 @@ class DynamicFactoryDocumentHandler
         }
 
         $query->getProxyManager()->wheres($query->getQuery(), $request->all());
-        $query->GroupBy('documents.id')->select('documents.*');
+        //쿼리를 느리게만든 주범
+//        $query->GroupBy('documents.id')->select('documents.*');
         return $query;
     }
 

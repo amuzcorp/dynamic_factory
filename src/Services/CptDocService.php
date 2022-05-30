@@ -91,7 +91,7 @@ class CptDocService
         if(!$controlled_visible) $query->visible();
 
         //얘가 존나 슬로우쿼리를 거네
-        //$query->GroupBy('documents.id');
+//        $query->GroupBy('documents.id');
 
         $perPage = $request->get('perPage',20);
 
