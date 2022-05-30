@@ -312,7 +312,10 @@ class SuperRelateField extends AbstractType
                     sprintf('%s.%s', $baseTable, $config->get('joinColumnName')),
                     '=',
                     sprintf('%s.s_id', $config->get('id'))
-                )->where($config->get('id') . '.field_id', $config->get('id'));
+                )->where(function($q) use ($config){
+                    $q->where($config->get('id') . '.ordering',0);
+                    $q->orWhere($config->get('id') . '.ordering',null);
+                })->where($config->get('id') . '.field_id', $config->get('id'));
             }
         )->selectRaw($rawString);
 
