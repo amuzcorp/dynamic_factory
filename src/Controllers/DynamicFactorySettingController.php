@@ -1181,7 +1181,7 @@ class DynamicFactorySettingController extends BaseController
         $test = explode(',', $headerText);
 
         foreach($docData as $index => $data) {
-            $inx = $index;
+            $inx = $index + 1;
             $doc_items = $data->getAttributes();
             $relateCptId = '';
             foreach($test as $key => $val) {
