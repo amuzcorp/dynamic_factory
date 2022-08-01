@@ -635,9 +635,9 @@ class DynamicFactorySettingController extends BaseController
             $query->orderBy(CptDocument::UPDATED_AT, 'desc')->orderBy('head', 'desc');
         }
 
-        if($withOutContent){
-            $query->select('documents.id','documents.title','documents.instance_id','documents.type','documents.user_id','documents.user_id','documents.read_count','documents.comment_count','documents.locale','documents.approved','documents.published','documents.status','documents.locale','documents.created_at','documents.updated_at','documents.published_at','documents.deleted_at','documents.ipaddress','documents.site_key');
-        }
+//        if($withOutContent){
+//            $query->select('documents.id','documents.title','documents.instance_id','documents.type','documents.user_id','documents.user_id','documents.read_count','documents.comment_count','documents.locale','documents.approved','documents.published','documents.status','documents.locale','documents.created_at','documents.updated_at','documents.published_at','documents.deleted_at','documents.ipaddress','documents.site_key');
+//        }
 
         $paginate = $query->paginate($perPage, ['*'], 'page')->appends($request->except('page'));
 
@@ -1013,7 +1013,7 @@ class DynamicFactorySettingController extends BaseController
             });
         }
 
-        $query->GroupBy('documents.id')->select('documents.*');
+//        $query->GroupBy('documents.id')->select('documents.*');
 
         //필터 검색
         /*if ($state = $request->get('search_state')) {
