@@ -1155,7 +1155,7 @@ class DynamicFactorySettingController extends BaseController
         $test = explode(',', $headerText);
 
         foreach($docData as $index => $data) {
-            $inx = $index;
+            $inx = $index + 1;
             $doc_items = $data->getAttributes();
             $relateCptId = '';
             foreach($test as $key => $val) {
@@ -1313,8 +1313,11 @@ class DynamicFactorySettingController extends BaseController
                     $decode = [];
                     if(strpos($val[$i], ',') !== false) $decode = json_dec($val[$i]);
                     else if(strpos($val[$i] , '|') !== false) $decode = json_dec(str_replace('|', ',', $val[$i]));
-
-                    $params[$index]['cate_item_id_'.$category_id] = $decode;
+                    $new_cate = [];
+                    foreach($decode as $decode_val) {
+                        $new_cate[] = (string) $decode_val;
+                    }
+                    $params[$index]['cate_item_id_'.$category_id] = $new_cate;
                     //$params[$index]['cate_item_id_'.$category_id] = json_dec($val[$i]);
                 }
                 else if($forms[0][$i] === 'content') {
