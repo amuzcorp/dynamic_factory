@@ -939,6 +939,25 @@ class DynamicFactorySettingController extends BaseController
             $query = $query->whereIn('user_id', $writerIds);
         }
 
+        //Super Relate 문서 조회
+        if(strpos($request->get('search_target'), 'relate_') !== false) {
+            if(strpos($request->get('search_target'), 'user_relate_') !== false) {
+                $search_target = str_replace("relate_", "", $request->get('search_target'));
+                $targetList = \XeDB::table('df_super_relate')->leftJoin('documents', 'df_super_relate.t_id', 'documents.id')->
+                where('df_super_relate.field_id', $search_target)->
+                where('df_super_relate.t_group', 'documents_'.$search_target)->
+                where('documents.title', 'like', '%'.$request->get('search_keyword').'%')->pluck('s_id');
+            } else {
+                $search_target = str_replace("relate_", "", $request->get('search_target'));
+                $targetList = \XeDB::table('df_super_relate')->leftJoin('user', 'df_super_relate.t_id', 'user.id')->
+                where('df_super_relate.field_id', $search_target)->
+                where('df_super_relate.t_group', 'user')->
+                where('user.display_name', 'like', '%'.$request->get('search_keyword').'%')->pluck('s_id');
+            }
+
+            $query->whereIn('id', $targetList);
+        }
+
         $category_items = [];
 
         $data = $request->except('_token');
@@ -959,46 +978,22 @@ class DynamicFactorySettingController extends BaseController
         }
 
         if(count($category_items) > 0) {
-//            $query->leftJoin(
-//                'df_taxonomy',
-//                sprintf('%s.%s', $query->getQuery()->from, 'id'),
-//                '=',
-//                sprintf('%s.%s', 'df_taxonomy', 'target_id')
-//            );
-            $from = $query->getQuery()->from;
-            foreach($category_items as $category_id => $selected_items){
-                $table_name = "taxonomy_{$category_id}";
-                $query->leftJoin("df_taxonomy as " . $table_name, function($leftJoin) use($from,$table_name,$category_id) {
-                    $leftJoin->on(sprintf('%s.%s', $from, 'id'),'=',sprintf('%s.%s', $table_name, 'target_id'))
-                        ->where($table_name . ".category_id",$category_id);
+            $isOrWhere = array_get($data, 'taxOr','N') == 'Y';
+            $query->whereHas('taxonomy', function ($qGroupWhere) use ($category_items,$isOrWhere){
+                $qGroupWhere->where(function($q) use ($category_items,$isOrWhere){
+                    foreach($category_items as $categoryId => $cate_items){
+                        foreach($cate_items as $id) {
+                            if($isOrWhere){
+                                $q->orWhere('item_ids','like', '%"' .(int) $id. '"%');
+                            }else{
+                                $q->where('item_ids','like', '%"' .(int) $id. '"%');
+                            }
+                        }
+                    }
                 });
-            }
+            });
         }
 
-        if(array_get($data, 'taxOr') == 'Y') {
-//            $query->where(function ($q) use ($category_items, $data) {
-//                foreach($category_items as $item_id) {
-//                    dd($item_id);
-//                    $categoryItem = CategoryItem::find($data);
-//                    if ($categoryItem !== null) {
-//                        $q->orWhere('df_taxonomy.item_ids', 'like', '%"' . $item_id . '"%');
-//                    }
-//                }
-//            });
-            foreach($category_items as $category_id => $selected_items){
-                $table_name = "taxonomy_{$category_id}";
-                $query->orWhere(function($q) use ($table_name,$selected_items){
-                    foreach($selected_items as $item_id) $q->where($table_name . '.item_ids', 'like', '%"' . (int) $item_id . '"%');
-                });
-            }
-        }else{
-            foreach($category_items as $category_id => $selected_items){
-                $table_name = "taxonomy_{$category_id}";
-                $query->where(function($q) use ($table_name,$selected_items){
-                    foreach($selected_items as $item_id) $q->where($table_name . '.item_ids', 'like', '%"' . (int) $item_id . '"%');
-                });
-            }
-        }
 
         if($request->get('userGroup') && $request->get('userGroup') !== '') {
             $userGroup_id = $request->get('userGroup');

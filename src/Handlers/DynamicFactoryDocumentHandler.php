@@ -353,32 +353,20 @@ class DynamicFactoryDocumentHandler
         }
 
         if(count($category_items) > 0) {
-            $from = $query->getQuery()->from;
-            foreach($category_items as $category_id => $selected_items){
-                $table_name = "taxonomy_{$category_id}";
-                $query->leftJoin("df_taxonomy as " . $table_name, function($leftJoin) use($from,$table_name,$category_id) {
-                    $leftJoin->on(sprintf('%s.%s', $from, 'id'),'=',sprintf('%s.%s', $table_name, 'target_id'))
-                    ->where($table_name . ".category_id",$category_id);
-                });
-            }
-        }
-
-        if(array_get($data, 'taxOr', 'N') == 'Y') {
-            $query->where(function ($q) use ($category_items, $data) {
-                foreach($category_items as $item_id) {
-                    $categoryItem = CategoryItem::find($data);
-                    if ($categoryItem !== null) {
-                        $q->orWhere('df_taxonomy.item_ids', 'like', '%"' . $item_id . '"%');
+            $isOrWhere = array_get($data, 'taxOr','N') == 'Y';
+            $query->whereHas('taxonomy', function ($qGroupWhere) use ($category_items,$isOrWhere){
+                $qGroupWhere->where(function($q) use ($category_items,$isOrWhere){
+                    foreach($category_items as $categoryId => $cate_items){
+                        foreach($cate_items as $id) {
+                            if($isOrWhere){
+                                $q->orWhere('item_ids','like', '%"' .(int) $id. '"%');
+                            }else{
+                                $q->where('item_ids','like', '%"' .(int) $id. '"%');
+                            }
+                        }
                     }
-                }
-            });
-        }else{
-            foreach($category_items as $category_id => $selected_items){
-                $table_name = "taxonomy_{$category_id}";
-                $query->where(function($q) use ($table_name,$selected_items){
-                    foreach($selected_items as $item_id) $q->where($table_name . '.item_ids', 'like', '%"' . (int) $item_id . '"%');
                 });
-            }
+            });
         }
 
         /*if ($request->get('category_item_id') !== null && $request->get('category_item_id') !== '') {

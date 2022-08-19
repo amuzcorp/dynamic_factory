@@ -140,7 +140,8 @@ class CptDocService
                     if(!isset($result[$taxonomyItem->category_slug])) $result[$taxonomyItem->category_slug] = [];
                     $result[$taxonomyItem->category_slug][] = array_merge((array)$taxonomyItem,$archive->items[$taxonomyItem->id]);
                 }
-                $item->selectedTaxonomyItems = $result;
+//                $item->selectedTaxonomyItems = $result;
+                $item->selectedTaxonomies = $result;
             }
 
             if($request->get('withOutColumns','') != ''){
