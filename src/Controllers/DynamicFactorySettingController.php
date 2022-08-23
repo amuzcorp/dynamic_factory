@@ -626,7 +626,7 @@ class DynamicFactorySettingController extends BaseController
                 $arr_order = explode('|@|',$order);
                 $query->orderBy($arr_order[0], $arr_order[1]);
             }
-            $query->orderBy('head', 'desc');
+            $query->orderBy('documents.head', 'desc');
         } elseif ($orderType == 'assent_count') {
             $query->orderBy('assent_count', 'desc')->orderBy('head', 'desc');
         } elseif ($orderType == 'recently_created') {
@@ -637,7 +637,7 @@ class DynamicFactorySettingController extends BaseController
             $query->orderBy(CptDocument::UPDATED_AT, 'desc')->orderBy('head', 'desc');
         }
         if($request->get('test', 0)  == 5) {
-            dd($query->first());
+            dd($orderType, $orders, $query->first());
         }
 //        if($withOutContent){
 //            $query->select('documents.id','documents.title','documents.instance_id','documents.type','documents.user_id','documents.user_id','documents.read_count','documents.comment_count','documents.locale','documents.approved','documents.published','documents.status','documents.locale','documents.created_at','documents.updated_at','documents.published_at','documents.deleted_at','documents.ipaddress','documents.site_key');
