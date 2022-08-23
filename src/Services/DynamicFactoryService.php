@@ -302,7 +302,7 @@ class DynamicFactoryService
         return $doc;
     }
 
-    public function getItemsWhereQuery(array $attributes, $site_key = null, $config = null)  // site_key == '*' 일때는 모든 사이트
+    public function getItemsWhereQuery(array $attributes, $site_key = null)  // site_key == '*' 일때는 모든 사이트
     {
         $instance_id = $attributes['cpt_id'];
 
@@ -311,30 +311,6 @@ class DynamicFactoryService
         if($site_key != '*' && Schema::hasColumn('documents', 'site_key')){
             $site_key = $site_key != null ? $site_key : \XeSite::getCurrentSitekey();
             $query->where('site_key', $site_key);
-        }
-
-        //TODO orderBy 오류 있어서 임시 제거
-        //TODO 부산경총 오류
-        $orderType = isset($attributes['order_type']) ? $attributes['order_type'] : '';
-//        dd($orderType);
-        if ($orderType == '') {
-            // order_type 이 없을때만 dyFac Config 의 정렬을 우선 적용한다.
-            if($config) {
-                $orders = $config->get('orders', []);
-                foreach ($orders as $order) {
-                    $arr_order = explode('|@|', $order);
-                    $query->orderBy($arr_order[0], $arr_order[1]);
-                }
-            }
-            $query->orderBy('head', 'desc');
-        } elseif ($orderType == 'assent_count') {
-            $query->orderBy('assent_count', 'desc')->orderBy('head', 'desc');
-        } elseif ($orderType == 'recently_created') {
-            $query->orderBy(CptDocument::CREATED_AT, 'desc')->orderBy('head', 'desc');
-        } elseif ($orderType == 'recently_published') {
-            $query->orderBy('published_at', 'desc')->orderBy('head', 'desc');
-        } elseif ($orderType == 'recently_updated') {
-            $query->orderBy(CptDocument::UPDATED_AT, 'desc')->orderBy('head', 'desc');
         }
 
 //        $query->visible(); // trash 가 아닌것만
