@@ -614,7 +614,9 @@ class DynamicFactorySettingController extends BaseController
 
         // 정렬
         $orderType = $request->get('order_type', '');
-
+        if($request->get('test', 0)  == 4) {
+            dd($query->first());
+        }
         //TODO orderBy 오류 있어서 임시 제거
         //TODO 부산경총 오류
         if ($orderType == '') {
@@ -634,7 +636,9 @@ class DynamicFactorySettingController extends BaseController
         } elseif ($orderType == 'recently_updated') {
             $query->orderBy(CptDocument::UPDATED_AT, 'desc')->orderBy('head', 'desc');
         }
-
+        if($request->get('test', 0)  == 5) {
+            dd($query->first());
+        }
 //        if($withOutContent){
 //            $query->select('documents.id','documents.title','documents.instance_id','documents.type','documents.user_id','documents.user_id','documents.read_count','documents.comment_count','documents.locale','documents.approved','documents.published','documents.status','documents.locale','documents.created_at','documents.updated_at','documents.published_at','documents.deleted_at','documents.ipaddress','documents.site_key');
 //        }
