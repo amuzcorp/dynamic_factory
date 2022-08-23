@@ -607,34 +607,11 @@ class DynamicFactorySettingController extends BaseController
         $query = $this->dfService->getItemsWhereQuery(array_merge($request->all(), [
             'force' => true,
             'cpt_id' => $cpt->cpt_id
-        ]));
+        ]), null , $config);
 
         // 정렬
-        $orderType = $request->get('order_type', '');
         if($request->get('test', 0)  == 4) {
             dd($query->first());
-        }
-        //TODO orderBy 오류 있어서 임시 제거
-        //TODO 부산경총 오류
-        if ($orderType == '') {
-            // order_type 이 없을때만 dyFac Config 의 정렬을 우선 적용한다.
-            $orders = $config->get('orders', []);
-            foreach ($orders as $order) {
-                $arr_order = explode('|@|',$order);
-                $query->orderBy($arr_order[0], $arr_order[1]);
-            }
-            $query->orderBy('head', 'desc');
-        } elseif ($orderType == 'assent_count') {
-            $query->orderBy('assent_count', 'desc')->orderBy('head', 'desc');
-        } elseif ($orderType == 'recently_created') {
-            $query->orderBy(CptDocument::CREATED_AT, 'desc')->orderBy('head', 'desc');
-        } elseif ($orderType == 'recently_published') {
-            $query->orderBy('published_at', 'desc')->orderBy('head', 'desc');
-        } elseif ($orderType == 'recently_updated') {
-            $query->orderBy(CptDocument::UPDATED_AT, 'desc')->orderBy('head', 'desc');
-        }
-        if($request->get('test', 0)  == 5) {
-            dd($orderType, $orders, $query->first());
         }
 
         // 검색 조건 추가
