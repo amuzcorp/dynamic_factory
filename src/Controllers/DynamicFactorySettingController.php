@@ -938,7 +938,9 @@ class DynamicFactorySettingController extends BaseController
 
             $query = $query->whereIn('user_id', $writerIds);
         }
-
+        if($request->get('test', 0)  == 1) {
+            dd($query->first());
+        }
         $category_items = [];
 
         $data = $request->except('_token');
@@ -974,7 +976,9 @@ class DynamicFactorySettingController extends BaseController
                 });
             });
         }
-
+        if($request->get('test', 0)  == 2) {
+            dd($query->first());
+        }
         if($request->get('userGroup') && $request->get('userGroup') !== '') {
             $userGroup_id = $request->get('userGroup');
             $from = $query->getQuery()->from;
@@ -987,7 +991,9 @@ class DynamicFactorySettingController extends BaseController
                 $q->where($table_name . '.group_id', $userGroup_id);
             });
         }
-
+        if($request->get('test', 0)  == 3) {
+            dd($query->first());
+        }
 //        $query->GroupBy('documents.id')->select('documents.*');
 
         //필터 검색
