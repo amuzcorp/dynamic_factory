@@ -649,6 +649,13 @@ class DynamicFactorySettingController extends BaseController
         $currentPage = $paginate->currentPage();
         $count = 0;
 
+        if($request->get('test', 0)  == 6) {
+            foreach($paginate as $cptDocItem) {
+                unset($cptDocItem->content);
+                unset($cptDocItem->pure_content);
+            }
+        }
+
         // 순번 필드를 추가하여 transform
         $paginate->getCollection()->transform(function ($paginate) use ($total, $perPage, $currentPage, &$count) {
             $paginate->seq = ($total - ($perPage * ($currentPage - 1))) - $count;
