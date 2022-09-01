@@ -247,6 +247,87 @@ class DynamicFactoryService
 
             $cptDocument = CptDocument::find($document->id);
             $this->saveSlug($cptDocument, $inputs);
+
+            $configHandler = app('overcode.df.configHandler');
+            $config = $configHandler->getConfig($cpt_id);
+            $alarm_config = $config->get('alarm_config');
+
+            if($alarm_config && isset($alarm_config['active']) && $alarm_config['active'] === 'Y') {
+                if(isset($alarm_config['email']) && $alarm_config['email'] !== '') {
+                    $managerEmails = explode(',', trim($alarm_config['email']));
+                    if (count($managerEmails) > 0) {
+
+                        $cpt = app('overcode.df.service')->getItem($cpt_id);
+
+                        $url = request()->getSchemeAndHttpHost().'/settings/dynamic_factory/'.$cptDocument->instance_id.'/list';
+                        if($alarm_config['content'] === '') {
+                            if ($cptDocument->instance_id === 'adapfit_license_application') {
+                                $cptDoc = CptDocument::where('id', $cptDocument->id)->first();
+                                $plan = $cptDoc->hasDocument('belong_license')->first();
+                                if ($plan) {
+                                    $message = sprintf(' 님이 [%s] 을(를) 구매하셨습니다.', $plan->title);
+                                } else {
+                                    $message = ' 님이 플랜을 구매하셨습니다.';
+                                }
+                                //dd( request()->getSchemeAndHttpHost().'/settings/dynamic_factory'.''.'/list');
+                                $content = sprintf(
+                                    '<span>%s : %s</span> <br/><br/><br/>%s<br/>%s',
+                                    '구매자',
+                                    $cptDocument->writer,
+                                    $message,
+                                    $url
+                                );
+                            } else {
+                                $message = sprintf(' 님이 %s 문서를 작성하였습니다.<br/>%s', $cpt->cpt_name, $url);
+                                $content = sprintf(
+                                    '<span>%s : %s</span> <br/><br/><br/>%s',
+                                    '작성자',
+                                    $cptDocument->writer,
+                                    $message
+                                );
+                            }
+                        } else {
+                            $content = $alarm_config['content'].'<br/>'.$url;
+                        }
+                        $title = isset($alarm_config['title']) && $alarm_config['title'] !== '' ? $alarm_config['title'] : xe_trans('board::newPostsRegistered');
+                        $data = [
+                            'title' => $title,
+                            'contents' => $content,
+                        ];
+
+                        foreach ($managerEmails as $toMail) {
+                            if (!$toMail) {
+                                continue;
+                            }
+
+                            send_notice_email(
+                                'new_article',
+                                trim($toMail),
+                                $data['title'],
+                                $data['contents'],
+                                function ($notifiable) use ($cpt, $cptDocument) {
+                                    $applicationName = xe_trans(app('xe.site')->getSiteConfig()->get('site_title'));
+
+                                    $message = '새로운 게시물이 작성되었습니다';
+                                    if ($cptDocument->instance_id === 'adapfit_license_application') {
+                                        $message = sprintf('%s 님이 플랜을 구매 했습니다.', $cptDocument->writer);
+                                    }
+                                    $subject = sprintf(
+                                        '[%s - %s] %s',
+                                        $applicationName,
+                                        '관리자 메일 전송',
+                                        $message
+                                    );
+                                    return $subject;
+                                }
+                            );
+
+                        }
+
+
+                    }
+                }
+            }
         }catch (\Exception $e) {
             XeDB::rollback();
 

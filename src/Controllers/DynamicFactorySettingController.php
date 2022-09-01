@@ -421,6 +421,54 @@ class DynamicFactorySettingController extends BaseController
         return redirect()->to(route('dyFac.setting.edit_permission', ['cpt_id' => $cpt_id]));
     }
 
+
+    public function editAlarm($cpt_id)
+    {
+        $cpt = $this->dfService->getItem($cpt_id);
+
+        $config = $this->configHandler->getConfig($cpt_id);
+        $alarm_config = $config->get('alarm_config');
+
+        if(!$alarm_config) {
+            $alarm_config = [
+                'active' => 'N',
+                'title' => '',
+                'content' => '',
+                'email' => '',
+            ];
+        } else {
+            if(!isset($alarm_config['active'])) {
+                $alarm_config['active'] = 'N';
+            }
+            if(!isset($alarm_config['title'])) {
+                $alarm_config['title'] = '';
+            }
+            if(!isset($alarm_config['content'])) {
+                $alarm_config['content'] = '';
+            }
+            if(!isset($alarm_config['email'])) {
+                $alarm_config['email'] = '';
+            }
+        }
+
+        return $this->presenter->make('dynamic_factory::views.settings.alarm', [
+            'cpt' => $cpt,
+            'config' => $config,
+            'alarm_config' => $alarm_config
+        ]);
+    }
+
+    public function updateAlarm(Request $request, $cpt_id) {
+
+        $alramConfig = $request->except('_token');
+
+        $config = $this->configHandler->getConfig($cpt_id);
+        $config->set('alarm_config', $alramConfig);
+        $this->configHandler->modifyConfig($config);
+
+        return redirect()->to(route('dyFac.setting.edit_alarm', ['cpt_id' => $cpt_id]));
+    }
+
     public function cptDocument($type = 'list', Request $request)
     {
         $current_route_name = Route::currentRouteName();
