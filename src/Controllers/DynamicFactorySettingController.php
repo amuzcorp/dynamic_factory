@@ -619,13 +619,7 @@ class DynamicFactorySettingController extends BaseController
         $query = $this->makeWhere($query, $request);
         if($request->get('test', 0)  == 88) {
             $ids = $query->get()->pluck('id');
-
-            $query = $this->dfService->getItemsWhereQuery(array_merge($request->all(), [
-                'force' => true,
-                'cpt_id' => $cpt->cpt_id
-            ]));
-            $query->whereIn('id', $ids);
-
+            $query = CptDocument::division($cpt->cpt_id)->whereIn('id', $ids);
 //            $query = $this->makeWhere($query, $request);
         }
         //TODO orderBy 오류 있어서 임시 제거
