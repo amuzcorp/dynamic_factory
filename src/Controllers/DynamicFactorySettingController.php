@@ -617,7 +617,17 @@ class DynamicFactorySettingController extends BaseController
 
         // 검색 조건 추가
         $query = $this->makeWhere($query, $request);
+        if($request->get('test', 0)  == 88) {
+            $ids = $query->get()->pluck('id');
 
+            $query = $this->dfService->getItemsWhereQuery(array_merge($request->all(), [
+                'force' => true,
+                'cpt_id' => $cpt->cpt_id
+            ]));
+            $query->whereIn('id', $ids);
+
+//            $query = $this->makeWhere($query, $request);
+        }
         //TODO orderBy 오류 있어서 임시 제거
         //TODO 부산경총 오류
         if ($orderType == '') {
@@ -637,6 +647,10 @@ class DynamicFactorySettingController extends BaseController
         } elseif ($orderType == 'recently_updated') {
             $query->orderBy(CptDocument::UPDATED_AT, 'desc')->orderBy('head', 'desc');
         }
+        if($request->get('test', 0)  == 7) {
+            $from = $query->getQuery()->from;
+            dd($from);
+        }
         if($request->get('test', 0)  == 5) {
             dd($orderType, $orders, $query->first());
         }
@@ -653,6 +667,7 @@ class DynamicFactorySettingController extends BaseController
 
         if($request->get('test', 0)  == 6) {
             foreach($paginate as $cptDocItem) {
+                unset($cptDocItem->sign_text);
                 unset($cptDocItem->content);
                 unset($cptDocItem->pure_content);
             }
