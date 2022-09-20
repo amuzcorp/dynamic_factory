@@ -1137,7 +1137,7 @@ class DynamicFactorySettingController extends BaseController
             'doc_id',
             'name',
             'email',
-            'cpt_status'
+            'cpt_status',
         ];
         $excels[] = [
             'no' => '넘버',
@@ -1214,6 +1214,9 @@ class DynamicFactorySettingController extends BaseController
                 $formOrder[] = $column;
             }
         }
+
+        $excels[0]['created_at'] = '작성일';
+        $formOrder[] = 'created_at';
 
         $headers = array(
             "Content-type" => "Type:text/csv; charset=UTF-8;",
