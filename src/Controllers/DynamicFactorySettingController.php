@@ -605,14 +605,21 @@ class DynamicFactorySettingController extends BaseController
         $perPage = (int) $request->get('perPage', '10');
 
         if($request->get('test', 0)  == 22) {
-            $testIds = \XeDB::table('documents')->where('instance_id', $cpt->cpt_id);
-            $test = $this->makeWhere($testIds, $request);
-            dd($test, $test->get());
+            $testIds = \XeDB::table('documents')->where('instance_id', $cpt->cpt_id)->pluck('id');
+
             $query = $this->dfService->getItemsWhereQuery(array_merge($request->all(), [
                 'force' => true,
                 'cpt_id' => $cpt->cpt_id
             ]));
-            $query->whereIn('documents.id', $testIds);
+
+            $limit = 999;
+            $front = array_chunk($testIds, $limit);
+
+            $query->whereHas($query->getQuery()->from, function ($query, $front) {
+                foreach($front as $ids) {
+                    $query->whereIn('id', $ids);
+                }
+            });
             $query = $this->makeWhere($query, $request);
 
             $orderType = $request->get('order_type', '');
