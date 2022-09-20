@@ -605,7 +605,10 @@ class DynamicFactorySettingController extends BaseController
         $perPage = (int) $request->get('perPage', '10');
 
         if($request->get('test', 0)  == 22) {
-            $testIds = \XeDB::table('documents')->where('instance_id', $cpt->cpt_id)->pluck('id');
+            $test = CptDocument::division($cpt->cpt_id)->pluck('id');
+            $test1 = $this->makeWhere($test, $request)->paginate($perPage, ['*'], 'page')->pluck('id');
+
+            dd($test1);
 
             $query = $this->dfService->getItemsWhereQuery(array_merge($request->all(), [
                 'force' => true,
