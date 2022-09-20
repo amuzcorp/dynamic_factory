@@ -1132,6 +1132,7 @@ class DynamicFactorySettingController extends BaseController
                         if($key === 'raw_data' || $key === 'logic_builder') continue;
                         if($column === 'builded') continue;
                         if($column === 'sign') continue;
+                        if($column === 'content') continue;
                         $formOrder[] = $column.'_'.$key;
                         if($key === 'start') {
                             $text = ' 시작';
