@@ -1047,7 +1047,7 @@ class DynamicFactorySettingController extends BaseController
 
         //TODO orderBy 오류 있어서 임시 제거
         //TODO 부산경총 오류
-        if ($orderType == '') {
+        if ($orderType == '' && $request->get('test', 0)  != 88) {
             // order_type 이 없을때만 dyFac Config 의 정렬을 우선 적용한다.
             $orders = $config->get('orders', []);
             foreach ($orders as $order) {
