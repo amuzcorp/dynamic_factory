@@ -615,11 +615,10 @@ class DynamicFactorySettingController extends BaseController
             $limit = 999;
             $front = array_chunk($testIds->toArray(), $limit);
 
-            $query->whereHas(function ($query, $front) {
-                foreach($front as $ids) {
-                    $query->whereIn('id', $ids);
-                }
-            });
+            foreach($front as $ids) {
+                $query->whereIn('id', $ids);
+            }
+
             $query = $this->makeWhere($query, $request);
 
             $orderType = $request->get('order_type', '');
