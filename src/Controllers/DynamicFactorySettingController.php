@@ -1032,7 +1032,10 @@ class DynamicFactorySettingController extends BaseController
         return $query;
     }
 
-    public function getDocDatas(Request $request, $cpt_id, $page) {
+    public function downloadCSV($cpt_id, Request $request) {
+        $count = CptDocument::division($cpt_id)->where('instance_id', $cpt_id)->where('type', $cpt_id)->count();
+        if($count === 0) return redirect()->back()->with('alert', ['type' => 'danger', 'message' => '문서를 하나 이상 작성 후 다운로드 해주세요.']);
+
         $query = $this->dfService->getItemsWhereQuery(array_merge($request->all(), [
             'force' => true,
             'cpt_id' => $cpt_id
@@ -1047,7 +1050,7 @@ class DynamicFactorySettingController extends BaseController
 
         //TODO orderBy 오류 있어서 임시 제거
         //TODO 부산경총 오류
-//        if ($orderType == '' && $request->get('test', 0)  != 88) {
+//        if ($orderType == '') {
 //            // order_type 이 없을때만 dyFac Config 의 정렬을 우선 적용한다.
 //            $orders = $config->get('orders', []);
 //            foreach ($orders as $order) {
@@ -1067,38 +1070,7 @@ class DynamicFactorySettingController extends BaseController
 //            $query->orderBy(CptDocument::UPDATED_AT, 'asc')->orderBy('head', 'asc');
 //        }
 
-        return $query->paginate(20, ['*'], 'page', $page)->pluck('id');
-    }
-
-    public function downloadCSV($cpt_id, Request $request) {
-        $count = CptDocument::division($cpt_id)->where('instance_id', $cpt_id)->where('type', $cpt_id)->count();
-        if($count === 0) return redirect()->back()->with('alert', ['type' => 'danger', 'message' => '문서를 하나 이상 작성 후 다운로드 해주세요.']);
-
-        $query = $this->dfService->getItemsWhereQuery(array_merge($request->all(), [
-            'force' => true,
-            'cpt_id' => $cpt_id
-        ]));
-
-        $config = $this->configHandler->getConfig($cpt_id);
-
-        // 검색 조건 추가
-        $query = $this->makeWhere($query, $request);
-        // 정렬
-        $orderType = $request->get('order_type', '');
-//        $docData = $query->get();
-
-        $total_count = $query->count();
-        $page_count = ceil($total_count / 20);
-        $docData = [];
-
-        for($i = 1; $i < $page_count + 1; $i++) {
-            $documentIds = $this->getDocDatas($request, $cpt_id, $i);
-            $documentData = CptDocument::division($cpt_id)->whereIn('id', $documentIds)->orderBy('head', 'desc')->get()->toArray();
-            foreach($documentData as $documentItem) {
-                unset($documentItem['sign_text']);
-            }
-            $docData = array_merge($docData, $documentData);
-        }
+        $docData = $query->get();
 
         if(count($docData) === 0) return redirect()->back()->with('alert', ['type' => 'danger', 'message' => '조회된 문서가 0개 입니다']);
         $cpt = app('overcode.df.service')->getItem($cpt_id);
