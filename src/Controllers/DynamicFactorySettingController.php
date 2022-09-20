@@ -1086,7 +1086,7 @@ class DynamicFactorySettingController extends BaseController
         // 정렬
         $orderType = $request->get('order_type', '');
         $total_count = $query->count();
-        $page_count = ceil($total_count / 50);
+        $page_count = ceil($total_count / 20);
         $docData = [];
 
         for($i = 1; $i < $page_count + 1; $i++) {
