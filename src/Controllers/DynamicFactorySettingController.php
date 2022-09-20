@@ -643,7 +643,7 @@ class DynamicFactorySettingController extends BaseController
         // 정렬
         $orderType = $request->get('order_type', '');
         if($request->get('test', 0)  == 4) {
-            dd($query->first());
+            dd($query->toSql());
         }
 
         // 검색 조건 추가
