@@ -607,7 +607,7 @@ class DynamicFactorySettingController extends BaseController
         if($request->get('test', 0)  == 22) {
             $testIds = \XeDB::table('documents')->where('instance_id', $cpt->cpt_id);
             $test = $this->makeWhere($testIds, $request);
-            dd($test, $test->paginate($perPage, ['*'], 'page')->appends($request->except('page')));
+            dd($test, $test->get());
             $query = $this->dfService->getItemsWhereQuery(array_merge($request->all(), [
                 'force' => true,
                 'cpt_id' => $cpt->cpt_id
