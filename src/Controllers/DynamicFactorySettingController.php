@@ -1067,7 +1067,7 @@ class DynamicFactorySettingController extends BaseController
 //            $query->orderBy(CptDocument::UPDATED_AT, 'asc')->orderBy('head', 'asc');
 //        }
 
-        return $query->paginate(20, ['*'], 'page', $page);
+        return $query->paginate(20, ['*'], 'page', $page)->pluck('id');
     }
 
     public function downloadCSV($cpt_id, Request $request) {
@@ -1092,11 +1092,12 @@ class DynamicFactorySettingController extends BaseController
         $docData = [];
 
         for($i = 1; $i < $page_count + 1; $i++) {
-            $documentData = $this->getDocDatas($request, $cpt_id, $i);
-            foreach($documentData as $document) {
-                unset($document->sign_text);
-                $docData[] = $document;
+            $documentIds = $this->getDocDatas($request, $cpt_id, $i);
+            $documentData = CptDocument::division($cpt_id)->whereIn('id', $documentIds)->orderBy('head', 'desc');
+            foreach($documentData as $documentItem) {
+                unset($documentItem->sign_text);
             }
+            $docData = array_merge($docData, $documentData);
         }
 
         if(count($docData) === 0) return redirect()->back()->with('alert', ['type' => 'danger', 'message' => '조회된 문서가 0개 입니다']);
