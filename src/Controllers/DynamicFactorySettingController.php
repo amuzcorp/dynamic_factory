@@ -1067,7 +1067,7 @@ class DynamicFactorySettingController extends BaseController
             $query->orderBy(CptDocument::UPDATED_AT, 'asc')->orderBy('head', 'asc');
         }
 
-        return $query->get();
+        return $query->paginate(50, ['*'], 'page', $page);
     }
 
     public function downloadCSV($cpt_id, Request $request) {
