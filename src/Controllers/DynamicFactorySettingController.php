@@ -1085,17 +1085,19 @@ class DynamicFactorySettingController extends BaseController
         $query = $this->makeWhere($query, $request);
         // 정렬
         $orderType = $request->get('order_type', '');
-        $total_count = $query->count();
-        $page_count = ceil($total_count / 20);
-        $docData = [];
+        $docData = $query->get();
 
-        for($i = 1; $i < $page_count + 1; $i++) {
-            $documentData = $this->getDocDatas($request, $cpt_id, $i);
-            foreach($documentData as $document) {
-                unset($document->sign_text);
-                $docData[] = $document;
-            }
-        }
+//        $total_count = $query->count();
+//        $page_count = ceil($total_count / 20);
+//        $docData = [];
+//
+//        for($i = 1; $i < $page_count + 1; $i++) {
+//            $documentData = $this->getDocDatas($request, $cpt_id, $i);
+//            foreach($documentData as $document) {
+//                unset($document->sign_text);
+//                $docData[] = $document;
+//            }
+//        }
 
         if(count($docData) === 0) return redirect()->back()->with('alert', ['type' => 'danger', 'message' => '조회된 문서가 0개 입니다']);
         $cpt = app('overcode.df.service')->getItem($cpt_id);
