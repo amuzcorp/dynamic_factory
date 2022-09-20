@@ -670,7 +670,7 @@ class DynamicFactorySettingController extends BaseController
 //        }
         if($request->get('test', 0)  == 7) {
             $from = $query->getQuery()->from;
-            dd($from);
+            dd($from, $query->toSql());
         }
 
 //        if($withOutContent){
