@@ -605,7 +605,7 @@ class DynamicFactorySettingController extends BaseController
         $perPage = (int) $request->get('perPage', '10');
 
         if($request->get('test', 0)  == 22) {
-            $test = CptDocument::division($cpt->cpt_id)->pluck('id');
+            $test = CptDocument::division($cpt->cpt_id)->select('id');
             $test1 = $this->makeWhere($test, $request)->paginate($perPage, ['*'], 'page')->pluck('id');
 
             dd($test1);
