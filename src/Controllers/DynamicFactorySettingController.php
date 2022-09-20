@@ -607,6 +607,12 @@ class DynamicFactorySettingController extends BaseController
         if($request->get('test', 0)  == 22) {
             $test = CptDocument::division($cpt->cpt_id)->select('id');
             $test1 = $this->makeWhere($test, $request)->paginate($perPage, ['*'], 'page');
+            foreach($test1 as $item) {
+                unset($item->builded_text);
+                unset($item->sign_text);
+                unset($item->content);
+                unset($item->pure_content);
+            }
             dd($test1);
 
             $query = $this->dfService->getItemsWhereQuery(array_merge($request->all(), [
