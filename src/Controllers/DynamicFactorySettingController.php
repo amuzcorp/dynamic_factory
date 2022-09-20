@@ -613,7 +613,7 @@ class DynamicFactorySettingController extends BaseController
             ]));
 
             $limit = 999;
-            $front = array_chunk($testIds, $limit);
+            $front = array_chunk($testIds->toArray(), $limit);
 
             $query->whereHas($query->getQuery()->from, function ($query, $front) {
                 foreach($front as $ids) {
