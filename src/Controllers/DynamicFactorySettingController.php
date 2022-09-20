@@ -604,6 +604,32 @@ class DynamicFactorySettingController extends BaseController
     {
         $perPage = (int) $request->get('perPage', '10');
 
+        if($request->get('test', 0)  == 2) {
+            $query = \XeDB::table('documents')->select('id')->where('instance_id', $cpt->cpt_id);
+            $orderType = $request->get('order_type', '');
+
+            //TODO orderBy 오류 있어서 임시 제거
+            //TODO 부산경총 오류
+            if ($orderType == '' && $request->get('test', 0)  != 88) {
+                // order_type 이 없을때만 dyFac Config 의 정렬을 우선 적용한다.
+                $orders = $config->get('orders', []);
+                foreach ($orders as $order) {
+                    $arr_order = explode('|@|',$order);
+                    $query->orderBy($arr_order[0], $arr_order[1]);
+                }
+                $query->orderBy('head', 'desc');
+            } elseif ($orderType == 'assent_count') {
+                $query->orderBy('assent_count', 'desc')->orderBy('head', 'desc');
+            } elseif ($orderType == 'recently_created') {
+                $query->orderBy(CptDocument::CREATED_AT, 'desc')->orderBy('head', 'desc');
+            } elseif ($orderType == 'recently_published') {
+                $query->orderBy('published_at', 'desc')->orderBy('head', 'desc');
+            } elseif ($orderType == 'recently_updated') {
+                $query->orderBy(CptDocument::UPDATED_AT, 'desc')->orderBy('head', 'desc');
+            }
+            dd($query->get());
+        }
+
         $query = $this->dfService->getItemsWhereQuery(array_merge($request->all(), [
             'force' => true,
             'cpt_id' => $cpt->cpt_id
