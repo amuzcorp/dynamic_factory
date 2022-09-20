@@ -611,11 +611,9 @@ class DynamicFactorySettingController extends BaseController
                 'force' => true,
                 'cpt_id' => $cpt->cpt_id
             ]));
-            $query->whereIn('id', $testIds);
+            $query->whereIn('documents.id', $testIds);
             $query = $this->makeWhere($query, $request);
-            $ids = $query->pluck('id');
 
-            $test = CptDocument::division($cpt->cpt_id)->whereIn('id',$ids);
             $orderType = $request->get('order_type', '');
 
             //TODO orderBy 오류 있어서 임시 제거
@@ -625,21 +623,21 @@ class DynamicFactorySettingController extends BaseController
                 $orders = $config->get('orders', []);
                 foreach ($orders as $order) {
                     $arr_order = explode('|@|',$order);
-                    $test->orderBy($arr_order[0], $arr_order[1]);
+                    $query->orderBy($arr_order[0], $arr_order[1]);
                 }
-                $test->orderBy('head', 'desc');
+                $query->orderBy('head', 'desc');
             } elseif ($orderType == 'assent_count') {
-                $test->orderBy('assent_count', 'desc')->orderBy('head', 'desc');
+                $query->orderBy('assent_count', 'desc')->orderBy('head', 'desc');
             } elseif ($orderType == 'recently_created') {
-                $test->orderBy(CptDocument::CREATED_AT, 'desc')->orderBy('head', 'desc');
+                $query->orderBy(CptDocument::CREATED_AT, 'desc')->orderBy('head', 'desc');
             } elseif ($orderType == 'recently_published') {
-                $test->orderBy('published_at', 'desc')->orderBy('head', 'desc');
+                $query->orderBy('published_at', 'desc')->orderBy('head', 'desc');
             } elseif ($orderType == 'recently_updated') {
-                $test->orderBy(CptDocument::UPDATED_AT, 'desc')->orderBy('head', 'desc');
+                $query->orderBy(CptDocument::UPDATED_AT, 'desc')->orderBy('head', 'desc');
             }
-            $paginate = $test->paginate($perPage, ['*'], 'page')->appends($request->except('page'));
+            $paginate = $query->paginate($perPage, ['*'], 'page')->appends($request->except('page'));
 
-            dd($paginate);
+            dd($testIds, $paginate);
         }
 
         $query = $this->dfService->getItemsWhereQuery(array_merge($request->all(), [
