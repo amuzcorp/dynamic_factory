@@ -611,6 +611,9 @@ class DynamicFactorySettingController extends BaseController
             ]));
 
             $query = $this->makeWhere($query, $request);
+            $ids = $query->pluck('id');
+
+            $test = CptDocument::division($cpt->cpt_id)->whereIn('id',$ids);
             $orderType = $request->get('order_type', '');
 
             //TODO orderBy 오류 있어서 임시 제거
@@ -620,19 +623,21 @@ class DynamicFactorySettingController extends BaseController
                 $orders = $config->get('orders', []);
                 foreach ($orders as $order) {
                     $arr_order = explode('|@|',$order);
-                    $query->orderBy($arr_order[0], $arr_order[1]);
+                    $test->orderBy($arr_order[0], $arr_order[1]);
                 }
-                $query->orderBy('head', 'desc');
+                $test->orderBy('head', 'desc');
             } elseif ($orderType == 'assent_count') {
-                $query->orderBy('assent_count', 'desc')->orderBy('head', 'desc');
+                $test->orderBy('assent_count', 'desc')->orderBy('head', 'desc');
             } elseif ($orderType == 'recently_created') {
-                $query->orderBy(CptDocument::CREATED_AT, 'desc')->orderBy('head', 'desc');
+                $test->orderBy(CptDocument::CREATED_AT, 'desc')->orderBy('head', 'desc');
             } elseif ($orderType == 'recently_published') {
-                $query->orderBy('published_at', 'desc')->orderBy('head', 'desc');
+                $test->orderBy('published_at', 'desc')->orderBy('head', 'desc');
             } elseif ($orderType == 'recently_updated') {
-                $query->orderBy(CptDocument::UPDATED_AT, 'desc')->orderBy('head', 'desc');
+                $test->orderBy(CptDocument::UPDATED_AT, 'desc')->orderBy('head', 'desc');
             }
-            dd($query->get()->pluck('id'));
+            $paginate = $test->paginate($perPage, ['*'], 'page')->appends($request->except('page'));
+
+            dd($paginate);
         }
 
         $query = $this->dfService->getItemsWhereQuery(array_merge($request->all(), [
@@ -683,13 +688,11 @@ class DynamicFactorySettingController extends BaseController
         $currentPage = $paginate->currentPage();
         $count = 0;
 
-        if($request->get('test', 0)  == 6) {
-            foreach($paginate as $cptDocItem) {
-                unset($cptDocItem->builded_text);
-                unset($cptDocItem->sign_text);
-                unset($cptDocItem->content);
-                unset($cptDocItem->pure_content);
-            }
+        foreach($paginate as $cptDocItem) {
+            unset($cptDocItem->builded_text);
+            unset($cptDocItem->sign_text);
+            unset($cptDocItem->content);
+            unset($cptDocItem->pure_content);
         }
 
         // 순번 필드를 추가하여 transform
