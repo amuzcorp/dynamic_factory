@@ -685,6 +685,7 @@ class DynamicFactorySettingController extends BaseController
 
         if($request->get('test', 0)  == 6) {
             foreach($paginate as $cptDocItem) {
+                unset($cptDocItem->builded);
                 unset($cptDocItem->sign_text);
                 unset($cptDocItem->content);
                 unset($cptDocItem->pure_content);
