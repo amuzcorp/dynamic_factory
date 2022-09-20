@@ -1115,8 +1115,6 @@ class DynamicFactorySettingController extends BaseController
             $documentData = $this->getDocDatas($request, $cpt_id, $i);
             foreach($documentData as $document) {
                 unset($document->sign_text);
-                unset($document->content);
-                unset($document->pure_content);
                 $docData[] = $document;
             }
         }
