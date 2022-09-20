@@ -1076,6 +1076,12 @@ class DynamicFactorySettingController extends BaseController
         $config = $this->configHandler->getConfig($cpt_id);
         $column_labels = $this->configHandler->getColumnLabels($config);
 
+        foreach($docData as $docItem) {
+            unset($docItem->sign_text);
+            unset($docItem->content);
+            unset($docItem->pure_content);
+        }
+
         $taxonomyHandler = app('overcode.df.taxonomyHandler');
         $taxonomies = $taxonomyHandler->getTaxonomies($cpt_id);
 
