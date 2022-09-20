@@ -1093,9 +1093,9 @@ class DynamicFactorySettingController extends BaseController
 
         for($i = 1; $i < $page_count + 1; $i++) {
             $documentIds = $this->getDocDatas($request, $cpt_id, $i);
-            $documentData = CptDocument::division($cpt_id)->whereIn('id', $documentIds)->orderBy('head', 'desc');
+            $documentData = CptDocument::division($cpt_id)->whereIn('id', $documentIds)->orderBy('head', 'desc')->get()->toArray();
             foreach($documentData as $documentItem) {
-                unset($documentItem->sign_text);
+                unset($documentItem['sign_text']);
             }
             $docData = array_merge($docData, $documentData);
         }
