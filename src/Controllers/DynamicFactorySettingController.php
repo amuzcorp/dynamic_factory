@@ -1047,7 +1047,7 @@ class DynamicFactorySettingController extends BaseController
 
         //TODO orderBy 오류 있어서 임시 제거
         //TODO 부산경총 오류
-        if ($orderType == '' && $request->get('test', 0)  != 88) {
+        if ($orderType == '') {
             // order_type 이 없을때만 dyFac Config 의 정렬을 우선 적용한다.
             $orders = $config->get('orders', []);
             foreach ($orders as $order) {
@@ -1067,7 +1067,7 @@ class DynamicFactorySettingController extends BaseController
             $query->orderBy(CptDocument::UPDATED_AT, 'asc')->orderBy('head', 'asc');
         }
 
-        return $query->paginate(50, ['*'], 'page', $page);
+        return $query->paginate(20, ['*'], 'page', $page);
     }
 
     public function downloadCSV($cpt_id, Request $request) {
@@ -1085,28 +1085,6 @@ class DynamicFactorySettingController extends BaseController
         $query = $this->makeWhere($query, $request);
         // 정렬
         $orderType = $request->get('order_type', '');
-
-        //TODO orderBy 오류 있어서 임시 제거
-        //TODO 부산경총 오류
-        if ($orderType == '' && $request->get('test', 0)  != 88) {
-            // order_type 이 없을때만 dyFac Config 의 정렬을 우선 적용한다.
-            $orders = $config->get('orders', []);
-            foreach ($orders as $order) {
-                $arr_order = explode('|@|',$order);
-                $sort = 'asc';
-                if($arr_order[1] === 'asc') $sort = 'desc';
-                $query->orderBy($arr_order[0], $sort);
-            }
-            $query->orderBy('head', 'asc');
-        } elseif ($orderType == 'assent_count') {
-            $query->orderBy('assent_count', 'asc')->orderBy('head', 'asc');
-        } elseif ($orderType == 'recently_created') {
-            $query->orderBy(CptDocument::CREATED_AT, 'asc')->orderBy('head', 'asc');
-        } elseif ($orderType == 'recently_published') {
-            $query->orderBy('published_at', 'asc')->orderBy('head', 'asc');
-        } elseif ($orderType == 'recently_updated') {
-            $query->orderBy(CptDocument::UPDATED_AT, 'asc')->orderBy('head', 'asc');
-        }
         $total_count = $query->count();
         $page_count = ceil($total_count / 50);
         $docData = [];
