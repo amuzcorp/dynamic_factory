@@ -1050,27 +1050,31 @@ class DynamicFactorySettingController extends BaseController
 
         //TODO orderBy 오류 있어서 임시 제거
         //TODO 부산경총 오류
-//        if ($orderType == '') {
-//            // order_type 이 없을때만 dyFac Config 의 정렬을 우선 적용한다.
-//            $orders = $config->get('orders', []);
-//            foreach ($orders as $order) {
-//                $arr_order = explode('|@|',$order);
-//                $sort = 'asc';
-//                if($arr_order[1] === 'asc') $sort = 'desc';
-//                $query->orderBy($arr_order[0], $sort);
-//            }
-//            $query->orderBy('head', 'asc');
-//        } elseif ($orderType == 'assent_count') {
-//            $query->orderBy('assent_count', 'asc')->orderBy('head', 'asc');
-//        } elseif ($orderType == 'recently_created') {
-//            $query->orderBy(CptDocument::CREATED_AT, 'asc')->orderBy('head', 'asc');
-//        } elseif ($orderType == 'recently_published') {
-//            $query->orderBy('published_at', 'asc')->orderBy('head', 'asc');
-//        } elseif ($orderType == 'recently_updated') {
-//            $query->orderBy(CptDocument::UPDATED_AT, 'asc')->orderBy('head', 'asc');
-//        }
-
-        $docData = $query->get();
+        if ($orderType == '') {
+            // order_type 이 없을때만 dyFac Config 의 정렬을 우선 적용한다.
+            $orders = $config->get('orders', []);
+            foreach ($orders as $order) {
+                $arr_order = explode('|@|',$order);
+                $sort = 'asc';
+                if($arr_order[1] === 'asc') $sort = 'desc';
+                $query->orderBy($arr_order[0], $sort);
+            }
+            $query->orderBy('head', 'asc');
+        } elseif ($orderType == 'assent_count') {
+            $query->orderBy('assent_count', 'asc')->orderBy('head', 'asc');
+        } elseif ($orderType == 'recently_created') {
+            $query->orderBy(CptDocument::CREATED_AT, 'asc')->orderBy('head', 'asc');
+        } elseif ($orderType == 'recently_published') {
+            $query->orderBy('published_at', 'asc')->orderBy('head', 'asc');
+        } elseif ($orderType == 'recently_updated') {
+            $query->orderBy(CptDocument::UPDATED_AT, 'asc')->orderBy('head', 'asc');
+        }
+        
+        if($request->get('test1', 0) === 0) {
+            $docData = $query->get();
+        } else {
+            $docData = $query->paginate(100, ['*'], 'page', $request->get('test1', 0));
+        }
 
         if(count($docData) === 0) return redirect()->back()->with('alert', ['type' => 'danger', 'message' => '조회된 문서가 0개 입니다']);
         $cpt = app('overcode.df.service')->getItem($cpt_id);
