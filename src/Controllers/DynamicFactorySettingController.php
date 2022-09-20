@@ -1032,6 +1032,44 @@ class DynamicFactorySettingController extends BaseController
         return $query;
     }
 
+    public function getDocDatas(Request $request, $cpt_id, $page) {
+        $query = $this->dfService->getItemsWhereQuery(array_merge($request->all(), [
+            'force' => true,
+            'cpt_id' => $cpt_id
+        ]));
+
+        $config = $this->configHandler->getConfig($cpt_id);
+
+        // 검색 조건 추가
+        $query = $this->makeWhere($query, $request);
+        // 정렬
+        $orderType = $request->get('order_type', '');
+
+        //TODO orderBy 오류 있어서 임시 제거
+        //TODO 부산경총 오류
+        if ($orderType == '' && $request->get('test', 0)  != 88) {
+            // order_type 이 없을때만 dyFac Config 의 정렬을 우선 적용한다.
+            $orders = $config->get('orders', []);
+            foreach ($orders as $order) {
+                $arr_order = explode('|@|',$order);
+                $sort = 'asc';
+                if($arr_order[1] === 'asc') $sort = 'desc';
+                $query->orderBy($arr_order[0], $sort);
+            }
+            $query->orderBy('head', 'asc');
+        } elseif ($orderType == 'assent_count') {
+            $query->orderBy('assent_count', 'asc')->orderBy('head', 'asc');
+        } elseif ($orderType == 'recently_created') {
+            $query->orderBy(CptDocument::CREATED_AT, 'asc')->orderBy('head', 'asc');
+        } elseif ($orderType == 'recently_published') {
+            $query->orderBy('published_at', 'asc')->orderBy('head', 'asc');
+        } elseif ($orderType == 'recently_updated') {
+            $query->orderBy(CptDocument::UPDATED_AT, 'asc')->orderBy('head', 'asc');
+        }
+
+        return $query->get();
+    }
+
     public function downloadCSV($cpt_id, Request $request) {
         $count = CptDocument::division($cpt_id)->where('instance_id', $cpt_id)->where('type', $cpt_id)->count();
         if($count === 0) return redirect()->back()->with('alert', ['type' => 'danger', 'message' => '문서를 하나 이상 작성 후 다운로드 해주세요.']);
@@ -1069,18 +1107,25 @@ class DynamicFactorySettingController extends BaseController
         } elseif ($orderType == 'recently_updated') {
             $query->orderBy(CptDocument::UPDATED_AT, 'asc')->orderBy('head', 'asc');
         }
+        $total_count = $query->count();
+        $page_count = ceil($total_count / 50);
+        $docData = [];
 
-        $docData = $query->get();
+        for($i = 1; $i < $page_count + 1; $i++) {
+            $documentData = $this->getDocDatas($request, $cpt_id, $i);
+            foreach($documentData as $document) {
+                unset($document->sign_text);
+                unset($document->content);
+                unset($document->pure_content);
+                $docData[] = $document;
+            }
+        }
+
         if(count($docData) === 0) return redirect()->back()->with('alert', ['type' => 'danger', 'message' => '조회된 문서가 0개 입니다']);
         $cpt = app('overcode.df.service')->getItem($cpt_id);
         $config = $this->configHandler->getConfig($cpt_id);
         $column_labels = $this->configHandler->getColumnLabels($config);
 
-        foreach($docData as $docItem) {
-            unset($docItem->sign_text);
-            unset($docItem->content);
-            unset($docItem->pure_content);
-        }
 
         $taxonomyHandler = app('overcode.df.taxonomyHandler');
         $taxonomies = $taxonomyHandler->getTaxonomies($cpt_id);
@@ -1131,6 +1176,7 @@ class DynamicFactorySettingController extends BaseController
                     foreach($fieldType->getColumns() as $key => $type) {
                         if($key === 'raw_data' || $key === 'logic_builder') continue;
                         if($column === 'builded') continue;
+                        if($column === 'sign') continue;
                         $formOrder[] = $column.'_'.$key;
                         if($key === 'start') {
                             $text = ' 시작';
