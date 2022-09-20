@@ -606,6 +606,7 @@ class DynamicFactorySettingController extends BaseController
 
         if($request->get('test', 0)  == 2) {
             $query = \XeDB::table('documents')->select('id')->where('instance_id', $cpt->cpt_id);
+            $query = $this->makeWhere($query, $request);
             $orderType = $request->get('order_type', '');
 
             //TODO orderBy 오류 있어서 임시 제거
