@@ -315,7 +315,7 @@ class DynamicFactoryService
 
 //        $query->visible(); // trash 가 아닌것만
 
-        if($attributes['test'] == 50 ) {
+        if($attributes['test'] == "50" ) {
             dd($this->handlers);
         }
         foreach ($this->handlers as $handler) {
