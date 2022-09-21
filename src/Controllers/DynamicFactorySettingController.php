@@ -605,27 +605,10 @@ class DynamicFactorySettingController extends BaseController
         $perPage = (int) $request->get('perPage', '10');
 
         if($request->get('test', 0)  == 22) {
-            $test = CptDocument::division($cpt->cpt_id)->select('id');
-            $test1 = $this->makeWhere($test, $request)->paginate($perPage, ['*'], 'page');
-            foreach($test1 as $item) {
-                unset($item->builded_text);
-                unset($item->sign_text);
-                unset($item->content);
-                unset($item->pure_content);
-            }
-            dd($test1);
-
             $query = $this->dfService->getItemsWhereQuery(array_merge($request->all(), [
                 'force' => true,
                 'cpt_id' => $cpt->cpt_id
             ]));
-
-            $limit = 999;
-            $front = array_chunk($testIds->toArray(), $limit);
-
-            foreach($front as $ids) {
-                $query->whereIn('id', $ids);
-            }
 
             $query = $this->makeWhere($query, $request);
 
@@ -671,23 +654,23 @@ class DynamicFactorySettingController extends BaseController
 
         //TODO orderBy 오류 있어서 임시 제거
         //TODO 부산경총 오류
-//        if ($orderType == '' && $request->get('test', 0)  != 88) {
-//            // order_type 이 없을때만 dyFac Config 의 정렬을 우선 적용한다.
-//            $orders = $config->get('orders', []);
-//            foreach ($orders as $order) {
-//                $arr_order = explode('|@|',$order);
-//                $query->orderBy($arr_order[0], $arr_order[1]);
-//            }
-//            $query->orderBy('head', 'desc');
-//        } elseif ($orderType == 'assent_count') {
-//            $query->orderBy('assent_count', 'desc')->orderBy('head', 'desc');
-//        } elseif ($orderType == 'recently_created') {
-//            $query->orderBy(CptDocument::CREATED_AT, 'desc')->orderBy('head', 'desc');
-//        } elseif ($orderType == 'recently_published') {
-//            $query->orderBy('published_at', 'desc')->orderBy('head', 'desc');
-//        } elseif ($orderType == 'recently_updated') {
-//            $query->orderBy(CptDocument::UPDATED_AT, 'desc')->orderBy('head', 'desc');
-//        }
+        if ($orderType == '' && $request->get('test', 0)  != 88) {
+            // order_type 이 없을때만 dyFac Config 의 정렬을 우선 적용한다.
+            $orders = $config->get('orders', []);
+            foreach ($orders as $order) {
+                $arr_order = explode('|@|',$order);
+                $query->orderBy($arr_order[0], $arr_order[1]);
+            }
+            $query->orderBy('head', 'desc');
+        } elseif ($orderType == 'assent_count') {
+            $query->orderBy('assent_count', 'desc')->orderBy('head', 'desc');
+        } elseif ($orderType == 'recently_created') {
+            $query->orderBy(CptDocument::CREATED_AT, 'desc')->orderBy('head', 'desc');
+        } elseif ($orderType == 'recently_published') {
+            $query->orderBy('published_at', 'desc')->orderBy('head', 'desc');
+        } elseif ($orderType == 'recently_updated') {
+            $query->orderBy(CptDocument::UPDATED_AT, 'desc')->orderBy('head', 'desc');
+        }
         if($request->get('test', 0)  == 7) {
             $from = $query->getQuery()->from;
             dd($from, $query->toSql());
