@@ -316,6 +316,9 @@ class DynamicFactoryService
 //        $query->visible(); // trash 가 아닌것만
 
         foreach ($this->handlers as $handler) {
+            if($attributes['test'] == 50 ) {
+                dd($this->handlers);
+            }
             if ($handler instanceof Searchable) {
                 $query = $handler->getItems($query, $attributes);
             }
