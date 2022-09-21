@@ -605,6 +605,10 @@ class DynamicFactorySettingController extends BaseController
         $perPage = (int) $request->get('perPage', '10');
 
         if($request->get('test', 0)  == 22) {
+            dd(array_merge($request->all(), [
+                'force' => true,
+                'cpt_id' => $cpt->cpt_id
+            ]));
             $query = $this->dfService->getItemsWhereQuery(array_merge($request->all(), [
                 'force' => true,
                 'cpt_id' => $cpt->cpt_id
@@ -635,7 +639,7 @@ class DynamicFactorySettingController extends BaseController
             }
             $paginate = $query->paginate($perPage, ['*'], 'page')->appends($request->except('page'));
 
-            dd($testIds, $paginate);
+            dd($paginate);
         }
 
         $query = $this->dfService->getItemsWhereQuery(array_merge($request->all(), [
@@ -685,13 +689,6 @@ class DynamicFactorySettingController extends BaseController
         $total = $paginate->total();
         $currentPage = $paginate->currentPage();
         $count = 0;
-
-        foreach($paginate as $cptDocItem) {
-            unset($cptDocItem->builded_text);
-            unset($cptDocItem->sign_text);
-            unset($cptDocItem->content);
-            unset($cptDocItem->pure_content);
-        }
 
         // 순번 필드를 추가하여 transform
         $paginate->getCollection()->transform(function ($paginate) use ($total, $perPage, $currentPage, &$count) {
