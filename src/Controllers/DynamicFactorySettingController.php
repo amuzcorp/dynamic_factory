@@ -1446,6 +1446,12 @@ class DynamicFactorySettingController extends BaseController
                     if(substr( $doc_key, (strlen($doc_key) - 7), strlen($doc_key) ) === "_column" && $val[$doc_key] === "") {
                         unset($val[$doc_key]);
                     }
+                    if($doc_key === 'created_at') {
+                        unset($val[$doc_key]);
+                    }
+                    if($doc_key === 'updated_at') {
+                        unset($val[$doc_key]);
+                    }
                 }
 
                 $val['user_id'] = '';
