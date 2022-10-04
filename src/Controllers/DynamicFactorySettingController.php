@@ -1438,7 +1438,10 @@ class DynamicFactorySettingController extends BaseController
                 $target_cpt_id = $cpt_id;
 
                 //기록된 doc_id 로 작성된 CPT 문서가 있는지 체크
-                $cptDocument = CptDocument::division($target_cpt_id)->where('instance_id',$target_cpt_id)->where('id', $val['doc_id'])->first();
+                $cptDocument = null;
+                if(isset($val['doc_id']) && $val['doc_id'] !== "" && $val['doc_id'] !== null)
+                    $cptDocument = CptDocument::division($target_cpt_id)->where('instance_id',$target_cpt_id)->where('id', $val['doc_id'])->first();
+
                 foreach($val as $doc_key => $value) {
                     if(substr( $doc_key, (strlen($doc_key) - 7), strlen($doc_key) ) === "_column" && $val[$doc_key] === "") {
                         unset($val[$doc_key]);
