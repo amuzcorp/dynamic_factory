@@ -983,9 +983,7 @@ class DynamicFactorySettingController extends BaseController
 
             $query = $query->whereIn('user_id', $writerIds);
         }
-        if($request->get('test', 0)  == 1) {
-            dd($query->first());
-        }
+
         $category_items = [];
 
         $data = $request->except('_token');
@@ -1021,15 +1019,10 @@ class DynamicFactorySettingController extends BaseController
                 });
             });
         }
-        if($request->get('test', 0)  == 2) {
-            dd($query->first());
-        }
+
         if($request->get('userGroup') && $request->get('userGroup') !== '') {
             $userGroup_id = $request->get('userGroup');
             $from = $query->getQuery()->from;
-            if($request->get('test', 0)  == 3) {
-                dd($from);
-            }
             $table_name = 'user_group_user';
             $query->leftJoin($table_name, function($leftJoin) use($from, $table_name, $userGroup_id) {
                 $leftJoin->on(sprintf('%s.%s', $from, 'user_id'),'=',sprintf('%s.%s', $table_name, 'user_id'));
