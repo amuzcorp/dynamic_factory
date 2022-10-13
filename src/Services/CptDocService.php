@@ -94,6 +94,10 @@ class CptDocService
 
         $perPage = $request->get('perPage',20);
 
+        if(+$request->get('test', '0') === 1) {
+            dd($query->toSql(), $query->paginate($perPage)->appends($request->except('page')));
+        }
+
         $paginate = $query->paginate($perPage)->appends($request->except('page'));
         $total = $paginate->total();
         $currentPage = $paginate->currentPage();
