@@ -63,6 +63,7 @@ foreach($data as $id => $value){
                                 <input type="file" class="__xe_file xe-hidden" name="csv_file" accept=".csv" onchange="uploadCSV(this)">
                             </label>
                             <a onclick="downloadCSV()" class="xe-btn xe-btn-success-outline"><i class="xi-download"></i>CSV 저장</a>
+                            <a onclick="downloadExcel()" class="xe-btn xe-btn-success-outline"><i class="xi-download"></i>엑셀 저장</a>
                             <a href="{{ route('dyFac.setting.edit', ['cpt_id' => $cpt->cpt_id]) }}" class="xe-btn xe-btn-positive-outline"><i class="xi-cog"></i> 설정</a>
                             <a href="{{ route($current_route_name, ['type' => 'create']) }}" class="xe-btn xe-btn-primary" data-toggle="xe-page-modal"><i class="xi-file-text-o"></i> {{ sprintf($cpt->labels['new_add_cpt'], $cpt->cpt_name) }}</a>
                         </div>
@@ -566,6 +567,14 @@ foreach($data as $id => $value){
         if($('input[name=csv_file]').val()) {
             $('#uploadCSV').submit();
         }
+    }
+
+    function downloadExcel() {
+        var downloadUrl = '{{route('dyFac.setting.downloadExcel', ['cpt_id' => $cpt->cpt_id])}}';
+        var defaultUrl = "{{route('dyFac.setting.'.$cpt->cpt_id)}}";
+        $('#__xe_search_form').attr('action', downloadUrl);
+        $('#__xe_search_form').submit();
+        $('#__xe_search_form').attr('action', defaultUrl);
     }
 
     function downloadCSV() {
