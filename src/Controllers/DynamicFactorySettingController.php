@@ -1212,7 +1212,7 @@ class DynamicFactorySettingController extends BaseController
         }
 
         $test = explode(',', $headerText);
-        if($request->get('test' , 'N') === 'Y') {
+        if($request->get('test' , 0) === 1) {
             dd($docData);
         }
         foreach($docData as $index => $data) {
@@ -1288,6 +1288,10 @@ class DynamicFactorySettingController extends BaseController
                     $excels[$inx][$val] = $doc_items[$val];
                 }
             }
+        }
+
+        if($request->get('test' , 0) === 2) {
+            dd($docData);
         }
 
         header("Content-Type:text/csv; charset=utf-8");
