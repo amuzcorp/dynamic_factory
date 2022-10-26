@@ -1385,7 +1385,9 @@ class DynamicFactorySettingController extends BaseController
             $cells[] = [40, 'taxo_'. $taxonomy->id];
             $excels[0]['taxo_'. $taxonomy->id] =  xe_trans($taxonomy->name);
         }
-
+        if($request->get('test' , 0) === 1) {
+            dd($docData);
+        }
         foreach($config['formColumns'] as $index => $column) {
             /**
              * 다이나믹 필드 column 조회
@@ -1398,8 +1400,8 @@ class DynamicFactorySettingController extends BaseController
                  */
 
                 if($fieldType->getTableName() === 'field_dynamic_factory_super_relate' || $fieldType->getTableName() === 'df_super_relate' ) {
-                    $cells[] = [40, $column];
-                    $excels[0][$column] =  $label;
+//                    $cells[] = [40, $column];
+//                    $excels[0][$column] =  $label;
                 } else {
                     foreach($fieldType->getColumns() as $key => $type) {
                         if($key === 'raw_data' || $key === 'logic_builder') continue;
@@ -1482,24 +1484,6 @@ class DynamicFactorySettingController extends BaseController
                     continue;
                 }
 
-                /* Relate Cpt 데이터 기록 json encode */
-                if(strpos($val,"_srf_chg")) {
-                    $relateCptId = str_replace('_srf_chg', '', $val);
-                    $excels[$inx][$val] = 1;
-                } else if($val === 'hidden_'.$relateCptId) {
-                    $item_realteCptData = [];
-                    foreach($data->hasDocument($relateCptId) as $relate_data) {
-                        $item_realteCptData[] = $relate_data->id;
-                    }
-                    if(count($item_realteCptData) === 0){
-                        $excels[$inx][$relateCptId.'_srf_chg'] = 1;
-                        $excels[$inx][$val] = '[]';
-                    } else {
-                        $excels[$inx][$val] = json_enc($item_realteCptData);
-                    }
-                }
-                /* Relate Cpt 데이터 기록 json encode */
-
                 //다운로드 시점 문서 공개속성 기록
                 else if($val === 'cpt_status') {
                     if($data->isPublic()) {
@@ -1543,7 +1527,9 @@ class DynamicFactorySettingController extends BaseController
                 }
             }
         }
-
+        if($request->get('test' , 0) === 2) {
+            dd($excels);
+        }
         $callback = function () use ($cells, $excels) {
             $spreadsheet = new Spreadsheet();
             $sheet = $spreadsheet->getActiveSheet();
