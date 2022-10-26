@@ -1212,7 +1212,7 @@ class DynamicFactorySettingController extends BaseController
         }
 
         $test = explode(',', $headerText);
-        if($request->get('test' , 0) === 1) {
+        if((int) $request->get('test' , 0) === 1) {
             dd($docData);
         }
         foreach($docData as $index => $data) {
@@ -1290,7 +1290,7 @@ class DynamicFactorySettingController extends BaseController
             }
         }
 
-        if($request->get('test' , 0) === 2) {
+        if((int) $request->get('test' , 0) === 2) {
             dd($docData);
         }
 
@@ -1354,7 +1354,7 @@ class DynamicFactorySettingController extends BaseController
             $query->orderBy(CptDocument::UPDATED_AT, 'asc')->orderBy('head', 'asc');
         }
 
-        $docData = $query->get();
+        $docData = $query->get()->pluck('id');
 
         if(count($docData) === 0) return redirect()->back()->with('alert', ['type' => 'danger', 'message' => '조회된 문서가 0개 입니다']);
         $cpt = app('overcode.df.service')->getItem($cpt_id);
@@ -1385,7 +1385,7 @@ class DynamicFactorySettingController extends BaseController
             $cells[] = [40, 'taxo_'. $taxonomy->id];
             $excels[0]['taxo_'. $taxonomy->id] =  xe_trans($taxonomy->name);
         }
-        if($request->get('test' , 0) === 1) {
+        if((int) $request->get('test' , 0) === 1) {
             dd($docData);
         }
         foreach($config['formColumns'] as $index => $column) {
@@ -1527,7 +1527,7 @@ class DynamicFactorySettingController extends BaseController
                 }
             }
         }
-        if($request->get('test' , 0) === 2) {
+        if((int) $request->get('test' , 0) === 2) {
             dd($excels);
         }
         $callback = function () use ($cells, $excels) {
