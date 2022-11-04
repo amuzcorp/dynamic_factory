@@ -1190,7 +1190,11 @@ class DynamicFactorySettingController extends BaseController
         }
 
         $excels[0]['created_at'] = '작성일';
+        $excels[0]['week'] = 'Week (1~52)';
+        $excels[0]['YYYY-mm-dd'] = 'YYYY-mm-dd';
         $formOrder[] = 'created_at';
+        $formOrder[] = 'week';
+        $formOrder[] = 'YYYY-mm-dd';
 
         $headers = array(
             "Content-type" => "Type:text/csv; charset=UTF-8;",
@@ -1243,6 +1247,17 @@ class DynamicFactorySettingController extends BaseController
                 if($val === 'name') {
                     if($writer_data) $excels[$inx][$val] = $writer_data->display_name;
                     else $excels[$inx][$val] = '대상회원 정보가 없습니다';
+                    continue;
+                }
+                //   $formOrder[] = 'week';
+                //        $formOrder[] = 'yyyy_mm_dd';
+                if($val === 'week') {
+                    $dt = Carbon::parse($data->created_at);
+                    $excels[$inx][$val] = $dt->weekOfYear ?: 0;
+                    continue;
+                }
+                if($val === 'YYYY-mm-dd') {
+                    $excels[$inx][$val] = date('Y-m-d', strtotime('2022-10-26 13:39:27'));
                     continue;
                 }
 
@@ -1386,42 +1401,41 @@ class DynamicFactorySettingController extends BaseController
             $excels[0]['taxo_'. $taxonomy->id] =  xe_trans($taxonomy->name);
         }
         if((int) $request->get('test' , 0) === 1) {
-            dd($docData);
-        }
-        foreach($config['formColumns'] as $index => $column) {
-            /**
-             * 다이나믹 필드 column 조회
-             */
-            $fieldType = \XeDynamicField::get($config->get('documentGroup'), $column);
-            if($fieldType) {
-                $label = xe_trans($column_labels[$column]);
+            foreach($config['formColumns'] as $index => $column) {
                 /**
-                 * 특수 필드 사용 시 조건 추가
+                 * 다이나믹 필드 column 조회
                  */
+                $fieldType = \XeDynamicField::get($config->get('documentGroup'), $column);
+                if($fieldType) {
+                    $label = xe_trans($column_labels[$column]);
+                    /**
+                     * 특수 필드 사용 시 조건 추가
+                     */
 
-                if($fieldType->getTableName() === 'field_dynamic_factory_super_relate' || $fieldType->getTableName() === 'df_super_relate' ) {
+                    if($fieldType->getTableName() === 'field_dynamic_factory_super_relate' || $fieldType->getTableName() === 'df_super_relate' ) {
 //                    $cells[] = [40, $column];
 //                    $excels[0][$column] =  $label;
-                } else {
-                    foreach($fieldType->getColumns() as $key => $type) {
-                        if($key === 'raw_data' || $key === 'logic_builder') continue;
-                        if($column === 'builded') continue;
+                    } else {
+                        foreach($fieldType->getColumns() as $key => $type) {
+                            if($key === 'raw_data' || $key === 'logic_builder') continue;
+                            if($column === 'builded') continue;
 
-                        $cells[] = [40, array_keys($fieldType->getRules())[0]];
-                        $excels[0][array_keys($fieldType->getRules())[0]] = $label;
-                    }
+                            $cells[] = [40, array_keys($fieldType->getRules())[0]];
+                            $excels[0][array_keys($fieldType->getRules())[0]] = $label;
+                        }
 //                    dd($fieldType->getRules(), $column , array_keys($fieldType->getRules())[0]);
-                }
-            } else {
-                if($column === 'title') {
-                    $label = '제목';
-                } else if($column === 'content') {
-                    $label = '내용';
+                    }
                 } else {
-                    $label = $column;
+                    if($column === 'title') {
+                        $label = '제목';
+                    } else if($column === 'content') {
+                        $label = '내용';
+                    } else {
+                        $label = $column;
+                    }
+                    $cells[] = [40, $column];
+                    $excels[0][$column] = $label;
                 }
-                $cells[] = [40, $column];
-                $excels[0][$column] = $label;
             }
         }
 
@@ -1627,6 +1641,9 @@ class DynamicFactorySettingController extends BaseController
 
                 if(count($val) !== count($forms[0])) {
                     break;
+                }
+                if($forms[0][$i] === 'YYYY-mm-dd' || $forms[0][$i] === 'week') {
+                    continue;
                 }
 
                 //다운로드할때 <br>로 바뀐 \r\n 원상복구
