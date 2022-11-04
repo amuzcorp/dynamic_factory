@@ -1257,7 +1257,7 @@ class DynamicFactorySettingController extends BaseController
                     continue;
                 }
                 if($val === 'YYYY-mm-dd') {
-                    $excels[$inx][$val] = date('Y-m-d', strtotime('2022-10-26 13:39:27'));
+                    $excels[$inx][$val] = date('Y-m-d', strtotime($data->created_at));
                     continue;
                 }
 
@@ -1457,7 +1457,7 @@ class DynamicFactorySettingController extends BaseController
 
         foreach($docData as $index => $data) {
             $inx = $index + 1;
-            $doc_items = $data->getAttributes();
+            if(!$data) continue;
             $relateCptId = '';
             foreach($test as $key => $val) {
 
@@ -1480,7 +1480,7 @@ class DynamicFactorySettingController extends BaseController
                     $excels[$inx][$val] = $cateText;
                     continue;
                 }
-                $writer_data = XeUser::where('id', $doc_items['user_id'])->first();
+                $writer_data = XeUser::where('id', $data->user_id)->first();
                 if($val === 'no') {
                     $excels[$inx][$val] = $inx + 1;
                     continue;
@@ -1512,12 +1512,12 @@ class DynamicFactorySettingController extends BaseController
                 else {
                     // Key - id > Key - doc_id로 저장
                     if($val === 'doc_id') {
-                        $excels[$inx][$val] = $doc_items['id'];
+                        $excels[$inx][$val] = $data->id;
                         continue;
                     }
                     //Content에 포함된 /r/n으로 인한 오작동 방지용 json 인코딩
                     if($val === 'content') {
-                        $doc_items[$val] = str_replace("\r\n", '<br>', $doc_items[$val]);
+                        $data->$val = str_replace("\r\n", '<br>', $data->$val);
                     }
 
                     if(strpos($val, 'belong_') !== false) {
@@ -1537,7 +1537,7 @@ class DynamicFactorySettingController extends BaseController
                             continue;
                         }
                     }
-                    $excels[$inx][$val] = $doc_items[$val];
+                    $excels[$inx][$val] = $data->$val;
                 }
             }
         }
