@@ -1690,7 +1690,6 @@ class DynamicFactorySettingController extends BaseController
                         if($key === 'raw_data' || $key === 'logic_builder') continue;
                         if($column === 'builded') continue;
                         if($column === 'sign') continue;
-                        $formOrder[] = $column.'_'.$key;
                         if($key === 'start') {
                             $text = ' 시작';
                         } else if($key === 'end') {
@@ -1717,7 +1716,7 @@ class DynamicFactorySettingController extends BaseController
                         }
 
                         $excels[0][$column.'_'.$key] = $label.$text;
-                        $cells[] = [40, $column];
+                        $cells[] = [40, $column.'_'.$key];
                     }
 //                    dd($fieldType->getRules(), $column , array_keys($fieldType->getRules())[0]);
                 }
