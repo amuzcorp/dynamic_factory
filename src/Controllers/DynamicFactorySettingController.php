@@ -902,11 +902,14 @@ class DynamicFactorySettingController extends BaseController
     protected function makeWhere($query, $request)
     {
         //기간 검색
-        if ($startDate = $request->get('start_date')) {
-            $query = $query->where('created_at', '>=', $startDate . ' 00:00:00');
-        }
-        if ($endDate = $request->get('end_date')) {
-            $query = $query->where('created_at', '<=', $endDate . ' 23:59:59');
+        $dateSearch = $request->get('date_search', 'N') ?? 'N';
+        if($dateSearch === 'Y') {
+            if ($startDate = $request->get('start_date')) {
+                $query = $query->where('created_at', '>=', $startDate . ' 00:00:00');
+            }
+            if ($endDate = $request->get('end_date')) {
+                $query = $query->where('created_at', '<=', $endDate . ' 23:59:59');
+            }
         }
 
         $stateType = $request->get('stateType', 'all');
