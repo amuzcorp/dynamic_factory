@@ -417,6 +417,7 @@ class Plugin extends AbstractPlugin
 
                 Route::get('/downloadCSV/{cpt_id}', [ 'as' => 'downloadCSV', 'uses' => 'DynamicFactorySettingController@downloadCSV' ]);
                 Route::get('/downloadExcel/{cpt_id}', [ 'as' => 'downloadExcel', 'uses' => 'DynamicFactorySettingController@downloadExcel' ]);
+                Route::get('/downloadFOTAExcel/{cpt_id}', [ 'as' => 'downloadExcel', 'uses' => 'DynamicFactorySettingController@downloadFOTAExcel' ]);
                 Route::post('/uploadCSV', [ 'as' => 'uploadCSV', 'uses' => 'DynamicFactorySettingController@uploadCSV' ]);
 
                 Route::get('/create', [ 'as' => 'create', 'uses' => 'DynamicFactorySettingController@create' ]);

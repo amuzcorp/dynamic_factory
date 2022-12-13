@@ -1587,6 +1587,307 @@ class DynamicFactorySettingController extends BaseController
 
     }
 
+    public function downloadFOTAExcel($cpt_id, Request $request) {
+        $count = CptDocument::division($cpt_id)->where('instance_id', $cpt_id)->where('type', $cpt_id)->count();
+        if($count === 0) return redirect()->back()->with('alert', ['type' => 'danger', 'message' => '문서를 하나 이상 작성 후 다운로드 해주세요.']);
+
+        $query = $this->dfService->getItemsWhereQuery(array_merge($request->all(), [
+            'force' => true,
+            'cpt_id' => $cpt_id
+        ]));
+
+        $config = $this->configHandler->getConfig($cpt_id);
+
+        // 검색 조건 추가
+        $query = $this->makeWhere($query, $request);
+        // 정렬
+        $orderType = $request->get('order_type', '');
+
+        $perPage = 500;
+        $page = (int) $request->except('ep') ?: 1;
+        if($page > 1) $page = 1;
+
+
+        if ($startDate = $request->get('start_date')) {
+            $query = $query->where('created_at', '>=', $startDate . ' 00:00:00');
+        }
+        if ($endDate = $request->get('end_date')) {
+            $query = $query->where('created_at', '<=', $endDate . ' 23:59:59');
+        }
+
+        //TODO orderBy 오류 있어서 임시 제거
+        //TODO 부산경총 오류
+        if ($orderType == '') {
+            // order_type 이 없을때만 dyFac Config 의 정렬을 우선 적용한다.
+            $orders = $config->get('orders', []);
+            foreach ($orders as $order) {
+                $arr_order = explode('|@|',$order);
+                $sort = 'asc';
+                if($arr_order[1] === 'asc') $sort = 'desc';
+                $query->orderBy($arr_order[0], $sort);
+            }
+            $query->orderBy('head', 'asc');
+        } elseif ($orderType == 'assent_count') {
+            $query->orderBy('assent_count', 'asc')->orderBy('head', 'asc');
+        } elseif ($orderType == 'recently_created') {
+            $query->orderBy(CptDocument::CREATED_AT, 'asc')->orderBy('head', 'asc');
+        } elseif ($orderType == 'recently_published') {
+            $query->orderBy('published_at', 'asc')->orderBy('head', 'asc');
+        } elseif ($orderType == 'recently_updated') {
+            $query->orderBy(CptDocument::UPDATED_AT, 'asc')->orderBy('head', 'asc');
+        }
+
+        $docData = $query->paginate($perPage, ['*'], 'page', $page)->appends();
+
+        if(count($docData) === 0) return redirect()->back()->with('alert', ['type' => 'danger', 'message' => '조회된 문서가 0개 입니다']);
+        $cpt = app('overcode.df.service')->getItem($cpt_id);
+        $config = $this->configHandler->getConfig($cpt_id);
+        $column_labels = $this->configHandler->getColumnLabels($config);
+
+        $taxonomyHandler = app('overcode.df.taxonomyHandler');
+        $taxonomies = $taxonomyHandler->getTaxonomies($cpt_id);
+
+        $cells = [
+            [40,'no'],
+            [20,'doc_id'],
+            [30,'name'],
+            [30,'email'],
+            [50,'cpt_status'],
+        ];
+        $excels = [
+            [
+                'no' => '넘버',
+                'doc_id' => '문서 ID',
+                'name' => '작성자 이름',
+                'email' => '작성자 이메일',
+                'cpt_status' => '공개 속성',
+            ]
+        ];
+
+        foreach($taxonomies as $taxonomy) {
+            $cells[] = [40, 'taxo_'. $taxonomy->id];
+            $excels[0]['taxo_'. $taxonomy->id] =  xe_trans($taxonomy->name);
+        }
+        foreach($config['formColumns'] as $index => $column) {
+            /**
+             * 다이나믹 필드 column 조회
+             */
+            $fieldType = \XeDynamicField::get($config->get('documentGroup'), $column);
+            if($fieldType) {
+                $label = xe_trans($column_labels[$column]);
+                /**
+                 * 특수 필드 사용 시 조건 추가
+                 */
+
+                if($fieldType->getTableName() === 'field_dynamic_factory_super_relate' || $fieldType->getTableName() === 'df_super_relate' ) {
+//                    $cells[] = [40, $column];
+//                    $excels[0][$column] =  $label;
+                } else {
+                    foreach($fieldType->getColumns() as $key => $type) {
+                        if($key === 'raw_data' || $key === 'logic_builder') continue;
+                        if($column === 'builded') continue;
+                        if($column === 'sign') continue;
+                        $formOrder[] = $column.'_'.$key;
+                        if($key === 'start') {
+                            $text = ' 시작';
+                        } else if($key === 'end') {
+                            $text = ' 종료';
+                        } else if($key === 'columns') {
+                            $text = ' 리스트';
+                        } else if($key === 'num') {
+                            $text = ' 숫자만';
+                        } else if($key === 'boolean') {
+                            $text = ' 택1 (1 or 0)';
+                        } else if($key === 'postcode') {
+                            $text = ' 우편번호';
+                        } else if($key === 'address1') {
+                            $text = ' 주소';
+                        } else if($key === 'address2') {
+                            $text = ' 상세주소';
+                        } else if($key === 'text') {
+                            $text = '';
+                        } else {
+                            $text = ' '.$key;
+                        }
+                        if( $fieldType->getTableName() === 'field_dynamic_field_extend_calendar') {
+                            $text = $text.'시간 0000-00-00 00:00';
+                        }
+
+                        $excels[0][$column.'_'.$key] = $label.$text;
+                    }
+//                    dd($fieldType->getRules(), $column , array_keys($fieldType->getRules())[0]);
+                }
+            } else {
+                if($column === 'title') {
+                    $label = '제목';
+                } else if($column === 'content') {
+                    $label = '내용';
+
+                    $cells[] = [40, $column];
+                    $excels[0][$column] = $label;
+
+                    $cells[] = [40, 'binary_pass'];
+                    $excels[0]['binary_pass'] = '바이너리 전송';
+                    continue;
+                } else {
+                    $label = $column;
+                }
+                $cells[] = [40, $column];
+                $excels[0][$column] = $label;
+            }
+        }
+
+        $headerText = '';
+        foreach($cells as $column) {
+            if($headerText === '') {
+                $headerText = $column[1];
+            } else {
+                if($column === 'id') {
+                    $headerText = $headerText.',doc_id';
+                } else {
+                    $headerText = $headerText.','.$column[1];
+                }
+            }
+        }
+
+        $test = explode(',', $headerText);
+        $index = 1;
+
+        foreach($docData as $index => $data) {
+            $inx = $index + 1;
+            if(!$data) continue;
+            $relateCptId = '';
+            foreach($test as $key => $val) {
+
+                if(strpos($val,"taxo_") !== false) {
+                    $category_id = (int) str_replace('taxo_', '', $val);
+                    $categories = app('overcode.df.taxonomyHandler')->getItemOnlyTargetId($data->id)->where('category_id', $category_id);
+                    $cateText = '';
+                    foreach($categories as $category) {
+                        if($cateText === '') {
+                            $cateText = xe_trans($category->word);
+                        } else {
+                            $cateText = $cateText.', '.xe_trans($category->word);
+                        }
+                    }
+
+                    if($cateText === '') {
+                        $cateText = '선택된 카테고리 없음';
+                    }
+//                    $excels[$inx][$val] = json_enc($categories);
+                    $excels[$inx][$val] = $cateText;
+                    continue;
+                }
+                $writer_data = XeUser::where('id', $data->user_id)->first();
+                if($val === 'no') {
+                    $excels[$inx][$val] = $inx + 1;
+                    continue;
+                }
+
+                if($val === 'email') {
+                    if($writer_data) $excels[$inx][$val] = $writer_data->email;
+                    else $excels[$inx][$val] = '대상회원 정보가 없습니다';
+                    continue;
+                }
+
+                if($val === 'name') {
+                    if($writer_data) $excels[$inx][$val] = $writer_data->display_name;
+                    else $excels[$inx][$val] = '대상회원 정보가 없습니다';
+                    continue;
+                }
+
+                //다운로드 시점 문서 공개속성 기록
+                else if($val === 'cpt_status') {
+                    if($data->isPublic()) {
+                        $excels[$inx][$val] = 'public';
+                    } else if($data->isTemp()) {
+                        $excels[$inx][$val] = 'temp';
+                    } else {
+                        $excels[$inx][$val] = 'private';
+                    }
+                }
+                //일반 데이터 + 일반 Field 분류 데이터
+                else {
+                    // Key - id > Key - doc_id로 저장
+                    if($val === 'doc_id') {
+                        $excels[$inx][$val] = $data->id;
+                        continue;
+                    }
+                    //Content에 포함된 /r/n으로 인한 오작동 방지용 json 인코딩
+                    if($val === 'content') {
+                        $data->$val = str_replace("\r\n", '<br>', $data->$val);
+
+                        $data->binary_pass = '-';
+                        if(strpos($data->content, '바이너리 전송 종료됨') !== false) {
+                            $data->binary_pass = "Hex 전달";
+                        }
+                    }
+
+                    if(strpos($val, 'belong_') !== false) {
+                        if(!$data->belongDocument($val, 'documents_'.$data->instance_id)->first()) {
+                            $excels[$inx][$val] = '선택된 문서 없음';
+                            continue;
+                        } else {
+                            $relateDocName = '';
+                            foreach($data->belongDocument($val, 'documents_'.$data->instance_id) as $relateDocument) {
+                                if($relateDocName === '') {
+                                    $relateDocName = $relateDocument->title;
+                                } else {
+                                    $relateDocName = $relateDocName.', '.$relateDocument->title;
+                                }
+                            }
+                            $excels[$inx][$val] = $relateDocName;
+                            continue;
+                        }
+                    }
+                    $excels[$inx][$val] = $data->$val;
+                }
+            }
+        }
+
+        $callback = function () use ($cells, $excels) {
+            $spreadsheet = new Spreadsheet();
+            $sheet = $spreadsheet->getActiveSheet();
+            $alpha = range('A', 'Z');
+            foreach($cells as $i => $val){
+                $cellName = $alpha[$i].'1';
+                $sheet->getColumnDimension($alpha[$i])->setWidth($val[0]);
+                $sheet->getRowDimension('1')->setRowHeight(25);
+                $sheet->setCellValue($cellName, $val[1]);
+                $sheet->getStyle($cellName)->getFont()->setBold(true);
+                $sheet->getStyle($cellName)->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+                $sheet->getStyle($cellName)->getAlignment()->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER);
+            }
+
+            for ($i = 2; $row = array_shift($excels); $i++) {
+                foreach ($cells as $key => $val) {
+                    if(count($row) <= 1) continue;
+                    if(!isset($row[$val[1]])) continue;
+                    $cellName = $alpha[$key].$i;
+                    $sheet->setCellValue($cellName, $row[$val[1]]);
+                }
+            }
+
+            $writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($spreadsheet);
+            $writer->save('php://output');
+//            dd($writer);
+        };
+//        $callback();
+
+        $filename = '엑셀 다운로드';
+        $headers = array(
+            "Content-type" => "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            "Content-Disposition" => 'attachment; filename=' . $filename . '.xlsx',
+            "Pragma" => "no-cache",
+            "Cache-Control" => "must-revalidate, post-check=0, pre-check=0",
+            "Expires" => "0"
+        );
+
+        return \Illuminate\Support\Facades\Response::stream($callback, 200, $headers);
+        return [$headers, $callback];
+
+    }
+
     public function isJson($string) {
         json_decode($string);
         return json_last_error() === JSON_ERROR_NONE;
