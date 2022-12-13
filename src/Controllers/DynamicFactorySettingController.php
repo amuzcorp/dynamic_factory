@@ -1717,6 +1717,7 @@ class DynamicFactorySettingController extends BaseController
                         }
 
                         $excels[0][$column.'_'.$key] = $label.$text;
+                        $cells[] = [40, $column];
                     }
 //                    dd($fieldType->getRules(), $column , array_keys($fieldType->getRules())[0]);
                 }
