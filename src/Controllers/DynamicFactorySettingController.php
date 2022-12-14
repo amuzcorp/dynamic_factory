@@ -1656,6 +1656,9 @@ class DynamicFactorySettingController extends BaseController
             [30,'name'],
             [30,'email'],
             [50,'cpt_status'],
+            [50,'title'],
+            [50,'content'],
+            [50,'binary_pass'],
         ];
         $excels = [
             [
@@ -1664,6 +1667,9 @@ class DynamicFactorySettingController extends BaseController
                 'name' => '작성자 이름',
                 'email' => '작성자 이메일',
                 'cpt_status' => '공개 속성',
+                'title' => '제목',
+                'content' => '로그내용',
+                'binary_pass' => '바이너리 전송',
             ]
         ];
 
@@ -1721,16 +1727,7 @@ class DynamicFactorySettingController extends BaseController
 //                    dd($fieldType->getRules(), $column , array_keys($fieldType->getRules())[0]);
                 }
             } else {
-                if($column === 'title') {
-                    $label = '제목';
-                } else if($column === 'content') {
-                    $label = '내용';
-
-                    $cells[] = [40, $column];
-                    $excels[0][$column] = $label;
-
-                    $cells[] = [40, 'binary_pass'];
-                    $excels[0]['binary_pass'] = '바이너리 전송';
+                if($column === 'title' || $column === 'content') {
                     continue;
                 } else {
                     $label = $column;
@@ -1739,6 +1736,13 @@ class DynamicFactorySettingController extends BaseController
                 $excels[0][$column] = $label;
             }
         }
+
+        $excels[0]['created_at'] = '작성일';
+        $excels[0]['week'] = 'Week (1~52)';
+        $excels[0]['YYYY-mm-dd'] = 'YYYY-mm-dd';
+        $cells[] = 'created_at';
+        $cells[] = 'week';
+        $cells[] = 'YYYY-mm-dd';
 
         $headerText = '';
         foreach($cells as $column) {
@@ -1796,6 +1800,20 @@ class DynamicFactorySettingController extends BaseController
                 if($val === 'name') {
                     if($writer_data) $excels[$inx][$val] = $writer_data->display_name;
                     else $excels[$inx][$val] = '대상회원 정보가 없습니다';
+                    continue;
+                }
+
+                if($val === 'created_at') {
+                    $excels[$inx][$val] = date('Y-m-d H:i:s', strtotime($data->created_at));
+                    continue;
+                }
+                if($val === 'week') {
+                    $dt = Carbon::parse($data->created_at);
+                    $excels[$inx][$val] = $dt->weekOfYear ?: 0;
+                    continue;
+                }
+                if($val === 'YYYY-mm-dd') {
+                    $excels[$inx][$val] = date('Y-m-d', strtotime($data->created_at));
                     continue;
                 }
 
