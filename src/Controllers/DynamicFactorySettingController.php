@@ -1740,9 +1740,9 @@ class DynamicFactorySettingController extends BaseController
         $excels[0]['created_at'] = '작성일';
         $excels[0]['week'] = 'Week (1~52)';
         $excels[0]['YYYY-mm-dd'] = 'YYYY-mm-dd';
-        $cells[] = 'created_at';
-        $cells[] = 'week';
-        $cells[] = 'YYYY-mm-dd';
+        $cells[] = [40, 'created_at'];
+        $cells[] = [40, 'week'];
+        $cells[] = [40, 'YYYY-mm-dd'];
 
         $headerText = '';
         foreach($cells as $column) {
@@ -1807,11 +1807,13 @@ class DynamicFactorySettingController extends BaseController
                     $excels[$inx][$val] = date('Y-m-d H:i:s', strtotime($data->created_at));
                     continue;
                 }
+
                 if($val === 'week') {
                     $dt = Carbon::parse($data->created_at);
                     $excels[$inx][$val] = $dt->weekOfYear ?: 0;
                     continue;
                 }
+
                 if($val === 'YYYY-mm-dd') {
                     $excels[$inx][$val] = date('Y-m-d', strtotime($data->created_at));
                     continue;
