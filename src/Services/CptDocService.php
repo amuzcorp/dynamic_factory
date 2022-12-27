@@ -189,7 +189,7 @@ class CptDocService
             return $paginate;
         });
 
-        if(+$request->get('test1', 'N') === 'Y') {
+        if($request->get('test1', 'N') === 'Y') {
             dd($paginate);
         }
 
