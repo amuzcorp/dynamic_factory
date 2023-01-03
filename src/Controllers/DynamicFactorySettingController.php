@@ -1742,11 +1742,11 @@ class DynamicFactorySettingController extends BaseController
         $excels[0]['week'] = 'Week (1~52)';
         $excels[0]['YYYY'] = 'YYYY';
         $excels[0]['mm-dd'] = 'mm-dd';
-        $cells[] = [40, 'created_at'];
-        $cells[] = [40, 'user_group'];
-        $cells[] = [40, 'week'];
-        $cells[] = [40, 'YYYY'];
-        $cells[] = [40, 'mm-dd'];
+        $cells[] = [20, 'created_at'];
+        $cells[] = [20, 'user_group'];
+        $cells[] = [10, 'week'];
+        $cells[] = [10, 'YYYY'];
+        $cells[] = [10, 'mm-dd'];
 
         $headerText = '';
         foreach($cells as $column) {
