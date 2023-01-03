@@ -1668,7 +1668,7 @@ class DynamicFactorySettingController extends BaseController
                 'email' => '작성자 이메일',
                 'cpt_status' => '공개 속성',
                 'title' => '제목',
-                'content' => '로그내용',
+//                'content' => '로그내용',
                 'binary_pass' => '바이너리 전송',
             ]
         ];
@@ -1738,11 +1738,15 @@ class DynamicFactorySettingController extends BaseController
         }
 
         $excels[0]['created_at'] = '작성일';
+        $excels[0]['user_group'] = '작성자 그룹';
         $excels[0]['week'] = 'Week (1~52)';
-        $excels[0]['YYYY-mm-dd'] = 'YYYY-mm-dd';
+        $excels[0]['YYYY'] = 'YYYY';
+        $excels[0]['mm-dd'] = 'mm-dd';
         $cells[] = [40, 'created_at'];
+        $cells[] = [40, 'user_group'];
         $cells[] = [40, 'week'];
-        $cells[] = [40, 'YYYY-mm-dd'];
+        $cells[] = [40, 'YYYY'];
+        $cells[] = [40, 'mm-dd'];
 
         $headerText = '';
         foreach($cells as $column) {
@@ -1814,8 +1818,27 @@ class DynamicFactorySettingController extends BaseController
                     continue;
                 }
 
-                if($val === 'YYYY-mm-dd') {
-                    $excels[$inx][$val] = date('Y-m-d', strtotime($data->created_at));
+                if($val === 'YYYY') {
+                    $excels[$inx][$val] = date('Y', strtotime($data->created_at));
+                    continue;
+                }
+
+                if($val === 'mm-dd') {
+                    $excels[$inx][$val] = date('m-d', strtotime($data->created_at));
+                    continue;
+                }
+
+                if($val === 'user_group') {
+                    $user = app('xe.user')->users()->with('groups', 'emails', 'accounts')->find($data->user_id);
+                    $groups = '-';
+                    foreach($user->groups as $group) {
+                        if($groups == '-') {
+                            $groups = $group->name;
+                        } else {
+                            $groups = $groups . ',' .$group->name;
+                        }
+                    }
+                    $excels[$inx][$val] = $groups;
                     continue;
                 }
 
