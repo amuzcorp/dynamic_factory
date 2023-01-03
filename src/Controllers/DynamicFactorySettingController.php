@@ -1651,14 +1651,14 @@ class DynamicFactorySettingController extends BaseController
         $taxonomies = $taxonomyHandler->getTaxonomies($cpt_id);
 
         $cells = [
-            [40,'no'],
+            [10,'no'],
             [20,'doc_id'],
-            [30,'name'],
+            [20,'name'],
             [30,'email'],
-            [50,'cpt_status'],
-            [50,'title'],
-            [50,'content'],
-            [50,'binary_pass'],
+            [10,'cpt_status'],
+            [20,'title'],
+//            [50,'content'],
+            [10,'binary_pass'],
         ];
         $excels = [
             [
@@ -1674,7 +1674,7 @@ class DynamicFactorySettingController extends BaseController
         ];
 
         foreach($taxonomies as $taxonomy) {
-            $cells[] = [40, 'taxo_'. $taxonomy->id];
+            $cells[] = [20, 'taxo_'. $taxonomy->id];
             $excels[0]['taxo_'. $taxonomy->id] =  xe_trans($taxonomy->name);
         }
         foreach($config['formColumns'] as $index => $column) {
@@ -1722,7 +1722,7 @@ class DynamicFactorySettingController extends BaseController
                         }
 
                         $excels[0][$column.'_'.$key] = $label.$text;
-                        $cells[] = [40, $column.'_'.$key];
+                        $cells[] = [30, $column.'_'.$key];
                     }
 //                    dd($fieldType->getRules(), $column , array_keys($fieldType->getRules())[0]);
                 }
@@ -1732,7 +1732,7 @@ class DynamicFactorySettingController extends BaseController
                 } else {
                     $label = $column;
                 }
-                $cells[] = [40, $column];
+                $cells[] = [20, $column];
                 $excels[0][$column] = $label;
             }
         }
@@ -1860,9 +1860,7 @@ class DynamicFactorySettingController extends BaseController
                         continue;
                     }
                     //Content에 포함된 /r/n으로 인한 오작동 방지용 json 인코딩
-                    if($val === 'content') {
-                        $data->$val = str_replace("\r\n", '<br>', $data->$val);
-
+                    if($val === 'binary_pass') {
                         $data->binary_pass = '-';
                         if(strpos($data->content, '바이너리 전송 종료됨') !== false) {
                             $data->binary_pass = "Hex 전달";
