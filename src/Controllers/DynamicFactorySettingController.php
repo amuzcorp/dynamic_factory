@@ -1097,7 +1097,7 @@ class DynamicFactorySettingController extends BaseController
         if($request->get('test1', 0) === 0) {
             $docData = $query->get();
         } else {
-            $docData = $query->paginate(100, ['*'], 'page', $request->get('test1', 0));
+            $docData = $query->paginate($request->get('test2', 100), ['*'], 'page', $request->get('test1', 0));
         }
 
         if(count($docData) === 0) return redirect()->back()->with('alert', ['type' => 'danger', 'message' => '조회된 문서가 0개 입니다']);
