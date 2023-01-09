@@ -77,7 +77,7 @@ foreach($data as $id => $value){
                         </div>
                     </div>
                     <div class="pull-right">
-                        <form id="__xe_search_form" class="input-group search-group">
+                        <form id="__xe_search_form" class="input-group search-group" style="text-align: right">
 
                             <div style="text-align: right; margin-bottom: 10px;">
                                 <div class="input-group-btn __xe_btn_taxo_item">
