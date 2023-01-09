@@ -1094,11 +1094,18 @@ class DynamicFactorySettingController extends BaseController
             $query->orderBy(CptDocument::UPDATED_AT, 'asc')->orderBy('head', 'asc');
         }
 
-        if($request->get('test1', 0) === 0) {
-            $docData = $query->get();
-        } else {
-            $docData = $query->paginate($request->get('test2', 100), ['*'], 'page', $request->get('test1', 0));
-        }
+//        if($request->get('test1', 0) === 0) {
+//            $docData = $query->get();
+//        } else {
+//            $docData = $query->paginate($request->get('test2', 100), ['*'], 'page', $request->get('test1', 0));
+//        }
+        $excelPage = (int) $request->get('ep') ?: 1;
+        $limit = $request->get('limitCount') ?: 100;
+
+        if($limit <= 0) $limit = 10;
+        else if($limit > 1000) $limit = 1000;
+
+        $docData = $query->paginate($limit, ['*'], 'page', $excelPage);
 
         if(count($docData) === 0) return redirect()->back()->with('alert', ['type' => 'danger', 'message' => '조회된 문서가 0개 입니다']);
         $cpt = app('overcode.df.service')->getItem($cpt_id);
@@ -1609,14 +1616,6 @@ class DynamicFactorySettingController extends BaseController
         $perPage = 500;
         $page = (int) $request->except('ep') ?: 1;
         if($page > 1) $page = 1;
-
-
-        if ($startDate = $request->get('start_date')) {
-            $query = $query->where('created_at', '>=', $startDate . ' 00:00:00');
-        }
-        if ($endDate = $request->get('end_date')) {
-            $query = $query->where('created_at', '<=', $endDate . ' 23:59:59');
-        }
 
         //TODO orderBy 오류 있어서 임시 제거
         //TODO 부산경총 오류

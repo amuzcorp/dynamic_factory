@@ -78,6 +78,79 @@ foreach($data as $id => $value){
                     </div>
                     <div class="pull-right">
                         <form id="__xe_search_form" class="input-group search-group">
+
+                            <div style="text-align: right; margin-bottom: 10px;">
+                                <div class="input-group-btn __xe_btn_taxo_item">
+                                    <input type="hidden" name="date_search" value="{{Request::get('date_search') ?? 'N'}}">
+                                    <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                                    <span class="taxOr_xe_text">
+                                        @if(Request::get('date_search') !== 'Y')
+                                            전체 조회
+                                        @else
+                                            기간 조회
+                                        @endif
+                                    </span>
+                                        <span class="caret"></span>
+                                    </button>
+                                    <ul class="dropdown-menu" role="menu">
+                                        <li @if(Request::get('date_search') !== 'Y') class="active" @endif><a value="N" onclick="searchScheduleDate(this)">전체 조회</a></li>
+                                        <li @if(Request::get('date_search') === 'Y') class="active" @endif><a value="Y" onclick="searchScheduleDate(this)">기간 조회</a></li>
+                                    </ul>
+                                </div>
+
+                                <div class="input-group-btn __xe_btn_per_page">
+                                    <button type="button" class="btn btn-default" disabled="">
+                                    <span class="__xe_text">
+                                        시작일
+                                    </span>
+                                    </button>
+                                </div>
+                                <div class="input-group-btn __xe_btn_per_page" style="margin-left: unset">
+                                    <input type="date" class="form-control filter-input" name="start_date"
+                                           @if(Request::has('start_date'))
+                                           value="{{date('Y-m-d', strtotime(Request::get('start_date')))}}"
+                                           @else
+                                           value="{{date('Y-m-d')}}"
+                                        @endif >
+                                </div>
+                                <div class="input-group-btn __xe_btn_per_page">
+                                    <button type="button" class="btn btn-default" disabled="">
+                                    <span class="__xe_text">
+                                        종료일
+                                    </span>
+                                    </button>
+                                </div>
+                                <div class="input-group-btn __xe_btn_per_page" style="margin-left: unset">
+                                    <input type="date" class="form-control filter-input" name="end_date"
+                                           @if(Request::has('end_date'))
+                                           value="{{date('Y-m-d', strtotime(Request::get('end_date')))}}"
+                                           @else
+                                           value="{{date('Y-m-d')}}"
+                                        @endif >
+                                </div>
+                                <div class="input-group-btn __xe_btn_per_page">
+                                    <button type="button" class="btn btn-default" disabled="">
+                                    <span class="__xe_text">
+                                        Page
+                                    </span>
+                                    </button>
+                                </div>
+                                <div class="input-group-btn __xe_btn_per_page" style="margin-left: unset">
+                                    <input type="number" class="form-control filter-input" name="ep"
+                                           value="{{Request::get('ep') ?? 1}}">
+                                </div>
+                                <div class="input-group-btn __xe_btn_per_page">
+                                    <button type="button" class="btn btn-default" disabled="">
+                                    <span class="__xe_text">
+                                        다운로드 데이터 수
+                                    </span>
+                                    </button>
+                                </div>
+                                <div class="input-group-btn __xe_btn_per_page" style="margin-left: unset">
+                                    <input type="number" name="limitCount" class="form-control filter-input" value="500" min="0" max="1000" onchange="setLimitCount(this)">
+                                </div>
+                            </div>
+
                             <div class="input-group-btn __xe_btn_taxo_item">
                                 <input type="hidden" name="taxOr" value="{{Request::get('taxOr')}}">
                                 <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
@@ -513,6 +586,19 @@ foreach($data as $id => $value){
     function searchTaxoOr(e) {
         $('[name="taxOr"]').val($(e).attr('value'));
         $('#__xe_search_form').submit();
+    }
+
+    function searchScheduleDate(e) {
+        $('[name="date_search"]').val($(e).attr('value'));
+        $('#__xe_search_form').submit();
+    }
+
+    function setLimitCount(e) {
+        var count = e.value;
+        if(0 >= count ) count = 1;
+        else if(1000 < count ) count = 1000;
+        else count = e.value;
+        $('input[name=limitCount]').val(count);
     }
 
     function clickTaxonomyBadge(category_id, id) {
