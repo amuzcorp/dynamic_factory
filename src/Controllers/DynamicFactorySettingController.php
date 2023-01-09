@@ -465,13 +465,27 @@ class DynamicFactorySettingController extends BaseController
             'recently_updated' => '최근 수정순',
         ];
 
+        $all = $this->makeWhere(CptDocument::cpt($cpt->cpt_id), $request)->where('site_key', \XeSite::getCurrentSiteKey())->count();
+        $published = $this->makeWhere(CptDocument::cpt($cpt->cpt_id), $request)->where('site_key', \XeSite::getCurrentSiteKey())->published()->public()->count();
+        $publishReserved = $this->makeWhere(CptDocument::cpt($cpt->cpt_id), $request)->where('site_key', \XeSite::getCurrentSiteKey())->publishReserved()->public()->count();
+        $tempBlog = $this->makeWhere(CptDocument::cpt($cpt->cpt_id), $request)->where('site_key', \XeSite::getCurrentSiteKey())->temp()->count();
+        $private = $this->makeWhere(CptDocument::cpt($cpt->cpt_id), $request)->where('site_key', \XeSite::getCurrentSiteKey())->private()->count();
+
         $stateTypeCounts = [
-            'all' => CptDocument::cpt($cpt->cpt_id)->where('site_key', \XeSite::getCurrentSiteKey())->count(),
-            'published' => CptDocument::cpt($cpt->cpt_id)->where('site_key', \XeSite::getCurrentSiteKey())->published()->public()->count(),
-            'publishReserved' => CptDocument::cpt($cpt->cpt_id)->where('site_key', \XeSite::getCurrentSiteKey())->publishReserved()->public()->count(),
-            'tempBlog' => CptDocument::cpt($cpt->cpt_id)->where('site_key', \XeSite::getCurrentSiteKey())->temp()->count(),
-            'private' => CptDocument::cpt($cpt->cpt_id)->where('site_key', \XeSite::getCurrentSiteKey())->private()->count()
+            'all' => $all,
+            'published' => $published,
+            'publishReserved' => $publishReserved,
+            'tempBlog' => $tempBlog,
+            'private' => $private
         ];
+
+        //$stateTypeCounts = [
+        //            'all' => CptDocument::cpt($cpt->cpt_id)->where('site_key', \XeSite::getCurrentSiteKey())->count(),
+        //            'published' => CptDocument::cpt($cpt->cpt_id)->where('site_key', \XeSite::getCurrentSiteKey())->published()->public()->count(),
+        //            'publishReserved' => CptDocument::cpt($cpt->cpt_id)->where('site_key', \XeSite::getCurrentSiteKey())->publishReserved()->public()->count(),
+        //            'tempBlog' => CptDocument::cpt($cpt->cpt_id)->where('site_key', \XeSite::getCurrentSiteKey())->temp()->count(),
+        //            'private' => CptDocument::cpt($cpt->cpt_id)->where('site_key', \XeSite::getCurrentSiteKey())->private()->count()
+        //        ];
 
         $config = $this->configHandler->getConfig($cpt->cpt_id);
         $column_labels = $this->configHandler->getColumnLabels($config);
