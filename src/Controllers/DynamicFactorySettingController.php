@@ -1326,6 +1326,12 @@ class DynamicFactorySettingController extends BaseController
         // 정렬
         $orderType = $request->get('order_type', '');
 
+        $limit = $request->get('limitCount') ?: 100;
+        if($limit <= 0) $limit = 10;
+        else if($limit > 1000) $limit = 1000;
+        $page = (int) $request->except('ep') ?: 1;
+        if($page > 1) $page = 1;
+
         //TODO orderBy 오류 있어서 임시 제거
         //TODO 부산경총 오류
         if ($orderType == '') {
@@ -1348,13 +1354,7 @@ class DynamicFactorySettingController extends BaseController
             $query->orderBy(CptDocument::UPDATED_AT, 'asc')->orderBy('head', 'asc');
         }
 
-        $excelPage = (int) $request->get('ep') ?: 1;
-        $limit = $request->get('limitCount') ?: 100;
-
-        if($limit <= 0) $limit = 10;
-        else if($limit > 1000) $limit = 1000;
-
-        $docData = $query->paginate($limit, ['*'], 'page', $excelPage);
+        $docData = $query->paginate($limit, ['*'], 'page', $page);
 //        $docData = $query->get();
 
         if(count($docData) === 0) return redirect()->back()->with('alert', ['type' => 'danger', 'message' => '조회된 문서가 0개 입니다']);
