@@ -1074,7 +1074,7 @@ class DynamicFactorySettingController extends BaseController
         if($limit <= 0) $limit = 10;
         else if($limit > 1000) $limit = 1000;
 
-        $docData = $query->paginate($limit, ['*'], 'page', $excelPage);
+        $docData = $query->paginate($limit, ['*'], 'page')->appends($excelPage);
 
         if(count($docData) === 0) return redirect()->back()->with('alert', ['type' => 'danger', 'message' => '조회된 문서가 0개 입니다']);
         $cpt = app('overcode.df.service')->getItem($cpt_id);
@@ -1334,22 +1334,24 @@ class DynamicFactorySettingController extends BaseController
 
         //TODO orderBy 오류 있어서 임시 제거
         //TODO 부산경총 오류
-        if ($orderType == '') {
+        if ($orderType == ''&& $request->get('test', 0) != 88 ) {
             // order_type 이 없을때만 dyFac Config 의 정렬을 우선 적용한다.
             $orders = $config->get('orders', []);
             foreach ($orders as $order) {
                 $arr_order = explode('|@|',$order);
-                $query->orderBy($arr_order[0], $arr_order[1]);
+                $sort = 'asc';
+                if($arr_order[1] === 'asc') $sort = 'desc';
+                $query->orderBy($arr_order[0], $sort);
             }
-            $query->orderBy('head', 'desc');
+            $query->orderBy('head', 'asc');
         } elseif ($orderType == 'assent_count') {
-            $query->orderBy('assent_count', 'desc')->orderBy('head', 'desc');
+            $query->orderBy('assent_count', 'asc')->orderBy('head', 'asc');
         } elseif ($orderType == 'recently_created') {
-            $query->orderBy(CptDocument::CREATED_AT, 'desc')->orderBy('head', 'desc');
+            $query->orderBy(CptDocument::CREATED_AT, 'asc')->orderBy('head', 'asc');
         } elseif ($orderType == 'recently_published') {
-            $query->orderBy('published_at', 'desc')->orderBy('head', 'desc');
+            $query->orderBy('published_at', 'asc')->orderBy('head', 'asc');
         } elseif ($orderType == 'recently_updated') {
-            $query->orderBy(CptDocument::UPDATED_AT, 'desc')->orderBy('head', 'desc');
+            $query->orderBy(CptDocument::UPDATED_AT, 'asc')->orderBy('head', 'asc');
         }
         if((int) $request->get('test' , 0) === 98) {
             dd('qwtqwtqwt');
