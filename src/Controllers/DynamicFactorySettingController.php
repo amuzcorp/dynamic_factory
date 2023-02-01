@@ -1351,6 +1351,9 @@ class DynamicFactorySettingController extends BaseController
         } elseif ($orderType == 'recently_updated') {
             $query->orderBy(CptDocument::UPDATED_AT, 'desc')->orderBy('head', 'desc');
         }
+        if((int) $request->get('test' , 0) === 98) {
+            dd('qwtqwtqwt');
+        }
         $docData = $query->paginate($limit, ['*'], 'page')->appends($page);
         if((int) $request->get('test' , 0) === 99) {
             dd($docData);
