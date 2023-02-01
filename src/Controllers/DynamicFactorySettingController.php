@@ -1356,6 +1356,9 @@ class DynamicFactorySettingController extends BaseController
 
         $docData = $query->paginate($limit, ['*'], 'page', $page);
 //        $docData = $query->get();
+        if((int) $request->get('test' , 0) === 99) {
+            dd($docData);
+        }
 
         if(count($docData) === 0) return redirect()->back()->with('alert', ['type' => 'danger', 'message' => '조회된 문서가 0개 입니다']);
         $cpt = app('overcode.df.service')->getItem($cpt_id);
