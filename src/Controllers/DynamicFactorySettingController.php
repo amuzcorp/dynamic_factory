@@ -1321,10 +1321,10 @@ class DynamicFactorySettingController extends BaseController
 
         $config = $this->configHandler->getConfig($cpt_id);
 
-        // 검색 조건 추가
-        $query = $this->makeWhere($query, $request);
         // 정렬
         $orderType = $request->get('order_type', '');
+        // 검색 조건 추가
+        $query = $this->makeWhere($query, $request);
 
         $limit = $request->get('limitCount') ?: 100;
         if($limit <= 0) $limit = 10;
@@ -1339,31 +1339,24 @@ class DynamicFactorySettingController extends BaseController
             $orders = $config->get('orders', []);
             foreach ($orders as $order) {
                 $arr_order = explode('|@|',$order);
-                $sort = 'asc';
-                if($arr_order[1] === 'asc') $sort = 'desc';
-                $query->orderBy($arr_order[0], $sort);
+                $query->orderBy($arr_order[0], $arr_order[1]);
             }
-            $query->orderBy('head', 'asc');
+            $query->orderBy('head', 'desc');
         } elseif ($orderType == 'assent_count') {
-            $query->orderBy('assent_count', 'asc')->orderBy('head', 'asc');
+            $query->orderBy('assent_count', 'desc')->orderBy('head', 'desc');
         } elseif ($orderType == 'recently_created') {
-            $query->orderBy(CptDocument::CREATED_AT, 'asc')->orderBy('head', 'asc');
+            $query->orderBy(CptDocument::CREATED_AT, 'desc')->orderBy('head', 'desc');
         } elseif ($orderType == 'recently_published') {
-            $query->orderBy('published_at', 'asc')->orderBy('head', 'asc');
+            $query->orderBy('published_at', 'desc')->orderBy('head', 'desc');
         } elseif ($orderType == 'recently_updated') {
-            $query->orderBy(CptDocument::UPDATED_AT, 'asc')->orderBy('head', 'asc');
+            $query->orderBy(CptDocument::UPDATED_AT, 'desc')->orderBy('head', 'desc');
         }
-
-        $docData = $query->paginate($limit, ['*'], 'page', $page);
-//        $docData = $query->get();
+        $docData = $query->paginate($limit, ['*'], 'page')->appends($page);
         if((int) $request->get('test' , 0) === 99) {
             dd($docData);
         }
 
         if(count($docData) === 0) return redirect()->back()->with('alert', ['type' => 'danger', 'message' => '조회된 문서가 0개 입니다']);
-        $cpt = app('overcode.df.service')->getItem($cpt_id);
-        $config = $this->configHandler->getConfig($cpt_id);
-        $column_labels = $this->configHandler->getColumnLabels($config);
 
         $taxonomyHandler = app('overcode.df.taxonomyHandler');
         $taxonomies = $taxonomyHandler->getTaxonomies($cpt_id);
@@ -1388,44 +1381,6 @@ class DynamicFactorySettingController extends BaseController
         foreach($taxonomies as $taxonomy) {
             $cells[] = [40, 'taxo_'. $taxonomy->id];
             $excels[0]['taxo_'. $taxonomy->id] =  xe_trans($taxonomy->name);
-        }
-        if((int) $request->get('test' , 0) === 1) {
-            foreach($config['formColumns'] as $index => $column) {
-                /**
-                 * 다이나믹 필드 column 조회
-                 */
-                $fieldType = \XeDynamicField::get($config->get('documentGroup'), $column);
-                if($fieldType) {
-                    $label = xe_trans($column_labels[$column]);
-                    /**
-                     * 특수 필드 사용 시 조건 추가
-                     */
-
-                    if($fieldType->getTableName() === 'field_dynamic_factory_super_relate' || $fieldType->getTableName() === 'df_super_relate' ) {
-//                    $cells[] = [40, $column];
-//                    $excels[0][$column] =  $label;
-                    } else {
-                        foreach($fieldType->getColumns() as $key => $type) {
-                            if($key === 'raw_data' || $key === 'logic_builder') continue;
-                            if($column === 'builded') continue;
-
-                            $cells[] = [40, array_keys($fieldType->getRules())[0]];
-                            $excels[0][array_keys($fieldType->getRules())[0]] = $label;
-                        }
-//                    dd($fieldType->getRules(), $column , array_keys($fieldType->getRules())[0]);
-                    }
-                } else {
-                    if($column === 'title') {
-                        $label = '제목';
-                    } else if($column === 'content') {
-                        $label = '내용';
-                    } else {
-                        $label = $column;
-                    }
-                    $cells[] = [40, $column];
-                    $excels[0][$column] = $label;
-                }
-            }
         }
 
         $headerText = '';
