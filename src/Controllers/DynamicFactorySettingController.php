@@ -617,45 +617,7 @@ class DynamicFactorySettingController extends BaseController
 
     public function getCptDocuments($request, $cpt, $config, $withOutContent = false)
     {
-        $perPage = (int) $request->get('perPage', '10');
-
-        if($request->get('test', 0)  == 22) {
-            dd(array_merge($request->all(), [
-                'force' => true,
-                'cpt_id' => $cpt->cpt_id
-            ]));
-            $query = $this->dfService->getItemsWhereQuery(array_merge($request->all(), [
-                'force' => true,
-                'cpt_id' => $cpt->cpt_id
-            ]));
-
-            $query = $this->makeWhere($query, $request);
-
-            $orderType = $request->get('order_type', '');
-
-            //TODO orderBy 오류 있어서 임시 제거
-            //TODO 부산경총 오류
-            if ($orderType == '' && $request->get('test', 0)  != 88) {
-                // order_type 이 없을때만 dyFac Config 의 정렬을 우선 적용한다.
-                $orders = $config->get('orders', []);
-                foreach ($orders as $order) {
-                    $arr_order = explode('|@|',$order);
-                    $query->orderBy($arr_order[0], $arr_order[1]);
-                }
-                $query->orderBy('head', 'desc');
-            } elseif ($orderType == 'assent_count') {
-                $query->orderBy('assent_count', 'desc')->orderBy('head', 'desc');
-            } elseif ($orderType == 'recently_created') {
-                $query->orderBy(CptDocument::CREATED_AT, 'desc')->orderBy('head', 'desc');
-            } elseif ($orderType == 'recently_published') {
-                $query->orderBy('published_at', 'desc')->orderBy('head', 'desc');
-            } elseif ($orderType == 'recently_updated') {
-                $query->orderBy(CptDocument::UPDATED_AT, 'desc')->orderBy('head', 'desc');
-            }
-            $paginate = $query->paginate($perPage, ['*'], 'page')->appends($request->except('page'));
-
-            dd($paginate);
-        }
+        $perPage = (int) $request->get('perPage', '10') ?? 10;
 
         $query = $this->dfService->getItemsWhereQuery(array_merge($request->all(), [
             'force' => true,
@@ -664,16 +626,13 @@ class DynamicFactorySettingController extends BaseController
 
         // 정렬
         $orderType = $request->get('order_type', '');
-        if($request->get('test', 0)  == 4) {
-            dd($query->toSql());
-        }
 
         // 검색 조건 추가
         $query = $this->makeWhere($query, $request);
 
         //TODO orderBy 오류 있어서 임시 제거
         //TODO 부산경총 오류
-        if ($orderType == '' && $request->get('test', 0)  != 88) {
+        if ($orderType == '') {
             // order_type 이 없을때만 dyFac Config 의 정렬을 우선 적용한다.
             $orders = $config->get('orders', []);
             foreach ($orders as $order) {
@@ -689,10 +648,6 @@ class DynamicFactorySettingController extends BaseController
             $query->orderBy('published_at', 'desc')->orderBy('head', 'desc');
         } elseif ($orderType == 'recently_updated') {
             $query->orderBy(CptDocument::UPDATED_AT, 'desc')->orderBy('head', 'desc');
-        }
-        if($request->get('test', 0)  == 7) {
-            $from = $query->getQuery()->from;
-            dd($from, $query->toSql());
         }
 
 //        if($withOutContent){
@@ -1393,7 +1348,14 @@ class DynamicFactorySettingController extends BaseController
             $query->orderBy(CptDocument::UPDATED_AT, 'asc')->orderBy('head', 'asc');
         }
 
-        $docData = $query->get();
+        $excelPage = (int) $request->get('ep') ?: 1;
+        $limit = $request->get('limitCount') ?: 100;
+
+        if($limit <= 0) $limit = 10;
+        else if($limit > 1000) $limit = 1000;
+
+        $docData = $query->paginate($limit, ['*'], 'page', $excelPage);
+//        $docData = $query->get();
 
         if(count($docData) === 0) return redirect()->back()->with('alert', ['type' => 'danger', 'message' => '조회된 문서가 0개 입니다']);
         $cpt = app('overcode.df.service')->getItem($cpt_id);
@@ -1565,9 +1527,7 @@ class DynamicFactorySettingController extends BaseController
                 }
             }
         }
-        if((int) $request->get('test' , 0) === 2) {
-            dd($excels);
-        }
+
         $callback = function () use ($cells, $excels) {
             $spreadsheet = new Spreadsheet();
             $sheet = $spreadsheet->getActiveSheet();
