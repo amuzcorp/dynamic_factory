@@ -1074,7 +1074,7 @@ class DynamicFactorySettingController extends BaseController
         if($limit <= 0) $limit = 10;
         else if($limit > 1000) $limit = 1000;
 
-        $docData = $query->paginate($limit, ['*'], 'page')->appends($excelPage);
+        $docData = $query->paginate($limit, ['*'], 'page', $excelPage);
 
         if(count($docData) === 0) return redirect()->back()->with('alert', ['type' => 'danger', 'message' => '조회된 문서가 0개 입니다']);
         $cpt = app('overcode.df.service')->getItem($cpt_id);
