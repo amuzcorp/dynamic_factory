@@ -168,7 +168,9 @@ class CptDocService
                         if(is_array($files) && count($files) > 0){
                             foreach($files as $fileId){
                                 $file = $this->xeStorage->find($fileId);
-
+                                if($file == null) {
+                                    continue;
+                                }
                                 //등록된 파일이 미디어이면,
                                 if($this->xeMedia->is($file)){
                                     $mediaFile = $this->xeMedia->make($file);
