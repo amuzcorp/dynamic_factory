@@ -12,7 +12,6 @@ use Xpressengine\Http\Request;
 use Xpressengine\Permission\Instance;
 use Xpressengine\User\UserInterface;
 use Gate;
-use Config;
 
 class CptDocService
 {
@@ -164,9 +163,6 @@ class CptDocService
 
                         if(!$item->{$field_id . "_column"} || $item->{$field_id . "_column"} === "") break;
 
-                        $storage_path = Config::get('filesystems.disks.media.url');
-                        $download_links = [];
-
                         $image_urls = [];
                         $files = json_dec($item->{$field_id . "_column"});
                         if(is_array($files) && count($files) > 0){
@@ -179,21 +175,8 @@ class CptDocService
                                 if($this->xeMedia->is($file)){
                                     $mediaFile = $this->xeMedia->make($file);
                                     $image_urls[$fileId] = $mediaFile->url();
-
-                                    //지그 다운로드 링크
-                                    if($config->get('cpt_id') == 'lg_sw_jig') {
-                                        $download_links[] = [
-                                            $fileId,
-                                            $file->clientname,
-                                            $storage_path.'/'.$file->path.'/'.$file->filename
-                                        ];
-                                    }
                                 }
                             }
-                        }
-
-                        if(is_array($download_links) && count($download_links) > 0) {
-                            $item->downloadLinks = $download_links;
                         }
                         $item->{$field_id . "_urls"} = $image_urls;
                         break;
