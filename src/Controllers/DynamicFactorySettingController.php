@@ -1072,7 +1072,6 @@ class DynamicFactorySettingController extends BaseController
         $limit = $request->get('limitCount') ?: 100;
 
         if($limit <= 0) $limit = 10;
-        else if($limit > 1000) $limit = 1000;
 
         $docData = $query->paginate($limit, ['*'], 'page', $excelPage);
 
@@ -1324,7 +1323,6 @@ class DynamicFactorySettingController extends BaseController
 
         $limit = $request->get('limitCount') ?: 100;
         if($limit <= 0) $limit = 10;
-        else if($limit > 1000) $limit = 1000;
         $page = (int) $request->except('ep') ?: 1;
         if($page > 1) $page = 1;
 
