@@ -1072,6 +1072,7 @@ class DynamicFactorySettingController extends BaseController
         $limit = $request->get('limitCount') ? +$request->get('limitCount') : 100;
 
         if($limit <= 0) $limit = 10;
+        else if( $limit > 1000 ) $limit = 1000;
 
         $docData = $query->paginate($limit, ['*'], 'page', $excelPage);
 
@@ -1323,18 +1324,13 @@ class DynamicFactorySettingController extends BaseController
 
         $limit = $request->get('limitCount') ? +$request->get('limitCount') : 100;
         if($limit <= 0) $limit = 10;
+        else if($limit > 1000) $limit = 1000;
         $page = (int) $request->except('ep') ?: 1;
         if($page > 1) $page = 1;
 
         $query->orderBy(CptDocument::CREATED_AT, 'asc');
 
-        if((int) $request->get('test' , 0) === 98) {
-            dd('qwtqwtqwt');
-        }
         $docData = $query->paginate($limit, ['*'], 'page')->appends($page);
-        if((int) $request->get('test' , 0) === 99) {
-            dd($docData);
-        }
 
         if(count($docData) === 0) return redirect()->back()->with('alert', ['type' => 'danger', 'message' => '조회된 문서가 0개 입니다']);
 
@@ -1525,7 +1521,8 @@ class DynamicFactorySettingController extends BaseController
         // 정렬
         $orderType = $request->get('order_type', '');
 
-        $perPage = 500;
+        $perPage = $request->get('limitCount') ? +$request->get('limitCount') : 100;
+        if($perPage <= 0) $perPage = 10;
         $page = (int) $request->except('ep') ?: 1;
         if($page > 1) $page = 1;
 
