@@ -1069,7 +1069,7 @@ class DynamicFactorySettingController extends BaseController
 //            $docData = $query->paginate($request->get('test2', 100), ['*'], 'page', $request->get('test1', 0));
 //        }
         $excelPage = (int) $request->get('ep') ?: 1;
-        $limit = $request->get('limitCount') ?: 100;
+        $limit = $request->get('limitCount') ? +$request->get('limitCount') : 100;
 
         if($limit <= 0) $limit = 10;
 
@@ -1321,7 +1321,7 @@ class DynamicFactorySettingController extends BaseController
         // 검색 조건 추가
         $query = $this->makeWhere($query, $request);
 
-        $limit = $request->get('limitCount') ?: 100;
+        $limit = $request->get('limitCount') ? +$request->get('limitCount') : 100;
         if($limit <= 0) $limit = 10;
         $page = (int) $request->except('ep') ?: 1;
         if($page > 1) $page = 1;
