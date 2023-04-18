@@ -1326,7 +1326,7 @@ class DynamicFactorySettingController extends BaseController
         if($limit <= 0) $limit = 10;
         else if($limit > 1000) $limit = 1000;
         $page = (int) $request->except('ep') ?: 1;
-        if($page > 1) $page = 1;
+        if($page < 1) $page = 1;
 
         $query->orderBy(CptDocument::CREATED_AT, 'asc');
 
@@ -1524,7 +1524,7 @@ class DynamicFactorySettingController extends BaseController
         $perPage = $request->get('limitCount') ? +$request->get('limitCount') : 100;
         if($perPage <= 0) $perPage = 10;
         $page = (int) $request->except('ep') ?: 1;
-        if($page > 1) $page = 1;
+        if($page < 1) $page = 1;
 
         //TODO orderBy 오류 있어서 임시 제거
         //TODO 부산경총 오류
