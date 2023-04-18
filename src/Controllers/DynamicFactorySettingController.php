@@ -1330,7 +1330,7 @@ class DynamicFactorySettingController extends BaseController
 
         $query->orderBy(CptDocument::CREATED_AT, 'asc');
 
-        $docData = $query->paginate($limit, ['*'], 'page')->appends($page);
+        $docData = $query->paginate($limit, ['*'], 'page', $page);
 
         if(count($docData) === 0) return redirect()->back()->with('alert', ['type' => 'danger', 'message' => '조회된 문서가 0개 입니다']);
 
@@ -1548,7 +1548,7 @@ class DynamicFactorySettingController extends BaseController
             $query->orderBy(CptDocument::UPDATED_AT, 'asc')->orderBy('head', 'asc');
         }
 
-        $docData = $query->paginate($perPage, ['*'], 'page')->appends($page);
+        $docData = $query->paginate($perPage, ['*'], 'page', $page);
 
         if(count($docData) === 0) return redirect()->back()->with('alert', ['type' => 'danger', 'message' => '조회된 문서가 0개 입니다']);
         $cpt = app('overcode.df.service')->getItem($cpt_id);
