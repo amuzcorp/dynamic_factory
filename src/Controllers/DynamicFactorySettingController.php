@@ -1373,7 +1373,6 @@ class DynamicFactorySettingController extends BaseController
         }
 
         $test = explode(',', $headerText);
-        $index = 1;
 
         foreach($docData as $index => $data) {
             $inx = $index + 1;
@@ -1670,7 +1669,6 @@ class DynamicFactorySettingController extends BaseController
         }
 
         $test = explode(',', $headerText);
-        $index = 1;
 
         foreach($docData as $index => $data) {
             $inx = $index + 1;
@@ -1739,11 +1737,13 @@ class DynamicFactorySettingController extends BaseController
                 if($val === 'user_group') {
                     $user = app('xe.user')->users()->with('groups', 'emails', 'accounts')->find($data->user_id);
                     $groups = '-';
-                    foreach($user->groups as $group) {
-                        if($groups == '-') {
-                            $groups = $group->name;
-                        } else {
-                            $groups = $groups . ',' .$group->name;
+                    if($user) {
+                        foreach ($user->groups as $group) {
+                            if ($groups == '-') {
+                                $groups = $group->name;
+                            } else {
+                                $groups = $groups . ',' . $group->name;
+                            }
                         }
                     }
                     $excels[$inx][$val] = $groups;
