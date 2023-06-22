@@ -1770,10 +1770,14 @@ class DynamicFactorySettingController extends BaseController
                     //Content에 포함된 /r/n으로 인한 오작동 방지용 json 인코딩
                     if($val === 'binary_pass') {
                         $data->binary_pass = '-';
-                        if(strpos($data->content, 'PGM 해쉬전송에 실패함') !== false) {
+                        if(strpos($data->content, 'PGM 해쉬전송에 실패함') !== false || strpos($data->content, 'PGM hash transfer failed') !== false) {
                             $data->binary_pass = "-";
-                        } else if(strpos($data->content, '바이너리 전송 종료됨') !== false) {
-                            $data->binary_pass = "Hex 전달";
+                        } else if(strpos($data->content, 'Binary Transfer Ended') !== false || strpos($data->content, '바이너리 전송 종료됨') !== false) {
+                            if(app('xe.translator')->getLocale() == 'ko') {
+                                $data->binary_pass = "Hex 전달";
+                            } else {
+                                $data->binary_pass = "Hex Transfer";
+                            }
                         }
                     }
 
