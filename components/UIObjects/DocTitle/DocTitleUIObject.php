@@ -74,6 +74,10 @@ class DocTitleUIObject extends AbstractUIObject
             $args['titleName'] = '제목';
         }
 
+        if (empty($args['limit'])) {
+            $args['limit'] = 0;
+        }
+
         $args['scriptInit'] = false;
         if (self::$loaded === false) {
             self::$loaded = true;
