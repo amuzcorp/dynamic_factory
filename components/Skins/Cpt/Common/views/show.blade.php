@@ -23,7 +23,11 @@
     </div>
     <div class="read_body">
         <div class="xe_content xe-content xe-content-{{ $item->instance_id }}">
-            {!! compile($item->instance_id, $item->content, $item->format === Overcode\XePlugin\DynamicFactory\Models\CptDocument::FORMAT_HTML) !!}
+            @if(compile($item->instance_id, $item->content, $item->format === Overcode\XePlugin\DynamicFactory\Models\CptDocument::FORMAT_HTML) != null)
+                {!! compile($item->instance_id, $item->content, $item->format === Overcode\XePlugin\DynamicFactory\Models\CptDocument::FORMAT_HTML) !!}
+            @else
+                {!! $item->content !!}
+            @endif
         </div>
     </div>
     <br/>
