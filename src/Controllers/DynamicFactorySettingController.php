@@ -1005,6 +1005,18 @@ class DynamicFactorySettingController extends BaseController
                 $q->where($table_name . '.group_id', $userGroup_id);
             });
         }
+        if($request->get('userCountry') && $request->get('userCountry') !== '') {
+            $userCountry = $request->get('userCountry');
+            $from = $query->getQuery()->from;
+            $table_name = 'user';
+            $query->leftJoin($table_name, function($leftJoin) use($from, $table_name) {
+                $leftJoin->on(sprintf('%s.%s', $from, 'user_id'),'=',sprintf('%s.%s', $table_name, 'id'));
+            });
+
+            $query->where(function($q) use ($table_name,$userCountry){
+                $q->where($table_name . '.country', $userCountry);
+            });
+        }
 //        if($request->get('test', 0)  == 3) {
 //            dd($query->first());
 //        }
@@ -1168,9 +1180,11 @@ class DynamicFactorySettingController extends BaseController
             }
         }
 
+        $excels[0]['user_country'] = '작성자 국가';
         $excels[0]['created_at'] = '작성일';
         $excels[0]['week'] = 'Week (1~52)';
         $excels[0]['YYYY-mm-dd'] = 'YYYY-mm-dd';
+        $formOrder[] = 'user_country';
         $formOrder[] = 'created_at';
         $formOrder[] = 'week';
         $formOrder[] = 'YYYY-mm-dd';
@@ -1603,6 +1617,7 @@ class DynamicFactorySettingController extends BaseController
                         if($key === 'raw_data' || $key === 'logic_builder') continue;
                         if($column === 'builded') continue;
                         if($column === 'sign') continue;
+                        if($column === 'app_version') continue;
                         if($key === 'start') {
                             $text = ' 시작';
                         } else if($key === 'end') {
@@ -1646,14 +1661,22 @@ class DynamicFactorySettingController extends BaseController
 
         $excels[0]['created_at'] = '작성일';
         $excels[0]['user_group'] = '작성자 그룹';
+        $excels[0]['user_country'] = '작성자 국가';
         $excels[0]['week'] = 'Week (1~52)';
         $excels[0]['YYYY'] = 'YYYY';
         $excels[0]['mm-dd'] = 'mm-dd';
+        if($cpt_id == 'lg_blackbox_fota_log' || $cpt_id == 'lge_global_fota_log') {
+            $excels[0]['app_version_text'] = '어플리케이션 버전';
+        }
         $cells[] = [20, 'created_at'];
         $cells[] = [20, 'user_group'];
+        $cells[] = [20, 'user_country'];
         $cells[] = [10, 'week'];
         $cells[] = [10, 'YYYY'];
         $cells[] = [10, 'mm-dd'];
+        if($cpt_id == 'lg_blackbox_fota_log' || $cpt_id == 'lge_global_fota_log') {
+            $cells[] = [10, 'app_version_text'];
+        }
 
         $headerText = '';
         foreach($cells as $column) {
@@ -1674,6 +1697,7 @@ class DynamicFactorySettingController extends BaseController
             $inx = $index + 1;
             if(!$data) continue;
             $relateCptId = '';
+            $user = app('xe.user')->users()->with('groups', 'emails', 'accounts')->find($data->user_id);
             foreach($test as $key => $val) {
 
                 if(strpos($val,"taxo_") !== false) {
@@ -1735,7 +1759,6 @@ class DynamicFactorySettingController extends BaseController
                 }
 
                 if($val === 'user_group') {
-                    $user = app('xe.user')->users()->with('groups', 'emails', 'accounts')->find($data->user_id);
                     $groups = '-';
                     if($user) {
                         foreach ($user->groups as $group) {
@@ -1747,6 +1770,15 @@ class DynamicFactorySettingController extends BaseController
                         }
                     }
                     $excels[$inx][$val] = $groups;
+                    continue;
+                }
+
+                if($val === 'user_country') {
+                    if(!$user) {
+                        $excels[$inx][$val] = '-';
+                        continue;
+                    }
+                    $excels[$inx][$val] = $user->country ?? '-';
                     continue;
                 }
 
