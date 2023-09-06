@@ -1246,6 +1246,7 @@ class DynamicFactorySettingController extends BaseController
                 if($val === 'user_country') {
                     if($writer_data) $excels[$inx][$val] = $writer_data->country;
                     else $excels[$inx][$val] = '-';
+                    continue;
                 }
 
                 //   $formOrder[] = 'week';
