@@ -1233,15 +1233,21 @@ class DynamicFactorySettingController extends BaseController
 
                 if($val === 'email') {
                     if($writer_data) $excels[$inx][$val] = $writer_data->email;
-                    else $excels[$inx][$val] = '대상회원 정보가 없습니다';
+                    else $excels[$inx][$val] = '-';
                     continue;
                 }
 
                 if($val === 'name') {
                     if($writer_data) $excels[$inx][$val] = $writer_data->display_name;
-                    else $excels[$inx][$val] = '대상회원 정보가 없습니다';
+                    else $excels[$inx][$val] = '-';
                     continue;
                 }
+
+                if($val === 'user_country') {
+                    if($writer_data) $excels[$inx][$val] = $writer_data->country;
+                    else $excels[$inx][$val] = '-';
+                }
+
                 //   $formOrder[] = 'week';
                 //        $formOrder[] = 'yyyy_mm_dd';
                 if($val === 'week') {
