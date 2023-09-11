@@ -1244,8 +1244,17 @@ class DynamicFactorySettingController extends BaseController
                 }
 
                 if($val === 'user_country') {
-                    if($writer_data) $excels[$inx][$val] = $writer_data->country;
-                    else $excels[$inx][$val] = '-';
+                    $country = $writer_data->country ?? '-';
+                    $excels[$inx][$val] = '-';
+                    if($writer_data) {
+                        if($country == 'in') {
+                            $excels[$inx][$val] = 'India';
+                        } else if($country == 'us') {
+                            $excels[$inx][$val] = 'USA';
+                        } else {
+                            $excels[$inx][$val] = 'Korea';
+                        }
+                    }
                     continue;
                 }
 
@@ -1781,11 +1790,17 @@ class DynamicFactorySettingController extends BaseController
                 }
 
                 if($val === 'user_country') {
-                    if(!$user) {
-                        $excels[$inx][$val] = '-';
-                        continue;
+                    $country = $user->country ?? '-';
+                    $excels[$inx][$val] = '-';
+                    if($user) {
+                        if($country == 'in') {
+                            $excels[$inx][$val] = 'India';
+                        } else if($country == 'us') {
+                            $excels[$inx][$val] = 'USA';
+                        } else {
+                            $excels[$inx][$val] = 'Korea';
+                        }
                     }
-                    $excels[$inx][$val] = $user->country ?? '-';
                     continue;
                 }
 
