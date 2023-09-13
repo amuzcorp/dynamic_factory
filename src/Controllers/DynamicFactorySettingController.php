@@ -1180,11 +1180,11 @@ class DynamicFactorySettingController extends BaseController
             }
         }
 
-        $excels[0]['user_country'] = '작성자 국가';
+//        $excels[0]['user_country'] = '작성자 국가';
         $excels[0]['created_at'] = '작성일';
         $excels[0]['week'] = 'Week (1~52)';
         $excels[0]['YYYY-mm-dd'] = 'YYYY-mm-dd';
-        $formOrder[] = 'user_country';
+//        $formOrder[] = 'user_country';
         $formOrder[] = 'created_at';
         $formOrder[] = 'week';
         $formOrder[] = 'YYYY-mm-dd';
@@ -1243,20 +1243,20 @@ class DynamicFactorySettingController extends BaseController
                     continue;
                 }
 
-                if($val === 'user_country') {
-                    $country = $writer_data->country ?? '-';
-                    $excels[$inx][$val] = '-';
-                    if($writer_data) {
-                        if($country == 'in') {
-                            $excels[$inx][$val] = 'India';
-                        } else if($country == 'us') {
-                            $excels[$inx][$val] = 'USA';
-                        } else {
-                            $excels[$inx][$val] = 'Korea';
-                        }
-                    }
-                    continue;
-                }
+//                if($val === 'user_country') {
+//                    $country = $writer_data->country ?? '-';
+//                    $excels[$inx][$val] = '-';
+//                    if($writer_data) {
+//                        if($country == 'in') {
+//                            $excels[$inx][$val] = 'India';
+//                        } else if($country == 'us') {
+//                            $excels[$inx][$val] = 'USA';
+//                        } else {
+//                            $excels[$inx][$val] = 'Korea';
+//                        }
+//                    }
+//                    continue;
+//                }
 
                 //   $formOrder[] = 'week';
                 //        $formOrder[] = 'yyyy_mm_dd';
@@ -1677,7 +1677,7 @@ class DynamicFactorySettingController extends BaseController
 
         $excels[0]['created_at'] = '작성일';
         $excels[0]['user_group'] = '작성자 그룹';
-        $excels[0]['user_country'] = '작성자 국가';
+//        $excels[0]['user_country'] = '작성자 국가';
         $excels[0]['week'] = 'Week (1~52)';
         $excels[0]['YYYY'] = 'YYYY';
         $excels[0]['mm-dd'] = 'mm-dd';
@@ -1686,7 +1686,7 @@ class DynamicFactorySettingController extends BaseController
         }
         $cells[] = [20, 'created_at'];
         $cells[] = [20, 'user_group'];
-        $cells[] = [20, 'user_country'];
+//        $cells[] = [20, 'user_country'];
         $cells[] = [10, 'week'];
         $cells[] = [10, 'YYYY'];
         $cells[] = [10, 'mm-dd'];
@@ -1789,20 +1789,20 @@ class DynamicFactorySettingController extends BaseController
                     continue;
                 }
 
-                if($val === 'user_country') {
-                    $country = $user->country ?? '-';
-                    $excels[$inx][$val] = '-';
-                    if($user) {
-                        if($country == 'in') {
-                            $excels[$inx][$val] = 'India';
-                        } else if($country == 'us') {
-                            $excels[$inx][$val] = 'USA';
-                        } else {
-                            $excels[$inx][$val] = 'Korea';
-                        }
-                    }
-                    continue;
-                }
+//                if($val === 'user_country') {
+//                    $country = $user->country ?? '-';
+//                    $excels[$inx][$val] = '-';
+//                    if($user) {
+//                        if($country == 'in') {
+//                            $excels[$inx][$val] = 'India';
+//                        } else if($country == 'us') {
+//                            $excels[$inx][$val] = 'USA';
+//                        } else {
+//                            $excels[$inx][$val] = 'Korea';
+//                        }
+//                    }
+//                    continue;
+//                }
 
                 //다운로드 시점 문서 공개속성 기록
                 else if($val === 'cpt_status') {
