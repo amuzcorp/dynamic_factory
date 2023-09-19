@@ -1638,6 +1638,7 @@ class DynamicFactorySettingController extends BaseController
                         if($column === 'builded') continue;
                         if($column === 'sign') continue;
                         if($column === 'app_version') continue;
+                        if($column === 'country') continue;
                         if($key === 'start') {
                             $text = ' 시작';
                         } else if($key === 'end') {
@@ -1681,6 +1682,7 @@ class DynamicFactorySettingController extends BaseController
 
         $excels[0]['created_at'] = '작성일';
         $excels[0]['user_group'] = '작성자 그룹';
+        $excels[0]['country_text'] = '계정 국가';
 //        $excels[0]['user_country'] = '작성자 국가';
         $excels[0]['week'] = 'Week (1~52)';
         $excels[0]['YYYY'] = 'YYYY';
@@ -1690,6 +1692,7 @@ class DynamicFactorySettingController extends BaseController
         }
         $cells[] = [20, 'created_at'];
         $cells[] = [20, 'user_group'];
+        $cells[] = [20, 'country_text'];
 //        $cells[] = [20, 'user_country'];
         $cells[] = [10, 'week'];
         $cells[] = [10, 'YYYY'];
