@@ -1447,6 +1447,10 @@ class DynamicFactorySettingController extends BaseController
                     continue;
                 }
 
+                if($val == "app_version_text") {
+                    $excels[$inx][$val] = (string) $data->$val;
+                }
+
                 //다운로드 시점 문서 공개속성 기록
                 else if($val === 'cpt_status') {
                     if($data->isPublic()) {
@@ -1803,6 +1807,11 @@ class DynamicFactorySettingController extends BaseController
 //                    }
 //                    continue;
 //                }
+
+                if($val == "app_version_text") {
+                    $excels[$inx][$val] = (string) $data->$val;
+                    continue;
+                }
 
                 //다운로드 시점 문서 공개속성 기록
                 else if($val === 'cpt_status') {
