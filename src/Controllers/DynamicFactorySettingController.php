@@ -1793,6 +1793,25 @@ class DynamicFactorySettingController extends BaseController
                     continue;
                 }
 
+                if($val === 'country_text') {
+                    if($data->$val == "" || $data->$val == null) {
+                        if(!$user) {
+                            $excels[$inx][$val] = '-';
+                        } else {
+                            if($user->country == 'in') {
+                                $excels[$inx][$val] = "India";
+                            } else if($user->country == 'us') {
+                                $excels[$inx][$val] = "USA";
+                            } else {
+                                $excels[$inx][$val] = "Korea";
+                            }
+                        }
+                    } else {
+                        $excels[$inx][$val] = $data->$val;
+                    }
+                    continue;
+                }
+
 //                if($val === 'user_country') {
 //                    $country = $user->country ?? '-';
 //                    $excels[$inx][$val] = '-';
