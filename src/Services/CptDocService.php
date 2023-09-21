@@ -37,9 +37,18 @@ class CptDocService
         //확장필드들은 config에 기반하기때문에 전체사이트를 조회하는경우 각 사이트의 config를 따로불러올 수 없으므로 default를 기준으로 join하도록 처리함
         //즉, default에서 선언되지 않은 확장필드를 멀티사이트에서 선언한다고해서 전체사이트 데이터를 조회할때 멀티사이트의 확장필드가 보여지지는 않음
         //하지만 멀티사이트 전체의 게시글을 한번에 조회하는것은 보통 default사이트에서 처리되므로 큰문제는 없을듯함.
-        $model = CptDocument::division($config->get('cpt_id'), $site_key != '*' ?: 'default');
-
-        $query = $model->where('instance_id', $config->get('cpt_id'));
+//        $model = CptDocument::division($config->get('cpt_id'), $site_key != '*' ?: 'default');
+//        $query = $model->where('instance_id', $config->get('cpt_id'));
+        if($request->hasHeader('X-AMUZ-DEVICE-UUID') && $config->get('cpt_id') == 'lg_products' || $config->get('cpt_id') == 'lg_rsd_products')  {
+            /// 모델 검색, RSD 모델 검색 시 키워드명이 일치하는 놈들만 가져와서 서칭
+            $model = CptDocument::where('instance_id', $config->get('cpt_id'));
+            $ids = $model->where('title', 'like', sprintf('%s%%', implode('%', explode(' ', $request->get('search_keyword')))))->pluck('id');
+            $model = CptDocument::division($config->get('cpt_id'), 'default')->whereIn('id', $ids);
+            $query = $model->where('instance_id', $config->get('cpt_id'));
+        } else {
+            $model = CptDocument::division($config->get('cpt_id'), $site_key != '*' ?: 'default');
+            $query = $model->where('instance_id', $config->get('cpt_id'));
+        }
 
         // site_key 컬럼을 가지고 있는지
         $hasSiteKey = \Schema::hasColumn('documents', 'site_key');
