@@ -1448,7 +1448,8 @@ class DynamicFactorySettingController extends BaseController
                 }
 
                 if($val == "app_version_text") {
-                    $excels[$inx][$val] = (string) $data->$val;
+                    $excels[$inx][$val] = (string) $data->$val ?? '-';
+                    continue;
                 }
 
                 //다운로드 시점 문서 공개속성 기록
@@ -1687,9 +1688,7 @@ class DynamicFactorySettingController extends BaseController
         $excels[0]['week'] = 'Week (1~52)';
         $excels[0]['YYYY'] = 'YYYY';
         $excels[0]['mm-dd'] = 'mm-dd';
-        if($cpt_id == 'lg_blackbox_fota_log' || $cpt_id == 'lge_global_fota_log') {
-            $excels[0]['app_version_text'] = '어플리케이션 버전';
-        }
+        $excels[0]['app_version_text'] = '어플리케이션 버전';
         $cells[] = [20, 'created_at'];
         $cells[] = [20, 'user_group'];
         $cells[] = [20, 'country_text'];
@@ -1697,9 +1696,7 @@ class DynamicFactorySettingController extends BaseController
         $cells[] = [10, 'week'];
         $cells[] = [10, 'YYYY'];
         $cells[] = [10, 'mm-dd'];
-        if($cpt_id == 'lg_blackbox_fota_log' || $cpt_id == 'lge_global_fota_log') {
-            $cells[] = [10, 'app_version_text'];
-        }
+        $cells[] = [10, 'app_version_text'];
 
         $headerText = '';
         foreach($cells as $column) {
@@ -1831,7 +1828,7 @@ class DynamicFactorySettingController extends BaseController
 //                }
 
                 if($val == "app_version_text") {
-                    $excels[$inx][$val] = (string) $data->$val;
+                    $excels[$inx][$val] = (string) $data->$val ?? '-';
                     continue;
                 }
 
