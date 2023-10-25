@@ -427,7 +427,12 @@ class DynamicFactorySettingController extends BaseController
         $current_route_name = Route::currentRouteName();
         $route_names = explode('.', $current_route_name);
         $cpt_id = $route_names[count($route_names) - 1];
-
+        if($cpt_id == 'lg_modem_fota' || $cpt_id == 'lg_sw_fota') {
+            $email = \Auth::user()->email;
+            if($email != 'zooz@amuz.co.kr' && $email != 'develop@amuz.co.kr') {
+                return redirect()->back()->with('alert', ['type' => 'danger', 'message' => xe_trans('xe::accessDenied')]);
+            }
+        }
         $request->current_route_name = $current_route_name;
 
         $cpt = $this->dfService->getItem($cpt_id);
