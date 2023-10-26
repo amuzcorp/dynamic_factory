@@ -429,7 +429,7 @@ class DynamicFactorySettingController extends BaseController
         $cpt_id = $route_names[count($route_names) - 1];
         if($cpt_id == 'lg_modem_fota' || $cpt_id == 'lg_sw_fota') {
             $email = \Auth::user()->email;
-            if($email != 'zooz@amuz.co.kr' && $email != 'develop@amuz.co.kr') {
+            if($email != 'zooz@amuz.co.kr' && $email != 'develop@amuz.co.kr' && $email != 'swani.lee@lge.com' && $email != 'hermedes.kwon@lge.com') {
                 return redirect()->back()->with('alert', ['type' => 'danger', 'message' => xe_trans('xe::accessDenied')]);
             }
         }
