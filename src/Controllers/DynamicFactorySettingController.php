@@ -429,7 +429,27 @@ class DynamicFactorySettingController extends BaseController
         $cpt_id = $route_names[count($route_names) - 1];
         if($cpt_id == 'lg_modem_fota' || $cpt_id == 'lg_sw_fota') {
             $email = \Auth::user()->email;
-            if($email != 'zooz@amuz.co.kr' && $email != 'develop@amuz.co.kr' && $email != 'swani.lee@lge.com' && $email != 'hermedes.kwon@lge.com') {
+            $emailList = [
+                'zooz@amuz.co.kr',
+                'develop@amuz.co.kr',
+                'jaehoon127.woo@lge.com',
+                'swani.lee@lge.com',
+                'museung.kim@lge.com',
+                'jaehun7.kim@lge.com',
+                'minq.park@lge.com',
+                'hayun.kim@lge.com',
+                'cheolsook.lee@lge.com',
+                'sangmi.lee@lge.com',
+                'chansung.jeon@lge.com',
+                'minyoung.park@lge.com',
+                'hyunwoo.ju@lge.com',
+                'junwoo.mun@lge.com',
+                '44sunghun.lee@lge.com',
+                'azor.kim@lge.com',
+                'seongjun.hwang@lge.com',
+                'minjeong27.kim@lge.com'
+            ];
+            if(!in_array($email, $emailList)) {
                 return redirect()->back()->with('alert', ['type' => 'danger', 'message' => xe_trans('xe::accessDenied')]);
             }
         }
