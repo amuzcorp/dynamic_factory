@@ -6,10 +6,10 @@
 {{ XeFrontend::css('/assets/core/settings/css/admin_menu.css')->before('/assets/core/settings/css/admin.css')->load() }}
 
 @if(isset($category->id))
-<ul class="nav nav-tabs">
-    <li class="active"><a href="{{ route('dyFac.setting.create_taxonomy', ['tax_id' => $category->id]) }}">기본정보</a></li>
-    <li><a href="{{ route('dyFac.setting.taxonomy_extra', ['category_slug' => $cpt_cate_extra->slug]) }}">확장필드</a></li>
-</ul>
+    <ul class="nav nav-tabs">
+        <li class="active"><a href="{{ route('dyFac.setting.create_taxonomy', ['tax_id' => $category->id]) }}">기본정보</a></li>
+        <li><a href="{{ route('dyFac.setting.taxonomy_extra', ['category_slug' => $cpt_cate_extra->slug]) }}">확장필드</a></li>
+    </ul>
 @endif
 
 <div class="row">
@@ -26,7 +26,11 @@
                         <div class="form-group row">
                             <label class="col-sm-2 col-form-label">ID (필수)</label>
                             <div class="col-sm-10">
-                                <input type="text" class="form-control" name="slug" value="{{ $cpt_cate_extra->slug }}">
+                                @if(\Auth::user()->login_id == 'amuzcorp')
+                                    <input type="text" class="form-control" name="slug" value="{{ $cpt_cate_extra->slug }}">
+                                @else
+                                    <input type="text" class="form-control" value="{{ $cpt_cate_extra->slug }}" disabled>
+                                @endif
                             </div>
                         </div>
                         <div class="form-group row">
@@ -38,11 +42,19 @@
                         <div class="form-group row">
                             <label class="col-sm-2 col-form-label">템플릿</label>
                             <div class="col-sm-10">
-                                <select class="form-control" name="template">
-                                    <option value="select" @if($cpt_cate_extra->template === 'select') selected="selected" @endif>Single Select</option>
-                                    <option value="multi_select" @if($cpt_cate_extra->template === 'multi_select') selected="selected" @endif>Multi Select</option>
-                                    <option value="depth" @if($cpt_cate_extra->template === 'depth') selected="selected" @endif>depth</option>
-                                </select>
+                                @if(\Auth::user()->login_id == 'amuzcorp')
+                                    <select class="form-control" name="template">
+                                        <option value="select" @if($cpt_cate_extra->template === 'select') selected="selected" @endif>Single Select</option>
+                                        <option value="multi_select" @if($cpt_cate_extra->template === 'multi_select') selected="selected" @endif>Multi Select</option>
+                                        <option value="depth" @if($cpt_cate_extra->template === 'depth') selected="selected" @endif>depth</option>
+                                    </select>
+                                @else
+                                    <select class="form-control" disabled>
+                                        <option value="select" @if($cpt_cate_extra->template === 'select') selected="selected" @endif>Single Select</option>
+                                        <option value="multi_select" @if($cpt_cate_extra->template === 'multi_select') selected="selected" @endif>Multi Select</option>
+                                        <option value="depth" @if($cpt_cate_extra->template === 'depth') selected="selected" @endif>depth</option>
+                                    </select>
+                                @endif
                             </div>
                         </div>
                     </div>
@@ -50,17 +62,28 @@
                         <div class="pull-left"><h4>이 분류와 함께 사용할 유형</h4></div>
                     </div>
                     <div class="panel-body">
-                        @foreach($cpts as $cpt)
-                        <input class="form-check-input" type="checkbox" id="chk{{ $cpt->cpt_id }}" name="cpts[]" value="{{ $cpt->cpt_id }}" @if(in_array($cpt->cpt_id, $cpt_ids)) checked="checked"@endif>
-                        <label class="form-check-label" for="chk{{ $cpt->cpt_id }}">{{ $cpt->cpt_name }}</label>
-                        @endforeach
-                        @foreach($cpts_fp as $fp)
-                        <input class="form-check-input" type="checkbox" id="chk{{ $fp->cpt_id }}" name="cpts[]" value="{{ $fp->cpt_id }}" @if(in_array($fp->cpt_id, $cpt_ids)) checked="checked"@endif>
-                        <label class="form-check-label" for="chk{{ $fp->cpt_id }}">{{ $fp->cpt_name }}</label>
-                        @endforeach
-                        <div class="clearfix">
-                            <button type="submit" class="btn btn-primary pull-right">@if(!$category->id)생성@else수정@endif</button>
-                        </div>
+                        @if(\Auth::user()->login_id == 'amuzcorp')
+                            @foreach($cpts as $cpt)
+                                <input class="form-check-input" type="checkbox" id="chk{{ $cpt->cpt_id }}" name="cpts[]" value="{{ $cpt->cpt_id }}" @if(in_array($cpt->cpt_id, $cpt_ids)) checked="checked"@endif>
+                                <label class="form-check-label" for="chk{{ $cpt->cpt_id }}">{{ $cpt->cpt_name }}</label>
+                            @endforeach
+                            @foreach($cpts_fp as $fp)
+                                <input class="form-check-input" type="checkbox" id="chk{{ $fp->cpt_id }}" name="cpts[]" value="{{ $fp->cpt_id }}" @if(in_array($fp->cpt_id, $cpt_ids)) checked="checked"@endif>
+                                <label class="form-check-label" for="chk{{ $fp->cpt_id }}">{{ $fp->cpt_name }}</label>
+                            @endforeach
+                            <div class="clearfix">
+                                <button type="submit" class="btn btn-primary pull-right">@if(!$category->id)생성@else수정@endif</button>
+                            </div>
+                        @else
+                            @foreach($cpts as $cpt)
+                                <input class="form-check-input" type="checkbox" id="chk{{ $cpt->cpt_id }}" value="{{ $cpt->cpt_id }}" @if(in_array($cpt->cpt_id, $cpt_ids)) checked="checked"@endif disabled>
+                                <label class="form-check-label" for="chk{{ $cpt->cpt_id }}">{{ $cpt->cpt_name }}</label>
+                            @endforeach
+                            @foreach($cpts_fp as $fp)
+                                <input class="form-check-input" type="checkbox" id="chk{{ $fp->cpt_id }}" value="{{ $fp->cpt_id }}" @if(in_array($fp->cpt_id, $cpt_ids)) checked="checked"@endif disabled>
+                                <label class="form-check-label" for="chk{{ $fp->cpt_id }}">{{ $fp->cpt_name }}</label>
+                            @endforeach
+                        @endif
                     </div>
                 </div>
             </form>
@@ -72,24 +95,24 @@
 </div>
 
 <div id="dynamic_field_hidden" style="display:none;">
-@foreach($category_items as $item)
-    @foreach((array)$item->dfs as $df)
-        <div class="cate_df_{{ $item->id }} dynamic_field_content">{!! $df !!}</div>
+    @foreach($category_items as $item)
+        @foreach((array)$item->dfs as $df)
+            <div class="cate_df_{{ $item->id }} dynamic_field_content">{!! $df !!}</div>
+        @endforeach
     @endforeach
-@endforeach
 </div>
 
 @if($category->id)
-<script type="text/javascript">
-    $(function () {
-        Category.init({
-            load: '{{ route('df.category.edit.item.children', ['id' => $category->id]) }}',
-            add: '{{ route('df.category.edit.item.store', ['id' => $category->id, 'slug' => $cpt_cate_extra->slug]) }}',
-            modify: '{{ route('df.category.edit.item.update', ['id' => $category->id, 'slug' => $cpt_cate_extra->slug]) }}',
-            remove: '{{ route('df.category.edit.item.destroy', ['id' => $category->id, 'force' => false]) }}',
-            removeAll: '{{ route('df.category.edit.item.destroy', ['id' => $category->id, 'force' => true]) }}',
-            move: '{{ route('df.category.edit.item.move', ['id' => $category->id]) }}'
+    <script type="text/javascript">
+        $(function () {
+            Category.init({
+                load: '{{ route('df.category.edit.item.children', ['id' => $category->id]) }}',
+                add: '{{ route('df.category.edit.item.store', ['id' => $category->id, 'slug' => $cpt_cate_extra->slug]) }}',
+                modify: '{{ route('df.category.edit.item.update', ['id' => $category->id, 'slug' => $cpt_cate_extra->slug]) }}',
+                remove: '{{ route('df.category.edit.item.destroy', ['id' => $category->id, 'force' => false]) }}',
+                removeAll: '{{ route('df.category.edit.item.destroy', ['id' => $category->id, 'force' => true]) }}',
+                move: '{{ route('df.category.edit.item.move', ['id' => $category->id]) }}'
+            });
         });
-    });
-</script>
+    </script>
 @endif
