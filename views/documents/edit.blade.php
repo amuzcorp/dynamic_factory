@@ -1,3 +1,6 @@
+<?php
+$adminRating = \Auth::user()->admin_rating;
+?>
 @section('page_title')
     <div class="clearfix">
         <h2 class="pull-left">{{ $cpt->cpt_name }} 수정</h2>
@@ -81,12 +84,14 @@
                     </div>
                 </div>
             </div>
-            <div class="text-right" style="margin-bottom:15px;">
-                <div class="pull-left">
-                <button type="button" id="trashBtn" class="xe-btn xe-btn-danger-outline" data-url="{{ route('dyFac.setting.trash_cpt_documents', ['id' => $item->id]) }}"><i class="xi-trash"></i> 휴지통</button>
+            @if($adminRating !== 'admin-corp')
+                <div class="text-right" style="margin-bottom:15px;">
+                    <div class="pull-left">
+                        <button type="button" id="trashBtn" class="xe-btn xe-btn-danger-outline" data-url="{{ route('dyFac.setting.trash_cpt_documents', ['id' => $item->id]) }}"><i class="xi-trash"></i> 휴지통</button>
+                    </div>
+                    <button type="submit" class="btn btn-primary"><i class="xi-redo"></i> 업데이트</button>
                 </div>
-                <button type="submit" class="btn btn-primary"><i class="xi-redo"></i> 업데이트</button>
-            </div>
+            @endif
             @if(count($taxonomies) > 0)
                 <div class="panel">
                     <div class="panel-heading"><h4>카테고리</h4></div>
