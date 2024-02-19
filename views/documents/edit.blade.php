@@ -1,5 +1,6 @@
 <?php
 $adminRating = \Auth::user()->admin_rating;
+$cpt_id = $cpt->cpt_id;
 ?>
 @section('page_title')
     <div class="clearfix">
@@ -85,12 +86,14 @@ $adminRating = \Auth::user()->admin_rating;
                 </div>
             </div>
             @if($adminRating !== 'admin-corp')
+                @if(!strpos($cpt_id, 'log'))
                 <div class="text-right" style="margin-bottom:15px;">
                     <div class="pull-left">
                         <button type="button" id="trashBtn" class="xe-btn xe-btn-danger-outline" data-url="{{ route('dyFac.setting.trash_cpt_documents', ['id' => $item->id]) }}"><i class="xi-trash"></i> 휴지통</button>
                     </div>
                     <button type="submit" class="btn btn-primary"><i class="xi-redo"></i> 업데이트</button>
                 </div>
+                @endif
             @endif
             @if(count($taxonomies) > 0)
                 <div class="panel">
