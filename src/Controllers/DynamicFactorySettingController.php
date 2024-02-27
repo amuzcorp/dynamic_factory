@@ -1153,7 +1153,7 @@ class DynamicFactorySettingController extends BaseController
                 /**
                  * 특수 필드 사용 시 조건 추가
                  */
-                if($fieldType->getTableName() === 'field_dynamic_factory_super_relate') {
+                if($fieldType->getTableName() === 'field_dynamic_factory_super_relate' || $fieldType->getTableName() === 'df_super_relate') {
                     /**
                      * RelateCPT 작성 시 2가지 필드만 필요
                      */
@@ -1161,9 +1161,11 @@ class DynamicFactorySettingController extends BaseController
                     //hidden_belong_application
                     $formOrder[] = $column.'_srf_chg';
                     $formOrder[] = 'hidden_'.$column;
+                    $formOrder[] = $column.'_title';
 
                     $excels[0][$column.'_srf_chg'] = $label.' 속성';
                     $excels[0]['hidden_'.$column] = $label.' 리스트';
+                    $excels[0][$column.'_title'] = $label.' 제목';
                 } else {
                     foreach($fieldType->getColumns() as $key => $type) {
                         if($key === 'raw_data' || $key === 'logic_builder') continue;
@@ -1310,6 +1312,15 @@ class DynamicFactorySettingController extends BaseController
                     } else {
                         $excels[$inx][$val] = json_enc($item_realteCptData);
                     }
+                } else if(strpos($val,"_title")) {
+                    $data->hasDocument($relateCptId);
+
+                    $check = $data->hasDocument($relateCptId)->first();
+                    $relate_title = '';
+                    if($check) {
+                        $relate_title = $check->title;
+                    }
+                    $excels[$inx][$val] = $relate_title;
                 }
                 /* Relate Cpt 데이터 기록 json encode */
 
@@ -2036,19 +2047,19 @@ class DynamicFactorySettingController extends BaseController
                     $params[$index]['hidden_'.$relateId][] = $val[$i];
                 }
                 else if(strpos($forms[0][$i],"_srf_chg")) {
-//                    $relateCptId = str_replace('_srf_chg', '', $forms[0][$i]);
-//                    $params[$index][$forms[0][$i]] = $val[$i];
+                    $relateCptId = str_replace('_srf_chg', '', $forms[0][$i]);
+                    $params[$index][$forms[0][$i]] = $val[$i];
                 }
                 //CSV에 기록된 RelateCPT ID 정보 json decode
                 else if($forms[0][$i] === 'hidden_'.$relateCptId) {
-//                    if($val[$i] === '') {
-//                        $params[$index][$forms[0][$i]] = '[]';
-//                    }
-//                    if($val[$i] !== '') {
-//                        $val[$i] = str_replace('|', ',', $val[$i]);
-//                        $params[$index][$forms[0][$i]] = json_dec($val[$i]);
-//                    }
-//                    else $params[$index][$forms[0][$i]] = '[]';
+                    if($val[$i] === '') {
+                        $params[$index][$forms[0][$i]] = '[]';
+                    }
+                    if($val[$i] !== '') {
+                        $val[$i] = str_replace('|', ',', $val[$i]);
+                        $params[$index][$forms[0][$i]] = json_dec($val[$i]);
+                    }
+                    else $params[$index][$forms[0][$i]] = '[]';
                 }
                 //calendar 기록 양식에 맞게 컨버트 [ 0 => 일자 , 1 => 시간 (시:분) ]
                 else if(strpos($forms[0][$i],"_date_start") !== false || strpos($forms[0][$i],"_date_end") !== false) {
