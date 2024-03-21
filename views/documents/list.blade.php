@@ -19,8 +19,6 @@ foreach($data as $id => $value){
 }
 
 $adminRating = \Auth::user()->admin_rating;
-$isNotAdminCorp = $adminRating !== 'admin-corp';
-
 @endphp
 
 @section('page_title')
@@ -62,7 +60,7 @@ $isNotAdminCorp = $adminRating !== 'admin-corp';
                         {!! csrf_field() !!}
                         <input type="hidden" name="cpt_id" value="{{$cpt->cpt_id}}">
                         <div class="pull-right">
-                            @if($isNotAdminCorp === true)
+                            @if($adminRating !== 'admin-corp' && $adminRating !== 'normal')
                             <label class="xe-btn xe-btn-warning-outline">
                                 <i class="xi-icon xi-plus"></i> CSV 등록
                                 <input type="file" class="__xe_file xe-hidden" name="csv_file" accept=".csv" onchange="uploadCSV(this)">
@@ -70,7 +68,7 @@ $isNotAdminCorp = $adminRating !== 'admin-corp';
                             @endif
                             <a onclick="downloadCSV()" class="xe-btn xe-btn-success-outline"><i class="xi-download"></i>CSV 저장</a>
                             <a onclick="downloadExcel()" class="xe-btn xe-btn-primary-outline"><i class="xi-download"></i>엑셀 저장</a>
-                            @if($isNotAdminCorp === true)
+                            @if($adminRating !== 'admin-corp' && $adminRating !== 'normal')
                             <a href="{{ route('dyFac.setting.edit', ['cpt_id' => $cpt->cpt_id]) }}" class="xe-btn xe-btn-positive-outline"><i class="xi-cog"></i> 설정</a>
                             <a href="{{ route($current_route_name, ['type' => 'create']) }}" class="xe-btn xe-btn-primary" data-toggle="xe-page-modal"><i class="xi-file-text-o"></i> {{ sprintf($cpt->labels['new_add_cpt'], $cpt->cpt_name) }}</a>
                             @endif
@@ -79,7 +77,7 @@ $isNotAdminCorp = $adminRating !== 'admin-corp';
                 </div>
 
                 <div class="panel-heading">
-                    @if($isNotAdminCorp === true)
+                    @if($adminRating !== 'admin-corp' && $adminRating !== 'normal')
                     <div class="pull-left">
                         <div class="btn-group __xe_function_buttons" role="group" aria-label="...">
                             <button type="button" class="btn btn-default __xe_button" data-mode="trash">{{xe_trans('xe::trash')}}</button>

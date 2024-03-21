@@ -85,7 +85,7 @@ $cpt_id = $cpt->cpt_id;
                     </div>
                 </div>
             </div>
-            @if($adminRating !== 'admin-corp')
+            @if($adminRating !== 'admin-corp' && $adminRating !== 'normal')
                 @if(!strpos($cpt_id, 'log'))
                 <div class="text-right" style="margin-bottom:15px;">
                     <div class="pull-left">
