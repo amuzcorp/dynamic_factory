@@ -85,8 +85,8 @@ $cpt_id = $cpt->cpt_id;
                     </div>
                 </div>
             </div>
-            @if($adminRating !== 'admin-corp' && $adminRating !== 'normal')
-                @if(!strpos($cpt_id, 'log'))
+            @if($adminRating === 'super' || $adminRating ==='admin-dev' || $adminRating ==='admin-oper')
+                @if(!strpos($cpt_id, 'log') || !strpos($cpt_id, 'pcc') || !strpos($cpt_id, 'rsd'))
                 <div class="text-right" style="margin-bottom:15px;">
                     <div class="pull-left">
                         <button type="button" id="trashBtn" class="xe-btn xe-btn-danger-outline" data-url="{{ route('dyFac.setting.trash_cpt_documents', ['id' => $item->id]) }}"><i class="xi-trash"></i> 휴지통</button>
